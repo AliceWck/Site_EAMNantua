@@ -1,8 +1,24 @@
 import Header from "./Header";
 import Footer from "./Footer";
 import "./Contact.css";
+import React, { useEffect, useState } from "react";
+
 
 export default function Contact() {
+  const [contact, setContact] = useState(null); // 🔧 1. Initialisation
+
+  useEffect(() => {
+    // 🔧 2. Récupération des infos de contact depuis l'API
+    fetch("http://localhost:5000/api/contact")
+      .then((res) => res.json())
+      .then((data) => setContact(data))
+      .catch((err) => console.error("Erreur de chargement des contacts :", err));
+  }, []);
+
+  if (!contact) {
+    return <p>Chargement des informations de contact...</p>;
+  }
+
   return (
     <div className="contact-page">
       <Header />

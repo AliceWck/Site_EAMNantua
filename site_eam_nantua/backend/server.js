@@ -25,3 +25,31 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`✅ Backend démarré sur http://localhost:${PORT}`);
 });
+
+// Données fictives à exposer
+let formulaires = [
+  { id: 1, nom: "Formulaire 1", contenu: "Contenu du formulaire 1" },
+  { id: 2, nom: "Formulaire 2", contenu: "Contenu du formulaire 2" },
+];
+
+let contactInfo = {
+  email: "contact@example.com",
+  phone: "0123456789",
+};
+
+// Route GET pour récupérer les formulaires
+app.get("/api/formulaires", (req, res) => {
+  res.json(formulaires);
+});
+
+// Route GET pour récupérer les infos de contact
+app.get("/api/contact", (req, res) => {
+  res.json(contactInfo);
+});
+
+// Route PUT pour mettre à jour les infos de contact
+app.put("/api/contact", (req, res) => {
+  const { email, phone } = req.body;
+  contactInfo = { email, phone };
+  res.status(200).json({ message: "Contact mis à jour" });
+});
