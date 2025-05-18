@@ -7,8 +7,11 @@ export default function AdminPanel({ onLogout }) {
     const [message, setMessage] = useState("");
     const [contact, setContact] = useState({ phone: "", email: "" });
 
+    const [eventNotes, setEventNotes] = useState([]);
+    const [newNote, setNewNote] = useState({ title: "", content: "" });
+
     useEffect(() => {
-        // Récupération des formulaires
+        // Récupération des formulaires A FAIRE, ICI EXEMPLE
         fetch("http://localhost:5000/api/formulaires")
             .then((res) => res.json())
             .then((data) => setFormulaires(data));
@@ -17,6 +20,10 @@ export default function AdminPanel({ onLogout }) {
         fetch("http://localhost:5000/api/contact")
             .then((res) => res.json())
             .then((data) => setContact(data));
+
+        fetch("http://localhost:5000/api/notes")
+            .then((res) => res.json())  
+            .then((data) => setEventNotes(data));
     }, []);
 
 
@@ -60,6 +67,43 @@ export default function AdminPanel({ onLogout }) {
         }
     };
 
+    const handleAddNote = async () => {
+        if (!newNote.title.trim() || !newNote.content.trim()) return;
+
+        const res = await fetch("http://localhost:5000/api/notes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newNote),
+        });
+
+        if (res.ok) {
+            const savedNote = await res.json();
+            setEventNotes([...eventNotes, savedNote]);
+            setNewNote({ title: "", content: "" });
+            setMessage("✅ Note ajoutée !");
+        }
+    };
+
+    const handleDeleteNote = async (id) => {
+        try {
+            const res = await fetch(`http://localhost:5000/api/notes/${id}`, {
+            method: "DELETE",
+            });
+
+            if (res.ok) {
+            setEventNotes(eventNotes.filter((note) => note.id !== id));
+            setMessage("🗑️ Note supprimée !");
+            } else {
+            setMessage("❌ Échec de la suppression de la note.");
+            }
+        } catch (error) {
+            console.error("Erreur lors de la suppression de la note :", error);
+            setMessage("❌ Une erreur est survenue.");
+        }
+    };
+
+
+
     return (
         <div className="admin-panel">
         <h1><center>Interface d'administration</center></h1>
@@ -92,10 +136,39 @@ export default function AdminPanel({ onLogout }) {
 
         {activeTab === "archives" && (
             <div className="formulaires-tab">
-            <h2>📁 Archives</h2>
-            <p>Ici s'afficheront les anciens formulaires ou inscriptions archivées.</p>
+                <h2>📁 Notes d'événements</h2>
+
+                <div className="note-form">
+                <input
+                    type="text"
+                    placeholder="Titre de la note"
+                    value={newNote.title}
+                    onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
+                />
+                <textarea
+                    placeholder="Contenu de la note"
+                    value={newNote.content}
+                    onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
+                ></textarea>
+                <button onClick={handleAddNote}>➕ Ajouter une note</button>
+                </div>
+
+                {eventNotes.length === 0 ? (
+                <p>Aucune note enregistrée.</p>
+                ) : (
+                <ul className="note-list">
+                    {eventNotes.map((note) => (
+                    <li key={note.id} className="note-item-admin">
+                        <strong>{note.title}</strong><br />
+                        <em>{note.content}</em><br />
+                        <button onClick={() => handleDeleteNote(note.id)}>🗑️ Supprimer</button>
+                    </li>
+                    ))}
+                </ul>
+                )}
             </div>
-        )}
+            )}
+
 
         {activeTab === "accueil" && (
             <div className="formulaires-tab">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import "./Archives.css";
@@ -10,27 +10,22 @@ export default function Photos() {
     { title: "Groupe EAM", slug: "groupe-eam", thumbnail: "/images/photo2.jpg" },
   ];
 
-
-  const notes = [
-    {
-      title: "🎄 Concert de Noël – 12 décembre 2025",
-      content: "Un moment magique avec nos élèves de tous âges. La salle était comble et les performances émouvantes !"
-    },
-    {
-      title: "🎶 Audition de printemps – 22 avril 2025",
-      content: "Nos élèves ont présenté leur travail de l’année devant leurs proches. Beaucoup d’émotion et de fierté."
-    }
-  ];
-
+  const [notes, setNotes] = useState([]);
   const [openNote, setOpenNote] = useState(null);
-  
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/notes")
+      .then((res) => res.json())
+      .then((data) => setNotes(data));
+  }, []);
+
   return (
     <div>
       <Header />
       <main className="photos-container">
         <h1>Archives</h1>
 
-        <h2 className="section-title"><br></br>Galerie Photos</h2>
+        <h2 className="section-title"><br />Galerie Photos</h2>
         <div className="photos-grid">
           {galleries.map((gallery, i) => (
             <Link to={`/evenements/${gallery.slug}`} key={i} className="photo-item">
@@ -40,7 +35,7 @@ export default function Photos() {
           ))}
         </div>
 
-        <h2 className="section-title"><br></br>Carnet d'événements</h2>
+        <h2 className="section-title"><br />Carnet d'événements</h2>
         <div className="notes-grid">
           {notes.map((note, i) => (
             <div key={i} className="note-item" onClick={() => setOpenNote(openNote === i ? null : i)}>
