@@ -1,0 +1,16 @@
+.admin-container {
+  text-align: center;
+  color: #111; /* couleur de texte par défaut */
+}
+
+.admin-title {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #111; /* noir pour le titre principal */
+}
+
+.admin-container p {
+  font-size: 1.2rem;
+  color: #222; /* texte légèrement plus clair que le titre */
+  margin-top: 1rem;
+}

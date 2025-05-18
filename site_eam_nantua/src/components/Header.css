@@ -1,0 +1,76 @@
+.header {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #9381FF;
+  height: auto;
+  padding: 0 1rem;
+  color: white;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: nowrap;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-grow: 1;
+  margin-left: 2rem;
+
+  /* ← d'abord on consomme le padding */
+  padding-right: clamp(0rem, 100vw - 800px, 30rem);
+
+  flex-shrink: 1;
+  min-width: 0;
+  
+}
+
+.logo {
+  height: clamp(50px, 4.5vw, 70px); /* ← peut réduire mais pas trop */
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.logo-link {
+  text-decoration: none;
+}
+
+.nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+
+  /* ← taille texte réactive */
+  font-size: clamp(1rem, 1.4vw, 1.4rem);
+
+  white-space: nowrap;
+  position: relative;
+  flex-shrink: 1;
+}
+
+/* soulignement seulement pour les liens, pas le logo */
+.nav a:not(.logo-link)::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: white;
+  transition: width 0.3s ease;
+}
+
+.nav a:not(.logo-link):hover::after {
+  width: 100%;
+}

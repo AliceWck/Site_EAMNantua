@@ -1,0 +1,21 @@
+.footer {
+  width: 100vw;
+  box-sizing: border-box;
+  background-color: #B8B8FF; 
+  color: white;
+  padding: 1rem 2rem;
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.footer a {
+  color: white;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.footer a:hover {
+  color: #d1caff;
+}

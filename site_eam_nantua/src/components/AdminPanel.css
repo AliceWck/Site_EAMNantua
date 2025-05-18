@@ -1,0 +1,78 @@
+.admin-tabs {
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.admin-tabs button {
+  padding: 0.6rem 1.2rem;
+  background-color: #B8B8FF;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #333;
+}
+
+.admin-tabs button:hover {
+  background-color: #9381FF;
+  color: white;
+}
+
+.formulaires-tab {
+  text-align: center;
+}
+
+.formulaire-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.formulaire-list li {
+  background-color: #fff;
+  margin-bottom: 0.5rem;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.formulaire-list li button {
+  background-color: #FF6B6B;
+  border: none;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.formulaire-list li button:hover {
+  background-color: #e34c4c;
+}
+
+.admin-message {
+  margin-top: 1rem;
+  font-weight: bold;
+  color: #008000;
+}
+
+.logout-button {
+  padding: 0.7rem 1.2rem;
+  background-color: #ffd8be;
+  color: #333;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  
+}
+
+.logout-button:hover {
+  background-color: #ffc9a9;
+}

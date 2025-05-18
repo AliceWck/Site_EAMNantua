@@ -1,0 +1,90 @@
+.photos-container {
+  padding: 2rem;
+  text-align: center;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: #222; /* Texte noir/gris foncé */
+  margin-bottom: 1.5rem;
+}
+
+
+.section-title {
+  font-size: 1.5rem;
+  color: #333;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.photos-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.photo-item {
+  width: 200px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f9f9f9;
+  transition: transform 0.2s;
+}
+
+.photo-item:hover {
+  transform: scale(1.05);
+}
+
+.photo-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.photo-caption {
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.notes-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.note-item {
+  width: 100%;
+  max-width: 600px;
+  background: #f4f4f4;
+  border-radius: 10px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+  border: 2px solid #ccc;
+}
+
+.note-item:hover {
+  background: #eaeaea;
+}
+
+.note-title {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.note-content {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.4;
+}

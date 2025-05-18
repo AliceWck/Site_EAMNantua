@@ -1,0 +1,36 @@
+.accueil-background {
+  background-image: url('/im1.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 70vh;
+  display: flex;
+  align-items: flex-start; /* ← met le contenu en haut */
+  justify-content: center;
+  padding-top: 4rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  text-align: center;
+}
+
+.accueil-content {
+  max-width: 900px;
+}
+
+.accueil-container h1{
+  text-align: center;
+  margin-top: 20vw;
+  color: #ffffff !important; 
+}
+
+.accueil-title {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #111; /* noir pour le titre principal */
+}
+
+.accueil-container p {
+  font-size: 1.2rem;
+  color: #d1d1d1 !important; /* texte légèrement plus clair que le titre */
+  margin-top: 1rem;
+}
