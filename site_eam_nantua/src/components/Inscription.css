@@ -49,3 +49,18 @@
     transform: translateY(0);
   }
 }
+
+
+.formulaire-item-bloc {
+  margin-bottom: 3rem;
+  padding: 1.5rem;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.formulaire-item-bloc:hover {
+  transform: translateY(-4px);
+}

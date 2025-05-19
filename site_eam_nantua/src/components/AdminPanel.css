@@ -22,6 +22,7 @@
 
 .formulaires-tab {
   text-align: center;
+  margin-top: 3rem;
 }
 
 .formulaire-list {
@@ -62,17 +63,88 @@
 }
 
 .logout-button {
-  padding: 0.7rem 1.2rem;
-  background-color: #ffd8be;
-  color: #333;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  
+    padding: 0.7rem 1.2rem;
+    background-color: #ffd8be;
+    color: #333;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 2rem auto;
+    display: block;
+    padding: 10px 20px;
+    font-size: 1rem;
+
 }
 
 .logout-button:hover {
   background-color: #ffc9a9;
 }
+
+.note-form input,
+.note-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.note-title-input {
+  font-weight: bold;
+}
+
+.note-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.note-item-admin {
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.add-form-section {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.form-input {
+  width: 70%;
+  padding: 0.6rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.form-actions button {
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  background-color: #6ec6ff;
+  color: #fff;
+  transition: background-color 0.3s ease;
+}
+
+.form-actions button:hover {
+  background-color: #4aa8e4;
+}
+
+
+

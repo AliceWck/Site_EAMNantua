@@ -10,7 +10,7 @@ export default function Photos() {
     { title: "Groupe EAM", slug: "groupe-eam", thumbnail: "/images/photo2.jpg" },
   ];
 
-  const [notes, setNotes] = useState([]);
+  const [newNote, setNewNote] = useState({ title: "", content: "", date: "" });
   const [openNote, setOpenNote] = useState(null);
 
   useEffect(() => {
