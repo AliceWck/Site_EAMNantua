@@ -283,7 +283,7 @@ export default function AdminPanel({ onLogout }) {
         )}
 
         {activeTab === "contact" && (
-            <div className="formulaires-tab">
+            <div className="contact-admin-container">
                 <h2>📬 Informations de contact</h2>
                 <p>Modifier les coordonnées de contact ou messages affichés.</p>
 

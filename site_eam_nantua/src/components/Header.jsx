@@ -15,6 +15,7 @@ export default function Header() {
           <Link to="/inscription">Inscription</Link>
           <Link to="/archives">Archives</Link>
           <Link to="/presentation">Qui sommes-nous</Link>
+          <Link to="/equipe">L'équipe</Link>
           <Link to="/contact">Nous contacter</Link>
         </div>
       </nav>

@@ -35,11 +35,6 @@ app.get("/", (req, res) => {
 
 
 
-let contactInfo = {
-  email: "contact@example.com",
-  phone: "0123456789",
-};
-
 let notesArray = [
   { id: 1, title: "Note A", content: "Contenu A", date: "2024-05-01" },
   { id: 2, title: "Note B", content: "Contenu B", date: "2024-05-10" },
@@ -49,18 +44,47 @@ let notesArray = [
 
 
 /////////// CONTACT
-// Route GET pour récupérer les infos de contact
+const contactFilePath = path.join(dataDir, "contact.json");
+
+if (!fs.existsSync(contactFilePath)) {
+  fs.writeFileSync(contactFilePath, JSON.stringify({ email: "", phone: "" }, null, 2));
+}
+
+// Helper pour lire/écrire les contacts
+function loadContact() {
+  const raw = fs.readFileSync(contactFilePath, "utf-8");
+  return JSON.parse(raw);
+}
+
+function saveContact(data) {
+  fs.writeFileSync(contactFilePath, JSON.stringify(data, null, 2), "utf-8");
+}
+
+// GET : lire les infos de contact depuis contact.json
 app.get("/api/contact", (req, res) => {
-  res.json(contactInfo);
+  try {
+    const contact = loadContact();
+    res.json(contact);
+  } catch (err) {
+    console.error("Erreur lecture contact :", err);
+    res.status(500).json({ message: "Erreur de lecture des informations de contact" });
+  }
 });
 
-// Route PUT pour mettre à jour les infos de contact
+// PUT : mettre à jour les infos de contact dans contact.json
 app.put("/api/contact", (req, res) => {
   const { email, phone } = req.body;
-  contactInfo = { email, phone };
-  res.status(200).json({ message: "Contact mis à jour" });
-});
+  if (!email || !phone) return res.status(400).json({ message: "Email et téléphone requis" });
 
+  try {
+    const updated = { email, phone };
+    saveContact(updated);
+    res.status(200).json({ message: "Contact mis à jour" });
+  } catch (err) {
+    console.error("Erreur sauvegarde contact :", err);
+    res.status(500).json({ message: "Erreur lors de l'enregistrement des contacts" });
+  }
+});
 
 
 

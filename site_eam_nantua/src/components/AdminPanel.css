@@ -148,3 +148,65 @@
 
 
 
+
+
+.contact-admin-container {
+  max-width: 600px;
+  margin: 3rem auto;
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.contact-admin-container h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.contact-admin-container p {
+  text-align: center;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+.contact-admin-container label {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.contact-admin-container input {
+  padding: 0.8rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #f9f9f9;
+  margin-top: 0.4rem;
+  color: #000;
+}
+
+.contact-admin-container button {
+  align-self: center;
+  display: block;
+  margin: 1.5rem auto 0;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #B8B8FF;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.contact-admin-container button:hover {
+  background-color: #9381FF;
+  color: rgb(245, 245, 245);
+}
+
+

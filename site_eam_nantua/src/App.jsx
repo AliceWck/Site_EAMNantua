@@ -6,6 +6,8 @@ import Admin from "./components/Admin";
 import Contact from "./components/Contact";
 import Presentation from "./components/Presentation";
 import EvenementPage from "./components/EvenementPage";
+import Equipe from "./components/Equipe";
+
 
 export default function App() {
   return (
@@ -19,6 +21,7 @@ export default function App() {
           <Route path="/presentation" element={<Presentation />} />
           <Route path="/archives" element={<Archives />} />
           <Route path="/evenements/:slug" element={<EvenementPage />} />
+          <Route path="/equipe" element={<Equipe />} />
         </Routes>
       </Router>
     </div>

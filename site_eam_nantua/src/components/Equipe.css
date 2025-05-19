@@ -1,0 +1,67 @@
+.equipe-page {
+  background-color: #f9f9fc;
+  font-family: "Segoe UI", sans-serif;
+  color: #333;
+}
+
+.equipe-main {
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: auto;
+  text-align: center;
+}
+
+.equipe-main h1 {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.equipe-intro {
+  font-size: 1.1rem;
+  margin-bottom: 2.5rem;
+  color: #555;
+}
+
+.equipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+  padding: 0 1rem;
+  justify-items: center;
+}
+
+.equipe-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  max-width: 250px;
+  text-align: center;
+}
+
+.equipe-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.12);
+}
+
+.equipe-photo {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.equipe-nom {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin: 0.4rem 0 0.2rem;
+}
+
+.equipe-poste {
+  font-size: 0.95rem;
+  color: #666;
+  margin: 0;
+}
