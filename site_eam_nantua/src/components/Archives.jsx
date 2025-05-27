@@ -10,14 +10,21 @@ export default function Photos() {
     { title: "Groupe EAM", slug: "groupe-eam", thumbnail: "/images/photo2.jpg" },
   ];
 
-  const [newNote, setNewNote] = useState({ title: "", content: "", date: "" });
+  // const [notes, setNotes] = useState({ title: "", content: "", date: "" });
+  const [notes, setNotes] = useState([]);
+
   const [openNote, setOpenNote] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/notes")
-      .then((res) => res.json())
-      .then((data) => setNotes(data));
+  fetch("http://localhost:5000/api/notes")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Notes reçues :", data); // 🐞 Vérifie ce que tu reçois
+      setNotes(Array.isArray(data) ? data : []);
+    })
+    .catch((err) => console.error("Erreur fetch notes :", err));
   }, []);
+
 
   return (
     <div>
