@@ -42,6 +42,7 @@ export default function AdminLogin({ onLogin }) {
         </form>
         {error && <p className="error">{error}</p>}
 
+        <p></p>
         <Link to="/">⬅️ Retour au site</Link>
 
       </div>

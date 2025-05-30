@@ -9,7 +9,7 @@ export default function Accueil() {
       <main className="accueil-background">
         <div className="accueil-content">
           <h1 className="accueil-title">
-            Bienvenue sur le site de l’Ecole des Arts et Musique du Nantua
+            Ecole des Arts et Musique du Haut-Bugey
           </h1>
           <p>Ceci est la page d’accueil.</p>
         </div>

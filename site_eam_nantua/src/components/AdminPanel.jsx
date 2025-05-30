@@ -18,6 +18,8 @@ export default function AdminPanel({ onLogout }) {
     const [nouveauMembre, setNouveauMembre] = useState({ nom: "", poste: "", photo: "" });
     const [photoFile, setPhotoFile] = useState(null);
 
+    const [saveMessage, setSaveMessage] = useState("");
+
 
 
     useEffect(() => {
@@ -31,12 +33,18 @@ export default function AdminPanel({ onLogout }) {
             .then((res) => res.json())
             .then((data) => setContact(data));
 
+        // fetch("http://localhost:5000/api/notes")
+        //     .then((res) => res.json())
+        //     .then((data) => {
+        //         const sorted = data.sort((a, b) => new Date(a.date) - new Date(b.date));
+        //         setEventNotes(sorted);
+        //     });
         fetch("http://localhost:5000/api/notes")
             .then((res) => res.json())
             .then((data) => {
-                const sorted = data.sort((a, b) => new Date(a.date) - new Date(b.date));
-                setEventNotes(sorted);
-            });
+                setEventNotes(data); // ne pas trier ici
+        });
+
 
         fetch("http://localhost:5000/api/equipe")
             .then((res) => res.json())
@@ -51,6 +59,12 @@ export default function AdminPanel({ onLogout }) {
             callback();
         }
     };
+
+    const showSaveMessage = (msg) => {
+        setSaveMessage(msg);
+        setTimeout(() => setSaveMessage(""), 3000); // disparaît après 3 sec
+    };
+
 
 
     //////////// CONTACT
@@ -184,9 +198,30 @@ export default function AdminPanel({ onLogout }) {
 
         if (targetIndex < 0 || targetIndex >= newNotes.length) return;
 
+        // Échange des positions
         [newNotes[index], newNotes[targetIndex]] = [newNotes[targetIndex], newNotes[index]];
+
         setEventNotes(newNotes);
+
+        // 📨 Enregistrement côté serveur
+        fetch("http://localhost:5000/api/notes/reorder", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newNotes)
+        })
+        .then((res) => {
+            if (!res.ok) throw new Error("Erreur serveur");
+            showSaveMessage("✅ Ordre des notes enregistré");
+        })
+        .catch((err) => {
+            console.error("❌ Erreur lors de la sauvegarde :", err);
+            showSaveMessage("❌ Erreur enregistrement ordre des notes");
+        });
+
     };
+
 
 
 
@@ -347,6 +382,12 @@ export default function AdminPanel({ onLogout }) {
         {activeTab === "archives" && (
             <div className="formulaires-tab">
                 <h2>📁 Notes d'événements</h2>
+
+                {saveMessage && (
+                    <div className="save-message">
+                        {saveMessage}
+                    </div>
+                )}
 
                 <div className="note-form">
                     <input

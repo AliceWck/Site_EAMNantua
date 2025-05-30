@@ -1,11 +1,5 @@
 [
   {
-    "id": 1748633981300,
-    "nom": "Vic",
-    "poste": "vc",
-    "photo": "/images/equipe/1748633981276-photo2.jpg"
-  },
-  {
     "id": 1748634013776,
     "nom": "qq",
     "poste": "qq",
@@ -16,5 +10,11 @@
     "nom": "Aloicedza",
     "poste": "dzjijdez",
     "photo": "https://media.sproutsocial.com/uploads/2022/06/profile-picture.jpeg"
+  },
+  {
+    "id": 1748643416447,
+    "nom": "zozi",
+    "poste": "zuzu",
+    "photo": "/images/equipe/1748643416440-tÃ©lÃ©chargement.jpeg"
   }
 ]

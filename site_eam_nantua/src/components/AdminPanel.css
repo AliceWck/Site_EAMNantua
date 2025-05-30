@@ -147,6 +147,16 @@
 }
 
 
+.save-message {
+  background-color: #e0ffe0;
+  color: #1a571a;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #b2d8b2;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
 
 
 

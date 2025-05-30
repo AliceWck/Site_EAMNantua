@@ -9,6 +9,7 @@ import Contact from "./components/Contact";
 import Presentation from "./components/Presentation";
 import EvenementPage from "./components/EvenementPage";
 import Equipe from "./components/Equipe";
+import Mentions from "./components/Mentions";
 
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/archives" element={<Archives />} />
           <Route path="/evenements/:slug" element={<EvenementPage />} />
           <Route path="/equipe" element={<Equipe />} />
+          <Route path="/mentions" element={<Mentions />} />
         </Routes>
       </Router>
     </div>

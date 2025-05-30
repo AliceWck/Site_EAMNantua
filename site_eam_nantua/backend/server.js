@@ -144,11 +144,17 @@ app.delete("/api/notes/:id", (req, res) => {
 // Notes — REORDER
 app.post("/api/notes/reorder", (req, res) => {
   const newOrder = req.body;
-  if (Array.isArray(newOrder)) {
-    notesArray = newOrder;
+
+  if (!Array.isArray(newOrder)) {
+    return res.status(400).json({ message: "Format invalide (tableau attendu)" });
+  }
+
+  try {
+    saveNotes(newOrder);
     res.status(200).json({ message: "Ordre des notes mis à jour" });
-  } else {
-    res.status(400).json({ message: "Format invalide" });
+  } catch (err) {
+    console.error("Erreur enregistrement ordre notes :", err);
+    res.status(500).json({ message: "Erreur serveur" });
   }
 });
 
