@@ -1,3 +1,5 @@
+// Penser à histoire de proxy
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Accueil from "./components/Accueil";
 import Archives from "./components/Archives";

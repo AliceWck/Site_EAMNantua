@@ -1,37 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import "./Equipe.css";
 
-const equipe = [
-  {
-    nom: "Claire Dubois",
-    poste: "Directrice",
-    photo: "/images/equipe/claire.jpg",
-  },
-  {
-    nom: "Jean Martin",
-    poste: "Professeur de piano",
-    photo: "/images/equipe/jean.jpg",
-  },
-  {
-    nom: "Lucie Morel",
-    poste: "Professeure de chant",
-    photo: "/images/equipe/lucie.jpg",
-  },
-  {
-    nom: "Marc Lefevre",
-    poste: "Professeur de guitare",
-    photo: "/images/equipe/marc.jpg",
-  },
-  {
-    nom: "Sophie Lambert",
-    poste: "Assistante administrative",
-    photo: "/images/equipe/sophie.jpg",
-  },
-];
-
 export default function Equipe() {
+  const [equipe, setEquipe] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [erreur, setErreur] = useState(null);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/equipe")
+      .then((res) => {
+        if (!res.ok) throw new Error("Erreur de chargement");
+        return res.json();
+      })
+      .then((data) => {
+        setEquipe(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Erreur fetch équipe :", err);
+        setErreur("Impossible de charger l'équipe.");
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <div className="equipe-page">
       <Header />
@@ -40,17 +33,27 @@ export default function Equipe() {
         <p className="equipe-intro">
           Découvrez l’équipe pédagogique et administrative qui fait vivre l'école.
         </p>
-        <div className="equipe-grid">
-          {equipe.map((personne, index) => (
-            <div className="equipe-card" key={index}>
-              <div className="equipe-photo-wrapper">
-                <img src={personne.photo} alt={personne.nom} className="equipe-photo" />
+
+        {loading && <p>Chargement de l’équipe...</p>}
+        {erreur && <p className="error">{erreur}</p>}
+
+        {!loading && !erreur && (
+          <div className="equipe-grid">
+            {equipe.map((personne) => (
+              <div className="equipe-card" key={personne.id}>
+                <div className="equipe-photo-wrapper">
+                  <img
+                    src={personne.photo || "/images/equipe/avatardefaut.png"}
+                    alt={personne.nom}
+                    className="equipe-photo"
+                  />
+                </div>
+                <h3 className="equipe-nom">{personne.nom}</h3>
+                <p className="equipe-poste">{personne.poste}</p>
               </div>
-              <h3 className="equipe-nom">{personne.nom}</h3>
-              <p className="equipe-poste">{personne.poste}</p>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </main>
       <Footer />
     </div>

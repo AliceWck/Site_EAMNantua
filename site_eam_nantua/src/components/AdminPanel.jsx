@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import "./AdminPanel.css";
 
+
 export default function AdminPanel({ onLogout }) {
     const [activeTab, setActiveTab] = useState("formulaires");
     const [formulaires, setFormulaires] = useState([]);
+
     const [message, setMessage] = useState("");
     const [contact, setContact] = useState({ phone: "", email: "" });
 
@@ -11,6 +13,12 @@ export default function AdminPanel({ onLogout }) {
     const [newNote, setNewNote] = useState({ title: "", content: "" });
 
     const [newForm, setNewForm] = useState({ name: "", url: "" });
+
+    const [equipe, setEquipe] = useState([]);
+    const [nouveauMembre, setNouveauMembre] = useState({ nom: "", poste: "", photo: "" });
+    const [photoFile, setPhotoFile] = useState(null);
+
+
 
     useEffect(() => {
         // Récupération des formulaires A FAIRE, ICI EXEMPLE
@@ -29,6 +37,11 @@ export default function AdminPanel({ onLogout }) {
                 const sorted = data.sort((a, b) => new Date(a.date) - new Date(b.date));
                 setEventNotes(sorted);
             });
+
+        fetch("http://localhost:5000/api/equipe")
+            .then((res) => res.json())
+            .then((data) => setEquipe(data));
+
     }, []);
 
 
@@ -39,6 +52,8 @@ export default function AdminPanel({ onLogout }) {
         }
     };
 
+
+    //////////// CONTACT
 
     const handleContactChange = (e) => {
     const { name, value } = e.target;
@@ -57,6 +72,12 @@ export default function AdminPanel({ onLogout }) {
     };
 
 
+
+
+
+    //////////////// FORMULAIRES
+
+
     const handleAddForm = (nouveauFormulaire) => {
         // Générer un ID temporaire ou unique
         const idTemp = Date.now().toString();
@@ -67,8 +88,6 @@ export default function AdminPanel({ onLogout }) {
         setMessage("📝 Formulaire ajouté localement. Cliquez sur 'Enregistrer' pour appliquer.");
         setNewForm({ name: "", url: "" });
     };
-
-
 
 
     const handleDeleteForm = async (id) => {
@@ -120,6 +139,10 @@ export default function AdminPanel({ onLogout }) {
     };
 
 
+
+
+    //////////// ARCHIVES
+
     const handleAddNote = async () => {
         if (!newNote.title.trim() || !newNote.content.trim()) return;
 
@@ -167,6 +190,102 @@ export default function AdminPanel({ onLogout }) {
 
 
 
+    ///////////// EQUIPE
+
+    const uploadPhoto = async () => {
+        if (!photoFile) return null;
+
+        const formData = new FormData();
+        formData.append("photo", photoFile);
+
+        const res = await fetch("http://localhost:5000/api/upload-photo", {
+            method: "POST",
+            body: formData,
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            return data.url;
+        } else {
+            setMessage("❌ Erreur lors de l’upload de la photo.");
+            return null;
+        }
+    };
+
+
+    const handleAddMembre = async () => {
+        if (!nouveauMembre.nom || !nouveauMembre.poste) return;
+
+        let photoUrl = nouveauMembre.photo;
+
+        // Si un fichier est sélectionné et pas d'URL manuelle
+        if (photoFile && !photoUrl) {
+            photoUrl = await uploadPhoto();
+            if (!photoUrl) return; // arrêt si l'upload échoue
+        }
+
+        const membreToAdd = { ...nouveauMembre, photo: photoUrl };
+
+        const res = await fetch("http://localhost:5000/api/equipe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(membreToAdd),
+        });
+
+        if (res.ok) {
+            const saved = await res.json();
+            setEquipe([...equipe, saved]);
+            setNouveauMembre({ nom: "", poste: "", photo: "" });
+            setPhotoFile(null);
+            setMessage("✅ Membre ajouté !");
+        } else {
+            setMessage("❌ Erreur ajout membre.");
+        }
+    };
+
+
+
+    const handleDeleteMembre = async (id) => {
+        const res = await fetch(`http://localhost:5000/api/equipe/${id}`, { method: "DELETE" });
+        if (res.ok) {
+            setEquipe(equipe.filter((m) => m.id !== id));
+            setMessage("🗑️ Membre supprimé.");
+        } else {
+            setMessage("❌ Suppression échouée.");
+        }
+    };
+
+    const moveMembre = (index, direction) => {
+        const newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= equipe.length) return;
+
+        const newEquipe = [...equipe];
+        const temp = newEquipe[index];
+        newEquipe[index] = newEquipe[newIndex];
+        newEquipe[newIndex] = temp;
+
+        setEquipe(newEquipe);
+
+        // ✅ Envoie la nouvelle liste via fetch
+        fetch("/api/equipe/reorder", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newEquipe),
+        })
+            .then((res) => {
+            if (!res.ok) throw new Error("Erreur serveur");
+            console.log("Ordre de l’équipe mis à jour");
+            })
+            .catch((err) => {
+            console.error("Erreur lors de la sauvegarde :", err);
+            });
+    };
+
+
+
+
 
     return (
         <div className="admin-panel">
@@ -177,8 +296,11 @@ export default function AdminPanel({ onLogout }) {
             <button onClick={() => setActiveTab("archives")}>📁 Archives</button>
             <button onClick={() => setActiveTab("accueil")}>🏠 Accueil</button>
             <button onClick={() => setActiveTab("contact")}>📬 Contact</button>
+            <button onClick={() => setActiveTab("equipe")}>👥 Équipe</button>
         </div>
 
+
+        
         {activeTab === "formulaires" && (
             <div className="formulaires-tab">
                 <h2>📄 Liens de formulaires d'inscription</h2>
@@ -312,6 +434,71 @@ export default function AdminPanel({ onLogout }) {
                 <button onClick={handleSaveContact}>💾 Enregistrer</button>
             </div>
             )}
+
+        {activeTab === "equipe" && (
+            <div className="formulaires-tab">
+                <h2>👥 Membres de l'équipe</h2>
+
+                {equipe.length === 0 ? (
+                    <p>Aucun membre pour l’instant.</p>
+                    ) : (
+                    <div className="equipe-grid">
+                        {equipe.map((m, index) => (
+                        <div className="equipe-card" key={m.id}>
+                            {m.photo && (
+                            <img src={m.photo} alt={m.nom} className="equipe-photo" />
+                            )}
+                            <h3>{m.nom}</h3>
+                            <p>{m.poste}</p>
+
+                            <div className="flex justify-center gap-2 mt-2">
+                            <button disabled={index === 0} onClick={() => moveMembre(index, -1)}>⬅️</button>
+                            <button disabled={index === equipe.length - 1} onClick={() => moveMembre(index, 1)}>➡️</button>
+                            </div>
+
+                            <button onClick={() => handleDeleteMembre(m.id)} style={{ marginTop: '0.5rem' }}>🗑️ Supprimer</button>
+                        </div>
+                        ))}
+                    </div>
+                    )}
+
+                <h3 style={{ marginTop: "2rem" }}>➕ Ajouter un membre</h3>
+                <div className="add-form-section">
+                <input
+                    type="text"
+                    placeholder="Nom"
+                    value={nouveauMembre.nom}
+                    onChange={(e) => setNouveauMembre({ ...nouveauMembre, nom: e.target.value })}
+                    className="form-input"
+                />
+                <input
+                    type="text"
+                    placeholder="Poste"
+                    value={nouveauMembre.poste}
+                    onChange={(e) => setNouveauMembre({ ...nouveauMembre, poste: e.target.value })}
+                    className="form-input"
+                />
+                <input
+                    type="text"
+                    placeholder="URL de la photo (optionnel)"
+                    value={nouveauMembre.photo}
+                    onChange={(e) => setNouveauMembre({ ...nouveauMembre, photo: e.target.value })}
+                    className="form-input"
+                />
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setPhotoFile(e.target.files[0])}
+                    className="form-input"
+                />
+                <small>Choisir un fichier OU entrer une URL ci-dessus.</small>
+
+                
+                <button onClick={handleAddMembre}>Ajouter</button>
+                </div>
+            </div>
+            )}
+
 
 
         {message && <div className="admin-message">{message}</div>}

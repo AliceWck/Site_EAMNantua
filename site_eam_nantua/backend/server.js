@@ -3,6 +3,30 @@ const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 
+const multer = require("multer");
+
+// Dossier de destination pour les images
+const uploadDir = path.join(__dirname, "..", "public", "images", "equipe");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Configurer multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    // Nettoyer le nom du fichier pour éviter les conflits
+    const safeName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
+    cb(null, safeName);
+  },
+});
+
+const upload = multer({ storage });
+
+
 const app = express();
 const PORT = 5000;
 
@@ -196,7 +220,108 @@ app.use((err, req, res, next) => {
 });
 
 
+app.use("/images", express.static(path.join(__dirname, "..", "public", "images")));
+
 
 app.listen(PORT, () => {
   console.log(`✅ Backend démarré sur http://localhost:${PORT}`);
 });
+
+
+
+
+////////// ÉQUIPE
+const equipeFilePath = path.join(dataDir, "equipe.json");
+
+// Init fichier si vide
+if (!fs.existsSync(equipeFilePath)) {
+  fs.writeFileSync(equipeFilePath, JSON.stringify([], null, 2));
+}
+
+// Helper pour lire/écrire l'équipe
+function loadEquipe() {
+  const raw = fs.readFileSync(equipeFilePath, "utf-8");
+  return JSON.parse(raw);
+}
+
+function saveEquipe(data) {
+  fs.writeFileSync(equipeFilePath, JSON.stringify(data, null, 2), "utf-8");
+}
+
+// GET équipe
+app.get("/api/equipe", (req, res) => {
+  try {
+    const equipe = loadEquipe();
+    res.json(equipe);
+  } catch (err) {
+    console.error("Erreur lecture équipe :", err);
+    res.status(500).json({ message: "Erreur lecture équipe" });
+  }
+});
+
+// POST ajout membre
+app.post("/api/equipe", (req, res) => {
+  const { nom, poste, photo } = req.body;
+  if (!nom || !poste) return res.status(400).json({ message: "Nom et poste requis" });
+
+  try {
+    const equipe = loadEquipe();
+    const nouveauMembre = { id: Date.now(), nom, poste, photo };
+    equipe.push(nouveauMembre);
+    saveEquipe(equipe);
+    res.status(201).json(nouveauMembre);
+  } catch (err) {
+    console.error("Erreur ajout membre :", err);
+    res.status(500).json({ message: "Erreur ajout membre" });
+  }
+});
+
+
+// Route pour uploader une image d’équipe
+app.post("/api/upload-photo", upload.single("photo"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "Aucun fichier envoyé" });
+  }
+
+  const relativePath = `/images/equipe/${req.file.filename}`;
+  res.status(200).json({ url: relativePath });
+});
+
+
+// DELETE membre
+app.delete("/api/equipe/:id", (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const equipe = loadEquipe();
+    const updatedEquipe = equipe.filter(m => m.id !== id);
+
+    if (equipe.length === updatedEquipe.length) {
+      return res.status(404).json({ message: "Membre non trouvé" });
+    }
+
+    saveEquipe(updatedEquipe);
+    res.status(200).json({ message: "Membre supprimé" });
+  } catch (err) {
+    console.error("Erreur suppression membre :", err);
+    res.status(500).json({ message: "Erreur suppression membre" });
+  }
+});
+
+
+
+app.post("/api/equipe/reorder", (req, res) => {
+  const newOrder = req.body;
+
+  if (!Array.isArray(newOrder)) {
+    return res.status(400).json({ message: "Format invalide (tableau attendu)" });
+  }
+
+  try {
+    saveEquipe(newOrder);
+    res.status(200).json({ message: "Ordre de l’équipe mis à jour" });
+  } catch (err) {
+    console.error("Erreur enregistrement ordre équipe :", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
