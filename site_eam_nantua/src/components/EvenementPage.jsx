@@ -1,37 +1,51 @@
+import { useEffect, useState } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import "./EvenementPage.css";
 import { useParams, useNavigate } from "react-router-dom";
 
-
 export default function EvenementPage() {
-  const { slug } = useParams();
+  const { slug } = useParams(); // slug = id de la galerie
   const navigate = useNavigate();
+  const [gallery, setGallery] = useState(null);
 
-  // ⚠️ temporaire : photos en dur pour chaque slug
-  const allPhotos = {
-    "tournoi-2023": [
-      "/images/tournoi2023/1.jpg",
-      "/images/tournoi2023/2.jpg",
-    ],
-    "groupe-eam": [
-      "/images/eam/1.jpg",
-      "/images/eam/2.jpg",
-    ]
-  };
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const res = await fetch("/api/galleries");
+        const data = await res.json();
+        const found = data.find((g) => g.id === slug);
+        setGallery(found);
+      } catch (err) {
+        console.error("Erreur chargement galerie :", err);
+      }
+    };
 
-  const photos = allPhotos[slug] || [];
+    fetchGallery();
+  }, [slug]);
+
+  if (!gallery) {
+    return (
+      <div>
+        <Header />
+        <main className="evenement-container">
+          <p>Chargement...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div>
       <Header />
       <main className="evenement-container">
         <button className="back-button" onClick={() => navigate(-1)}>← Retour</button>
-        <h1>{slug.replace("-", " ").toUpperCase()}</h1>
+        <h1>{gallery.title}</h1>
         <div className="photos-grid">
-          {photos.map((src, i) => (
+          {gallery.images?.map((src, i) => (
             <div key={i} className="photo-item">
-              <img src={src} alt={`Photo ${i + 1}`} />
+              <img src={typeof src === "string" ? src : src.url} alt={`Photo ${i + 1}`} />
             </div>
           ))}
         </div>

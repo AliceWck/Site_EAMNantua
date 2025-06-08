@@ -71,3 +71,16 @@
   color: #666;
   margin: 0;
 }
+
+.equipe-section {
+  margin-bottom: 3rem;
+}
+
+.equipe-section h2 {
+  font-size: 1.6rem;
+  margin-bottom: 1.5rem;
+  color: #1e293b;
+  border-bottom: 2px solid #ddd;
+  display: inline-block;
+  padding-bottom: 0.3rem;
+}

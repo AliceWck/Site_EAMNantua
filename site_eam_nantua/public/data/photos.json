@@ -1,4 +1,12 @@
 [
-  { "url": "/images/photo1.jpg", "caption": "Tournoi 2023" },
-  { "url": "/images/photo2.jpg", "caption": "Groupe EAM" }
+  {
+    "id": "dezdez",
+    "title": "de",
+    "images": [
+      "/images/photos/dezdez/1749395839397.jpeg",
+      "/images/photos/dezdez/1749395839411.jpeg",
+      "/images/photos/dezdez/1749395839421.jpeg",
+      "/images/photos/dezdez/1749395839431.jpeg"
+    ]
+  }
 ]

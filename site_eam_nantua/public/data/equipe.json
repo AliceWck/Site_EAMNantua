@@ -1,20 +1,37 @@
 [
   {
-    "id": 1748634013776,
-    "nom": "qq",
-    "poste": "qq",
-    "photo": "/images/equipe/1748634013752-photo1.jpg"
+    "id": 1749425324438,
+    "nom": "jo",
+    "poste": "hiohjio",
+    "photo": "/images/equipe/1749425324425-860_hogwartslegacy2.jpg",
+    "type": "CA"
   },
   {
-    "id": 1748633953458,
-    "nom": "Aloicedza",
-    "poste": "dzjijdez",
-    "photo": "https://media.sproutsocial.com/uploads/2022/06/profile-picture.jpeg"
+    "id": 1749425336255,
+    "nom": "nknkj",
+    "poste": "jp",
+    "photo": "",
+    "type": "prof"
   },
   {
-    "id": 1748643416447,
-    "nom": "zozi",
-    "poste": "zuzu",
-    "photo": "/images/equipe/1748643416440-tÃ©lÃ©chargement.jpeg"
+    "id": 1749425377632,
+    "nom": "jionjkn",
+    "poste": "jio",
+    "photo": "/images/equipe/1749425377617-tÃ©lÃ©chargement.jpeg",
+    "type": "CA"
+  },
+  {
+    "id": 1749425386375,
+    "nom": "cds",
+    "poste": "njvr",
+    "photo": "",
+    "type": "prof"
+  },
+  {
+    "id": 1749425415276,
+    "nom": "njkdnjkcds",
+    "poste": "njkcsd",
+    "photo": "/images/equipe/1749425415265-ð¬ð­ðð²_ð¦ð.jpeg",
+    "type": "prof"
   }
 ]

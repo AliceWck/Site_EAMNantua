@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const fs = require("fs");
+const fs = require("fs-extra");
 const path = require("path");
 
 const multer = require("multer");
@@ -24,7 +24,9 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+const uploadEquipe = multer({ storage });
+const uploadTemp = multer({ dest: "temp_uploads/" }); // pour les galeries
+
 
 
 const app = express();
@@ -42,6 +44,12 @@ const formulairesFilePath = path.join(dataDir, "formulaires.json");
 if (!fs.existsSync(formulairesFilePath)) {
   fs.writeFileSync(formulairesFilePath, JSON.stringify([], null, 2));
 }
+
+const photosJsonPath = path.join(dataDir, "photos.json");
+if (!fs.existsSync(photosJsonPath)) {
+  fs.writeFileSync(photosJsonPath, JSON.stringify([], null, 2));
+}
+
 
 
 app.post("/api/login", (req, res) => {
@@ -159,6 +167,135 @@ app.post("/api/notes/reorder", (req, res) => {
 });
 
 
+
+
+//////////// PHOTOS
+const galleriesFilePath = path.join(dataDir, "photos.json");
+
+const loadGalleries = async () => {
+  try {
+    const data = await fs.promises.readFile(galleriesFilePath, "utf-8");
+    return JSON.parse(data);
+  } catch {
+    return [];
+  }
+};
+
+const saveGalleries = async (data) => {
+  await fs.promises.writeFile(galleriesFilePath, JSON.stringify(data, null, 2));
+};
+
+
+
+// GET - liste des galeries
+app.get("/api/galleries", async (req, res) => {
+  const galleries = await loadGalleries();
+  res.json(galleries);
+});
+
+// POST - ajouter une nouvelle galerie
+app.post("/api/galleries", async (req, res) => {
+  const galleries = await loadGalleries();
+  const { id, title } = req.body;
+
+  if (galleries.find((g) => g.id === id)) {
+    return res.status(400).json({ error: "ID already exists" });
+  }
+
+  const newGallery = { id, title, images: [] };
+  galleries.push(newGallery);
+  await saveGalleries(galleries);
+  res.json(newGallery);
+});
+
+// POST - ajouter une image par URL
+app.post("/api/galleries/:id/add-url", async (req, res) => {
+  const galleries = await loadGalleries();
+  const gallery = galleries.find((g) => g.id === req.params.id);
+  if (!gallery) return res.status(404).json({ error: "Gallery not found" });
+
+  gallery.images.push(req.body.url);
+  await saveGalleries(galleries);
+  res.json(gallery);
+});
+
+// POST - upload image locale
+app.post("/api/galleries/:id/upload", uploadTemp.single("photo"), async (req, res) => {
+  const galleries = await loadGalleries();
+  const gallery = galleries.find((g) => g.id === req.params.id);
+  if (!gallery) return res.status(404).json({ error: "Gallery not found" });
+
+  const ext = path.extname(req.file.originalname);
+  const newFileName = Date.now() + ext;
+  const galleryDir = path.join(__dirname, "..", "public", "images", "photos", gallery.id);
+  const finalPath = path.join(galleryDir, newFileName);
+
+  await fs.ensureDir(galleryDir);
+  await fs.move(req.file.path, finalPath);
+
+  const publicUrl = `/images/photos/${gallery.id}/${newFileName}`;
+  gallery.images.push(publicUrl);
+  await saveGalleries(galleries);
+  res.json(gallery);
+});
+
+
+// Supprimer la gallerie entière
+app.delete("/api/galleries/:id", async (req, res) => {
+  const galleries = await loadGalleries();
+  const galleryId = req.params.id;
+
+  const index = galleries.findIndex((g) => g.id === galleryId);
+  if (index === -1) return res.status(404).json({ message: "Galerie non trouvée" });
+
+  const removed = galleries.splice(index, 1)[0];
+  await saveGalleries(galleries);
+
+  // ✅ Définir le chemin du dossier à supprimer
+  const galleryDir = path.join(__dirname, "..", "public", "images", "photos", galleryId);
+
+  fs.rm(galleryDir, { recursive: true, force: true }, (err) => {
+    if (err) console.error("Erreur suppression dossier galerie :", err);
+  });
+
+  res.status(200).json({ message: "Galerie supprimée", galerie: removed });
+});
+
+
+
+// POST - supprimer une image d'une galerie
+app.post("/api/galleries/:id/delete-image", async (req, res) => {
+  const { id } = req.params;
+  const { url } = req.body;
+
+  if (!url) return res.status(400).json({ error: "URL manquante" });
+
+  const galleries = await loadGalleries();
+  const gallery = galleries.find((g) => g.id === id);
+  if (!gallery) return res.status(404).json({ error: "Galerie non trouvée" });
+
+  const oldLength = gallery.images.length;
+  gallery.images = gallery.images.filter((img) => (img.url || img) !== url);
+
+  if (gallery.images.length === oldLength) {
+    return res.status(404).json({ error: "Image non trouvée dans la galerie" });
+  }
+
+  // Optionnel : supprimer physiquement l'image si c'est un fichier local
+  const localPrefix = `/images/photos/${gallery.id}/`;
+  if (url.startsWith(localPrefix)) {
+    const localPath = path.join(__dirname, "..", "public", url);
+    fs.unlink(localPath, (err) => {
+      if (err) console.warn("Erreur suppression fichier :", err.message);
+    });
+  }
+
+  await saveGalleries(galleries);
+  res.status(200).json({ message: "Image supprimée" });
+});
+
+
+
 ///////////// FORMULAIRES
 
 // GET tous les formulaires
@@ -267,12 +404,12 @@ app.get("/api/equipe", (req, res) => {
 
 // POST ajout membre
 app.post("/api/equipe", (req, res) => {
-  const { nom, poste, photo } = req.body;
-  if (!nom || !poste) return res.status(400).json({ message: "Nom et poste requis" });
+  const { nom, poste, photo, type } = req.body;
+  if (!nom || !poste || !type) return res.status(400).json({ message: "Nom, poste et type requis" });
 
   try {
     const equipe = loadEquipe();
-    const nouveauMembre = { id: Date.now(), nom, poste, photo };
+    const nouveauMembre = { id: Date.now(), nom, poste, photo, type  };
     equipe.push(nouveauMembre);
     saveEquipe(equipe);
     res.status(201).json(nouveauMembre);
@@ -283,15 +420,16 @@ app.post("/api/equipe", (req, res) => {
 });
 
 
-// Route pour uploader une image d’équipe
-app.post("/api/upload-photo", upload.single("photo"), (req, res) => {
+// Endpoint pour uploader une photo de membre d'équipe
+app.post("/api/upload-photo", uploadEquipe.single("photo"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: "Aucun fichier envoyé" });
   }
 
-  const relativePath = `/images/equipe/${req.file.filename}`;
-  res.status(200).json({ url: relativePath });
+  const publicUrl = `/images/equipe/${req.file.filename}`;
+  res.json({ url: publicUrl });
 });
+
 
 
 // DELETE membre

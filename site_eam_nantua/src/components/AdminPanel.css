@@ -82,6 +82,28 @@
   background-color: #ffc9a9;
 }
 
+
+.archive-section {
+  background-color: #fdfdff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin: 2rem auto; 
+  border: 1px solid #eee;
+  max-width: 800px;
+  width: 90%;
+}
+
+.archive-section h3 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  color: #444;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.5rem;
+}
+
+
+
 .note-form input,
 .note-form textarea {
   width: 100%;

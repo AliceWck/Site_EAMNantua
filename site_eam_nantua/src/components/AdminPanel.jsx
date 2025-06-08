@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./AdminPanel.css";
+import GalleryManager from './GalleryManager';
 
 
 export default function AdminPanel({ onLogout }) {
@@ -10,12 +11,13 @@ export default function AdminPanel({ onLogout }) {
     const [contact, setContact] = useState({ phone: "", email: "" });
 
     const [eventNotes, setEventNotes] = useState([]);
-    const [newNote, setNewNote] = useState({ title: "", content: "" });
+    const [newNote, setNewNote] = useState({ title: "", content: "", date: "" });
+
 
     const [newForm, setNewForm] = useState({ name: "", url: "" });
 
     const [equipe, setEquipe] = useState([]);
-    const [nouveauMembre, setNouveauMembre] = useState({ nom: "", poste: "", photo: "" });
+    const [nouveauMembre, setNouveauMembre] = useState({ nom: "", poste: "", photo: "", type: "" });
     const [photoFile, setPhotoFile] = useState(null);
 
     const [saveMessage, setSaveMessage] = useState("");
@@ -381,61 +383,66 @@ export default function AdminPanel({ onLogout }) {
 
         {activeTab === "archives" && (
             <div className="formulaires-tab">
-                <h2>📁 Notes d'événements</h2>
+
+                <div className="archive-section">
+                <h3>📷 Galerie photos</h3>
+                <GalleryManager />
+                </div>
+
+                <div className="archive-section">
+                <h3>📝 Notes d'événements</h3>
 
                 {saveMessage && (
-                    <div className="save-message">
-                        {saveMessage}
-                    </div>
+                    <div className="save-message">{saveMessage}</div>
                 )}
 
                 <div className="note-form">
                     <input
-                        type="text"
-                        className="note-title-input"
-                        placeholder="Titre de la note"
-                        value={newNote.title}
-                        onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
+                    type="text"
+                    className="note-title-input"
+                    placeholder="Titre de la note"
+                    value={newNote.title}
+                    onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
                     />
-
                     <textarea
-                        className="note-content-input"
-                        placeholder="Contenu de la note"
-                        value={newNote.content}
-                        onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
-                    ></textarea>
-
-                    <input
-                        type="date"
-                        value={newNote.date}
-                        onChange={(e) => setNewNote({ ...newNote, date: e.target.value })}
-                        className="note-date-input"
+                    className="note-content-input"
+                    placeholder="Contenu de la note"
+                    value={newNote.content}
+                    onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
                     />
-
+                    <input
+                    type="date"
+                    value={newNote.date}
+                    onChange={(e) => setNewNote({ ...newNote, date: e.target.value })}
+                    className="note-date-input"
+                    />
                     <button onClick={handleAddNote}>➕ Ajouter une note</button>
                 </div>
 
                 {eventNotes.length === 0 ? (
-                <p>Aucune note enregistrée.</p>
+                    <p>Aucune note enregistrée.</p>
                 ) : (
-                <div className="note-list">
+                    <div className="note-list">
                     {eventNotes.map((note, index) => (
                         <div key={note.id} className="note-item-admin">
-                            <strong>{note.title}</strong><br />
-                            <em>{note.content}</em><br />
-                            {note.date && <small>📅 {note.date}</small>}<br />
-
-                            <div className="note-actions">
-                                <button disabled={index === 0} onClick={() => moveNote(index, -1)}>⬆️</button>
-                                <button disabled={index === eventNotes.length - 1} onClick={() => moveNote(index, 1)}>⬇️</button>
-                                <button onClick={() => handleDeleteNote(note.id)}>🗑️ Supprimer</button>
-                            </div>
+                        <strong>{note.title}</strong><br />
+                        <em>{note.content}</em><br />
+                        {note.date && <small>📅 {note.date}</small>}<br />
+                        <div className="note-actions">
+                            <button disabled={index === 0} onClick={() => moveNote(index, -1)}>⬆️</button>
+                            <button disabled={index === eventNotes.length - 1} onClick={() => moveNote(index, 1)}>⬇️</button>
+                            <button onClick={() => handleDeleteNote(note.id)}>🗑️ Supprimer</button>
+                        </div>
                         </div>
                     ))}
-                </div>
+                    </div>
                 )}
+                </div>
+
             </div>
-            )}
+        )}
+
+
 
 
         {activeTab === "accueil" && (
@@ -519,6 +526,16 @@ export default function AdminPanel({ onLogout }) {
                     onChange={(e) => setNouveauMembre({ ...nouveauMembre, poste: e.target.value })}
                     className="form-input"
                 />
+                <select
+                    value={nouveauMembre.type}
+                    onChange={(e) => setNouveauMembre({ ...nouveauMembre, type: e.target.value })}
+                    className="form-input"
+                    >
+                    <option value="">Sélectionner un type</option>
+                    <option value="prof">Professeur</option>
+                    <option value="CA">CA</option>
+                </select>
+
                 <input
                     type="text"
                     placeholder="URL de la photo (optionnel)"

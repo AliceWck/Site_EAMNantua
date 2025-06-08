@@ -38,22 +38,47 @@ export default function Equipe() {
         {erreur && <p className="error">{erreur}</p>}
 
         {!loading && !erreur && (
-          <div className="equipe-grid">
-            {equipe.map((personne) => (
-              <div className="equipe-card" key={personne.id}>
-                <div className="equipe-photo-wrapper">
-                  <img
-                    src={personne.photo || "/images/equipe/avatardefaut.png"}
-                    alt={personne.nom}
-                    className="equipe-photo"
-                  />
+        <>
+          <section className="equipe-section">
+            <h2>Conseil d’administration</h2>
+            <div className="equipe-grid">
+              {equipe.filter(p => p.type === "CA").map(personne => (
+                <div className="equipe-card" key={personne.id}>
+                  <div className="equipe-photo-wrapper">
+                    <img
+                      src={personne.photo || "/images/equipe/avatardefaut.png"}
+                      alt={personne.nom}
+                      className="equipe-photo"
+                    />
+                  </div>
+                  <h3 className="equipe-nom">{personne.nom}</h3>
+                  <p className="equipe-poste">{personne.poste}</p>
                 </div>
-                <h3 className="equipe-nom">{personne.nom}</h3>
-                <p className="equipe-poste">{personne.poste}</p>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          </section>
+
+          <section className="equipe-section">
+            <h2>Corps professoral</h2>
+            <div className="equipe-grid">
+              {equipe.filter(p => p.type === "prof").map(personne => (
+                <div className="equipe-card" key={personne.id}>
+                  <div className="equipe-photo-wrapper">
+                    <img
+                      src={personne.photo || "/images/equipe/avatardefaut.png"}
+                      alt={personne.nom}
+                      className="equipe-photo"
+                    />
+                  </div>
+                  <h3 className="equipe-nom">{personne.nom}</h3>
+                  <p className="equipe-poste">{personne.poste}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        </>
+      )}
+
       </main>
       <Footer />
     </div>
