@@ -9,13 +9,13 @@ NOTES ADMIN
 - enregistrermodifs notes admin
 - prendre en compte ordre : là ok, mais enft ça enregistre pas
 - pas affichage des dates
-- ajouter possibilité de mettre photo ?
+- Pas mettre titre notes si pas notes
 - pb quan dpas de commentaire
 
 
 ACCUEIL ADMIN
 
-PRESENTATION ADMIN
+PRESENTATION ADMIN - ajouter possibilité de lister les cours et l'année en cours
 
 PAGE DROITS ALICE SITE
 
