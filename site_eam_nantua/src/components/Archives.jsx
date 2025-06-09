@@ -31,10 +31,13 @@ export default function Photos() {
   }, []);
 
   return (
-    <div>
+    <div className="layout">
       <Header />
       <main className="photos-container">
-        <h1>Archives</h1>
+        <section className="hero-section-archives">
+          <h4>Archives</h4>
+        </section>
+
 
         <h2 className="section-title"><br />Galerie Photos</h2>
         <div className="photos-grid">

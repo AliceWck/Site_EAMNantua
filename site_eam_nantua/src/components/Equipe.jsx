@@ -28,11 +28,12 @@ export default function Equipe() {
   return (
     <div className="equipe-page">
       <Header />
-      <main className="equipe-main">
+      <section className="hero-section-equipe">
         <h1>🎵 Notre équipe</h1>
-        <p className="equipe-intro">
-          Découvrez l’équipe pédagogique et administrative qui fait vivre l'école.
-        </p>
+        <p className="subtitle">Découvrez l’équipe pédagogique et administrative qui fait vivre l'école.</p>
+      </section>
+
+      <main className="equipe-main">
 
         {loading && <p>Chargement de l’équipe...</p>}
         {erreur && <p className="error">{erreur}</p>}
@@ -59,7 +60,7 @@ export default function Equipe() {
           </section>
 
           <section className="equipe-section">
-            <h2>Corps professoral</h2>
+            <h2>Professeurs</h2>
             <div className="equipe-grid">
               {equipe.filter(p => p.type === "prof").map(personne => (
                 <div className="equipe-card" key={personne.id}>

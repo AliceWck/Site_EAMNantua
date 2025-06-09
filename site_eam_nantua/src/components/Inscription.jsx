@@ -15,14 +15,12 @@ export default function Inscription() {
   return (
     <div className="inscription-container">
       <Header />
-      <main className="inscription-main">
-        <section className="inscription-hero">
-          <h1 className="inscription-title">Inscription à l'École des Arts et Musique</h1>
-          <p className="inscription-subtitle">
-            Merci de remplir un des formulaires ci-dessous pour effectuer votre inscription.
-          </p>
-        </section>
+      <section className="hero-section-inscr">
+        <h1>Inscription à l'École des Arts et Musique</h1>
+        <p className="subtitle">Merci de remplir un des formulaires ci-dessous pour effectuer votre inscription.</p>
+      </section>
 
+      <main className="inscription-main">
         <div className="inscription-form-wrapper">
           {formulaires.length === 0 ? (
             <p>Chargement des formulaires...</p>

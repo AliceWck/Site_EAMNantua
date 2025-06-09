@@ -7,6 +7,23 @@
   min-height: 100vh;
 }
 
+.hero-section-equipe {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(120deg, #4e7b77, #a6b6b4);
+  color: white;
+  border-radius: 1rem;
+  margin-bottom: 3rem;
+  margin-top: 2.5rem;
+  margin-left: 4rem;
+  margin-right: 4rem;
+}
+
+.hero-section-equipe h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0rem;
+  color: #2B2E42;
+}
 
 .equipe-main {
   padding: 2rem 1rem;
@@ -20,7 +37,9 @@
 .equipe-main h1 {
   font-size: 2.2rem;
   margin-bottom: 0.5rem;
+  color: #2B2E42;
 }
+
 
 .equipe-intro {
   font-size: 1.1rem;
@@ -79,7 +98,7 @@
 .equipe-section h2 {
   font-size: 1.6rem;
   margin-bottom: 1.5rem;
-  color: #1e293b;
+  color: #2B2E42;
   border-bottom: 2px solid #ddd;
   display: inline-block;
   padding-bottom: 0.3rem;

@@ -7,8 +7,8 @@ export default function Presentation() {
     <div className="presentation-container">
       <Header />
       <main className="presentation-main">
-        <section className="hero-section">
-          <h1>École des Arts et Musique du Nantua</h1>
+        <section className="hero-section-pres">
+          <h1>École des Arts et Musique du Haut Bugey</h1>
           <p className="subtitle">Un lieu d’épanouissement artistique pour tous les âges</p>
         </section>
 

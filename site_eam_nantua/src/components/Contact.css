@@ -8,20 +8,51 @@
 
 .contact-main {
   flex: 1;
-  padding: 2rem;
-  max-width: 600px;
+  padding: 0rem;
+  max-width: 35vw;
+  min-width: 400px;
+  width: 100%;
   margin: 0 auto;
   text-align: left;
 }
 
 .contact-main h1 {
-  color: #9381ff;
+  color: #4b3f72;
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
 }
 
+.contact-padding {
+  padding: 0rem;
+  flex-grow: 1;
+}
+
+
+.hero-section-contact {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(120deg, #4e7b77, #a6b6b4);
+  color: white;
+  border-radius: 1rem;
+  margin: 4rem; /* Évite que ce soit collé aux bords */
+  margin-top: 2.5rem; /* Marge avec le header */
+}
+
+.hero-section-contact h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0rem;
+  color: #2B2E42;
+}
+
+.subtitle {
+  font-size: 1.3rem;
+  margin-top: 0rem;
+}
+
+
 .contact-main p {
-  margin-bottom: 2rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
   color: #333;
 }
 
@@ -40,7 +71,7 @@
 
 .contact-form input,
 .contact-form textarea {
-  padding: 0.75rem;
+  padding: 0.7rem;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 1rem;
@@ -52,7 +83,7 @@
   padding: 0.8rem 1.5rem;
   font-size: 1rem;
   border: none;
-  background-color: #9381ff;
+  background-color: #4e7b77;
   color: white;
   border-radius: 8px;
   cursor: pointer;
@@ -64,7 +95,7 @@
 }
 
 .contact-infos {
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
   color: #444;
   font-size: 1.1rem;
   line-height: 1.6;

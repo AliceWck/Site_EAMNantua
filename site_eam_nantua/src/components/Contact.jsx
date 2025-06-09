@@ -22,9 +22,12 @@ export default function Contact() {
   return (
     <div className="contact-page">
       <Header />
-      <main className="contact-main">
-        <h1>Contactez-nous</h1>
-        <p>Pour toute question ou information, vous pouvez nous contacter...</p>
+      <section className="hero-section-contact">
+          <h1>Contactez-nous</h1>
+          <p className="subtitle">Pour toute question ou information, vous pouvez nous joindre...</p>
+      </section>
+
+      <main className="contact-main contact-padding">
 
         <div className="contact-infos">
           <p><strong>📞 Par téléphone :</strong> {contact.phone}</p>

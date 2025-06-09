@@ -1,20 +1,38 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .photos-container {
+  flex: 1;
   padding: 2rem;
   text-align: center;
 }
 
-h1 {
+
+h4 {
   font-size: 2.5rem;
-  color: #222; /* Texte noir/gris foncé */
-  margin-bottom: 1.5rem;
+  color: #2B2E42;
 }
 
+.hero-section-archives {
+  text-align: center;
+  padding: 1rem 2rem;
+  background: linear-gradient(120deg, #4e7b77, #a6b6b4);
+  color: white;
+  border-radius: 1rem;
+  margin-bottom: 2rem;
+  margin-top: 0.5rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
+}
 
 .section-title {
   font-size: 1.5rem;
-  color: #333;
+  color: #2B2E42;
   margin-top: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0rem;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.5px;

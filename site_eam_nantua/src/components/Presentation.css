@@ -7,16 +7,33 @@
 
 .presentation-main {
   flex-grow: 1;
-  padding: 2rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  margin-top: 0rem;
 }
 
-.hero-section {
+h1 {
+  font-size: 2.5rem;
+  color: #000000; /* Texte noir/gris foncé */
+  margin-bottom: 1.5rem;
+}
+
+.hero-section-pres {
   text-align: center;
   padding: 4rem 2rem;
-  background: linear-gradient(120deg, #9381FF, #B8B8FF);
+  background: linear-gradient(120deg, #4e7b77, #a6b6b4);
   color: white;
   border-radius: 1rem;
   margin-bottom: 3rem;
+  margin-top: 2.5rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
+}
+
+.hero-section-pres h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0rem;
+  color: #2B2E42;
 }
 
 .subtitle {
@@ -29,6 +46,8 @@
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 2rem;
   margin-bottom: 3rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
 }
 
 .info-card  {
@@ -44,7 +63,7 @@
 
 .info-card h2 {
   margin-bottom: 1rem;
-  color: #9381FF;
+  color: #2B2E42;
 }
 
 .cta-section {
@@ -55,8 +74,8 @@
 
 .cta-button {
   display: inline-block;
-  margin-top: 1rem;
-  background-color: #9381FF;
+  margin-top: 0rem;
+  background-color: #4e7b77;
   color: white;
   padding: 0.8rem 1.5rem;
   border-radius: 2rem;
