@@ -3,6 +3,8 @@ A ajouter :
 ajout formulaire : votre inscription ne sera effectivequ'après avoir payé un accompte de 100€ à l'adresse suivante : IBAN
 ajouter gestion de sélection des tarifsdans le forms ? Ou simulateur de prix
 gestion dates notes
+Lier accueil à backend, dont les liens réseauau au mail
+
 
 
 NOTES ADMIN
@@ -21,10 +23,10 @@ PAGE DROITS ALICE SITE
 
 GESTION PAIEMENT
 
-PAGE PARTENAIRES
 
-LIEN VERS LES RESEAUX DANS FOOTER
 
+ACHECK A LA FIN
+/public à raj dans gitignore pour pas écraser les données avec filezilla à chaque maj du site
 Nom de domaine
-Lierbonne adresse mail à nous contacter
+Lier bonne adresse mail à nous contacter
 Ok actualités dans page accueil ?
