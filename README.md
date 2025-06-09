@@ -21,6 +21,9 @@ PAGE DROITS ALICE SITE
 
 GESTION PAIEMENT
 
+PAGE PARTENAIRES
+
+LIEN VERS LES RESEAUX DANS FOOTER
 
 Nom de domaine
 Lierbonne adresse mail à nous contacter
