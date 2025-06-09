@@ -12,7 +12,7 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configurer multer
+// Configurer multer pour storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
@@ -26,6 +26,26 @@ const storage = multer.diskStorage({
 
 const uploadEquipe = multer({ storage });
 const uploadTemp = multer({ dest: "temp_uploads/" }); // pour les galeries
+
+
+// mutler pour storagePartenaires
+const partenairesUploadDir = path.join(__dirname, "..", "public", "images", "partenaires");
+if (!fs.existsSync(partenairesUploadDir)) {
+  fs.mkdirSync(partenairesUploadDir, { recursive: true });
+}
+
+const storagePartenaires = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, partenairesUploadDir);
+  },
+  filename: (req, file, cb) => {
+    const safeName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
+    cb(null, safeName);
+  },
+});
+
+
+const uploadPartenaireLogo = multer({ storage: storagePartenaires });
 
 
 
@@ -71,6 +91,24 @@ let notesArray = [
   { id: 1, title: "Note A", content: "Contenu A", date: "2024-05-01" },
   { id: 2, title: "Note B", content: "Contenu B", date: "2024-05-10" },
 ];
+
+
+//////////// PARTENAIRES API
+const partenairesFilePath = path.join(dataDir, "partenaires.json");
+if (!fs.existsSync(partenairesFilePath)) {
+  fs.writeFileSync(partenairesFilePath, JSON.stringify([], null, 2));
+}
+
+function loadPartenaires() {
+  const raw = fs.readFileSync(partenairesFilePath, "utf-8");
+  return JSON.parse(raw);
+}
+
+function savePartenaires(data) {
+  fs.writeFileSync(partenairesFilePath, JSON.stringify(data, null, 2), "utf-8");
+}
+
+
 
 
 
@@ -281,10 +319,10 @@ app.post("/api/galleries/:id/delete-image", async (req, res) => {
     return res.status(404).json({ error: "Image non trouvée dans la galerie" });
   }
 
-  // Optionnel : supprimer physiquement l'image si c'est un fichier local
+  // Supprimer physiquement l'image si c'est un fichier local
   const localPrefix = `/images/photos/${gallery.id}/`;
   if (url.startsWith(localPrefix)) {
-    const localPath = path.join(__dirname, "..", "public", url);
+    const localPath = path.join(__dirname, "..", "public", url.replace(/^\//, ""));
     fs.unlink(localPath, (err) => {
       if (err) console.warn("Erreur suppression fichier :", err.message);
     });
@@ -293,6 +331,7 @@ app.post("/api/galleries/:id/delete-image", async (req, res) => {
   await saveGalleries(galleries);
   res.status(200).json({ message: "Image supprimée" });
 });
+
 
 
 
@@ -437,20 +476,32 @@ app.delete("/api/equipe/:id", (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const equipe = loadEquipe();
-    const updatedEquipe = equipe.filter(m => m.id !== id);
+    const membreToDelete = equipe.find(m => m.id === id);
 
-    if (equipe.length === updatedEquipe.length) {
+    if (!membreToDelete) {
       return res.status(404).json({ message: "Membre non trouvé" });
     }
 
+    // Supprimer l’image physique si c’est une image stockée localement
+    if (membreToDelete.photo && membreToDelete.photo.startsWith("/images/equipe/")) {
+      const photoPath = path.join(__dirname, "..", "public", membreToDelete.photo.replace(/^\//, ""));
+      fs.unlink(photoPath, (err) => {
+        if (err) {
+          console.warn("Erreur suppression photo membre :", err.message);
+          // Non bloquant
+        }
+      });
+    }
+
+    const updatedEquipe = equipe.filter(m => m.id !== id);
     saveEquipe(updatedEquipe);
+
     res.status(200).json({ message: "Membre supprimé" });
   } catch (err) {
     console.error("Erreur suppression membre :", err);
     res.status(500).json({ message: "Erreur suppression membre" });
   }
 });
-
 
 
 app.post("/api/equipe/reorder", (req, res) => {
@@ -465,6 +516,96 @@ app.post("/api/equipe/reorder", (req, res) => {
     res.status(200).json({ message: "Ordre de l’équipe mis à jour" });
   } catch (err) {
     console.error("Erreur enregistrement ordre équipe :", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+
+
+/////////////// PARTENAIRES
+
+// GET - récupérer tous les partenaires
+app.get("/api/partenaires", (req, res) => {
+  try {
+    const partenaires = loadPartenaires();
+    res.json(partenaires);
+  } catch (err) {
+    console.error("Erreur lecture partenaires :", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+// POST - ajouter un partenaire
+app.post("/api/partenaires", (req, res) => {
+  const { nom, logo, url } = req.body;
+  if (!nom || !logo) return res.status(400).json({ message: "Nom et logo requis" });
+
+  try {
+    const partenaires = loadPartenaires();
+    const nouveau = { id: Date.now(), nom, logo, url };
+    partenaires.push(nouveau);
+    savePartenaires(partenaires);
+    res.status(201).json(nouveau);
+  } catch (err) {
+    console.error("Erreur ajout partenaire :", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+app.post("/api/upload-logo", uploadPartenaireLogo.single("logo"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "Aucun fichier envoyé" });
+  }
+
+  const publicUrl = `/images/partenaires/${req.file.filename}`;
+  res.json({ url: publicUrl });
+});
+
+
+// DELETE - supprimer un partenaire
+app.delete("/api/partenaires/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    const partenaires = loadPartenaires();
+    const partenaireToDelete = partenaires.find(p => p.id === id);
+
+    if (!partenaireToDelete) {
+      return res.status(404).json({ message: "Partenaire non trouvé" });
+    }
+
+    // Supprimer le fichier logo physiquement
+    if (partenaireToDelete.logo) {
+      const logoPath = path.join(__dirname, "..", "public", partenaireToDelete.logo.replace(/^\//, ""));
+      fs.unlink(logoPath, (err) => {
+        if (err) {
+          console.warn("Erreur suppression fichier logo :", err.message);
+          // Pas bloquant, on continue la suppression
+        }
+      });
+    }
+
+    // Supprimer du tableau
+    const updated = partenaires.filter(p => p.id !== id);
+    savePartenaires(updated);
+
+    res.status(200).json({ message: "Partenaire supprimé" });
+  } catch (err) {
+    console.error("Erreur suppression partenaire :", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+
+// PUT - modifier tous les partenaires (batch)
+app.put("/api/partenaires", (req, res) => {
+  const newList = req.body;
+  if (!Array.isArray(newList)) return res.status(400).json({ message: "Format attendu: tableau" });
+
+  try {
+    savePartenaires(newList);
+    res.status(200).json({ message: "Liste mise à jour" });
+  } catch (err) {
+    console.error("Erreur mise à jour partenaires :", err);
     res.status(500).json({ message: "Erreur serveur" });
   }
 });

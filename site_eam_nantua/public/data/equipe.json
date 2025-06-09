@@ -1,23 +1,23 @@
 [
   {
-    "id": 1749425324438,
-    "nom": "jo",
-    "poste": "hiohjio",
-    "photo": "/images/equipe/1749425324425-860_hogwartslegacy2.jpg",
+    "id": 1749509110482,
+    "nom": "fdez",
+    "poste": "deez",
+    "photo": "/images/equipe/1749509110469-ð¬ð­ðð²_ð¦ð.jpeg",
+    "type": "prof"
+  },
+  {
+    "id": 1749509127612,
+    "nom": "dedez",
+    "poste": "dez",
+    "photo": "/images/equipe/1749509127605-tfyjdtfh_stfh_ds.jpeg",
     "type": "CA"
   },
   {
-    "id": 1749425377632,
-    "nom": "jionjkn",
-    "poste": "jio",
-    "photo": "/images/equipe/1749425377617-tÃ©lÃ©chargement.jpeg",
-    "type": "CA"
-  },
-  {
-    "id": 1749425415276,
-    "nom": "njkdnjkcds",
-    "poste": "njkcsd",
-    "photo": "/images/equipe/1749425415265-ð¬ð­ðð²_ð¦ð.jpeg",
+    "id": 1749509141780,
+    "nom": "gtr",
+    "poste": "gtr",
+    "photo": "",
     "type": "prof"
   }
 ]

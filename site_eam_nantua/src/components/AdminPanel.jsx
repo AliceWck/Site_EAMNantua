@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import "./AdminPanel.css";
 import GalleryManager from './GalleryManager';
+import PartenaireManager from './PartenaireManager';
+
 
 
 export default function AdminPanel({ onLogout }) {
@@ -329,13 +331,21 @@ export default function AdminPanel({ onLogout }) {
         <h1><center>Interface d'administration</center></h1>
 
         <div className="admin-tabs">
+            <button onClick={() => setActiveTab("accueil")}>🏠 Accueil</button>
             <button onClick={() => setActiveTab("formulaires")}>📄 Formulaires</button>
             <button onClick={() => setActiveTab("archives")}>📁 Archives</button>
-            <button onClick={() => setActiveTab("accueil")}>🏠 Accueil</button>
-            <button onClick={() => setActiveTab("contact")}>📬 Contact</button>
             <button onClick={() => setActiveTab("equipe")}>👥 Équipe</button>
+            <button onClick={() => setActiveTab("contact")}>📬 Contact</button>
+            <button onClick={() => setActiveTab("partenaires")}>🤝 Partenaires</button>
+
         </div>
 
+        {activeTab === "accueil" && (
+            <div className="formulaires-tab">
+            <h2>🏠 Contenu de la page d’accueil</h2>
+            <p>Ici tu pourras modifier les textes ou éléments de la page d'accueil.</p>
+            </div>
+        )}
 
         
         {activeTab === "formulaires" && (
@@ -416,7 +426,7 @@ export default function AdminPanel({ onLogout }) {
                     onChange={(e) => setNewNote({ ...newNote, date: e.target.value })}
                     className="note-date-input"
                     />
-                    <button onClick={handleAddNote}>➕ Ajouter une note</button>
+                    <button onClick={handleAddNote} className="add-button-violet">➕ Ajouter une note</button>
                 </div>
 
                 {eventNotes.length === 0 ? (
@@ -442,46 +452,6 @@ export default function AdminPanel({ onLogout }) {
             </div>
         )}
 
-
-
-
-        {activeTab === "accueil" && (
-            <div className="formulaires-tab">
-            <h2>🏠 Contenu de la page d’accueil</h2>
-            <p>Ici tu pourras modifier les textes ou éléments de la page d'accueil.</p>
-            </div>
-        )}
-
-        {activeTab === "contact" && (
-            <div className="contact-admin-container">
-                <h2>📬 Informations de contact</h2>
-                <p>Modifier les coordonnées de contact ou messages affichés.</p>
-
-                <label>
-                Téléphone :
-                <input
-                    type="text"
-                    name="phone"
-                    value={contact.phone}
-                    onChange={handleContactChange}
-                    placeholder="04 74 75 00 81"
-                />
-                </label>
-
-                <label>
-                Email :
-                <input
-                    type="email"
-                    name="email"
-                    value={contact.email}
-                    onChange={handleContactChange}
-                    placeholder="ecole@artsmusique-hb.fr"
-                />
-                </label>
-
-                <button onClick={handleSaveContact}>💾 Enregistrer</button>
-            </div>
-            )}
 
         {activeTab === "equipe" && (
             <div className="formulaires-tab">
@@ -552,10 +522,50 @@ export default function AdminPanel({ onLogout }) {
                 <small>Choisir un fichier OU entrer une URL ci-dessus.</small>
 
                 
-                <button onClick={handleAddMembre}>Ajouter</button>
+                <button onClick={handleAddMembre} className="add-button-violet">Ajouter</button>
                 </div>
             </div>
+        )}
+
+        {activeTab === "contact" && (
+            <div className="contact-admin-container">
+                <h2>📬 Informations de contact</h2>
+                <p>Modifier les coordonnées de contact ou messages affichés.</p>
+
+                <label>
+                Téléphone :
+                <input
+                    type="text"
+                    name="phone"
+                    value={contact.phone}
+                    onChange={handleContactChange}
+                    placeholder="04 74 75 00 81"
+                />
+                </label>
+
+                <label>
+                Email :
+                <input
+                    type="email"
+                    name="email"
+                    value={contact.email}
+                    onChange={handleContactChange}
+                    placeholder="ecole@artsmusique-hb.fr"
+                />
+                </label>
+
+                <button onClick={handleSaveContact} >💾 Enregistrer</button>
+            </div>
             )}
+
+
+        {activeTab === "partenaires" && (
+            <div className="formulaires-tab">
+                <h2>🤝 Logos des partenaires</h2>
+                <PartenaireManager />
+            </div>
+        )}
+
 
 
 

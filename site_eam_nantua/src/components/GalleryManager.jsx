@@ -172,7 +172,7 @@ const deleteImage = async (imgUrl) => {
             value={newGallery.title}
             onChange={(e) => setNewGallery({ ...newGallery, title: e.target.value })}
             />
-            <button onClick={createGallery}>Créer</button>
+            <button onClick={createGallery} className="add-button-violet">Créer</button>
         </div>
 
         <div className="gallery-grid">

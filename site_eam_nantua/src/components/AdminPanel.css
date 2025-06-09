@@ -15,6 +15,23 @@
   color: #333;
 }
 
+.add-button-violet {
+  padding: 0.6rem 1.2rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  background-color: #B8B8FF;
+  color: #333;
+  transition: background-color 0.3s ease;
+}
+
+.add-button-violet:hover {
+  background-color: #9381FF;
+  color: white;
+}
+
+
 .admin-tabs button:hover {
   background-color: #9381FF;
   color: white;
@@ -159,13 +176,14 @@
   border-radius: 6px;
   cursor: pointer;
   border: none;
-  background-color: #6ec6ff;
-  color: #fff;
+  background-color: #B8B8FF;
+  color: #333;
   transition: background-color 0.3s ease;
 }
 
 .form-actions button:hover {
-  background-color: #4aa8e4;
+  background-color: #9381FF;
+  color: white;
 }
 
 

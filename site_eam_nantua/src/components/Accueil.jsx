@@ -49,6 +49,23 @@ export default function Accueil() {
                 </div>
             </section>
 
+            <section className="accueil-reseaux">
+                <h2>Réseaux sociaux</h2>
+                <p>Vous pouvez également nous suivre sur ces différentes plateformes :</p>
+                <div className="reseaux-icons">
+                    <a href="https://www.facebook.com/p/Ecole-Arts-et-Musique-du-Haut-Bugey-100038170507594/?locale=fr_FR" target="_blank" rel="noopener noreferrer" className="reseau-link">
+                    <img src="/images/logos/logo-fb-2.png" alt="Facebook" />
+                    </a>
+                    <a href="https://www.instagram.com/ecoleartsetmusiquenantua/" target="_blank" rel="noopener noreferrer" className="reseau-link">
+                    <img src="/images/logos/logo-insta-2.png" alt="Instagram" />
+                    </a>
+                    <a href="mailto:ecole@artsmusique-hb.fr" className="reseau-link">
+                    <img src="/images/logos/logo-mail.png" alt="Mail" />
+                    </a>
+                </div>
+            </section>
+
+
             <Footer />
         </div>
     );

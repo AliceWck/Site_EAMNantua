@@ -10,6 +10,7 @@ import Presentation from "./components/Presentation";
 import EvenementPage from "./components/EvenementPage";
 import Equipe from "./components/Equipe";
 import Mentions from "./components/Mentions";
+import Partenaires from "./components/Partenaires";
 
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/evenements/:slug" element={<EvenementPage />} />
           <Route path="/equipe" element={<Equipe />} />
           <Route path="/mentions" element={<Mentions />} />
+          <Route path="/partenaires" element={<Partenaires />} />
         </Routes>
       </Router>
     </div>

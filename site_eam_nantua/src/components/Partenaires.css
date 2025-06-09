@@ -1,0 +1,43 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.partenaires-container {
+  flex: 1;
+  padding: 2rem;
+  text-align: center;
+}
+
+.hero-section-partenaires {
+  text-align: center;
+  padding: 1rem 2rem;
+  background: linear-gradient(120deg, #4e7b77, #a6b6b4);
+  color: white;
+  border-radius: 1rem;
+  margin: 0.5rem 2rem 2rem 2rem;
+}
+
+.logo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.logo-item {
+  max-width: 200px;
+  max-height: 120px;
+  object-fit: contain;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  background: #fff;
+  padding: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.logo-item:hover {
+  transform: scale(1.05);
+}

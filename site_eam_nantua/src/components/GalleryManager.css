@@ -34,8 +34,8 @@
   width: 100%;
   padding: 0.6rem 0.8rem;
   font-size: 1rem;
-  background-color: #000000;
-  color: white;
+  background-color: #B8B8FF;
+  color: 333;
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -44,9 +44,8 @@
 }
 
 .gallery-creation button:hover {
-  background-color: #15803d;
+  background-color: #9381FF;
 }
-
 
 
 .gallery-grid {

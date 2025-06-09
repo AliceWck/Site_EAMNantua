@@ -7,7 +7,7 @@ export default function Header() {
       <nav className="nav">
         <div className="nav-left">
             <Link to="/" className="logo-link">
-                <img src="/Logo.png" alt="Logo EAM" className="logo" />
+                <img src="/images/logos/Logo.png" alt="Logo EAM" className="logo" />
             </Link>
         </div>
         <div className="nav-right">

@@ -219,3 +219,39 @@
 .news-item a:hover {
     text-decoration: none;
 }
+
+
+
+/* RÉSEAUX SOCIAUX */
+.accueil-reseaux {
+  background-color: #f8f7ff;
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #2b2e42;
+}
+
+.accueil-reseaux h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.accueil-reseaux p {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.reseaux-icons {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.reseau-link img {
+  width: 60px;
+  height: 60px;
+  transition: transform 0.2s ease;
+}
+
+.reseau-link img:hover {
+  transform: scale(1.1);
+}
