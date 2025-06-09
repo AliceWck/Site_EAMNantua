@@ -125,6 +125,33 @@
 }
 
 
+/* INFOS MISES EN AVANT */
+.accueil-facts {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: #2b2e42;
+}
+
+.fact-item {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: rem 0;
+  color: #4e7b77;
+}
+
+.fact-item .inline-link {
+  color: #2b2e42;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.fact-item .inline-link:hover {
+  text-decoration: none;
+  color: #4e7b77;
+}
+
+
+
 /* HERO (déjà présent, garde le reste) */
 .accueil-subtitle {
     font-size: 1.5rem;
@@ -146,7 +173,7 @@
 /* ACTUALITÉS */
 .accueil-news {
     background-color: #f8f7ff;
-    padding: 3rem 2rem;
+    padding: 0rem 2rem;
     text-align: center;
 }
 

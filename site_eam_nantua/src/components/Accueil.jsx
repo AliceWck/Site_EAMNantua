@@ -12,7 +12,7 @@ export default function Accueil() {
                 <div className="hero-overlay">
                     <div className="accueil-hero-text">
                     <h1 className="hero-title">
-                        École des Arts et Musique du Haut-Bugey
+                        Bienvenue à l'École des Arts et Musique du Haut-Bugey !
                     </h1>
                     <p className="hero-subtitle">
                         Un lieu d’expression, de partage et d’apprentissage artistique.
@@ -21,8 +21,14 @@ export default function Accueil() {
                 </div>
             </section>
 
-
-            <p >Découvrez tous nos cours <Link to="/presentation" className="inline-link">ICI</Link>.</p>
+            <section className="accueil-facts">
+                <p className="fact-item">
+                    Découvrez tous les cours proposés <Link to="/presentation" className="inline-link">ICI</Link>.
+                </p>
+                <p className="fact-item">
+                    Inscrivez-vous dès maintenant <Link to="/inscription" className="inline-link">ICI</Link>.
+                </p>
+            </section>
 
             {/* Actualités */}
             <section className="accueil-news">
