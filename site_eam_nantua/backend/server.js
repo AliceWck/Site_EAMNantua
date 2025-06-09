@@ -48,7 +48,6 @@ const storagePartenaires = multer.diskStorage({
 const uploadPartenaireLogo = multer({ storage: storagePartenaires });
 
 
-
 const app = express();
 const PORT = 5000;
 
@@ -71,6 +70,27 @@ if (!fs.existsSync(photosJsonPath)) {
 }
 
 
+////////// NOTES début
+// Créer fichier notes.json si existe pas
+const notesFilePath = path.join(dataDir, "notes.json");
+
+if (!fs.existsSync(notesFilePath)) {
+  fs.writeFileSync(notesFilePath, JSON.stringify([], null, 2));
+}
+
+function loadNotes() {
+  const raw = fs.readFileSync(notesFilePath, "utf-8");
+  return JSON.parse(raw);
+}
+
+function saveNotes(data) {
+  fs.writeFileSync(notesFilePath, JSON.stringify(data, null, 2), "utf-8");
+}
+
+
+
+
+
 
 app.post("/api/login", (req, res) => {
   const { username, password } = req.body;
@@ -85,12 +105,6 @@ app.get("/", (req, res) => {
   res.send("Backend EAM opérationnel 🎉");
 });
 
-
-
-let notesArray = [
-  { id: 1, title: "Note A", content: "Contenu A", date: "2024-05-01" },
-  { id: 2, title: "Note B", content: "Contenu B", date: "2024-05-10" },
-];
 
 
 //////////// PARTENAIRES API
@@ -162,32 +176,52 @@ app.put("/api/contact", (req, res) => {
 //////////// NOTES
 // GET /api/notes événement
 app.get("/api/notes", (req, res) => {
-    res.json(notesArray); // Ex: récupérer depuis une BDD ou un fichier
-});
-
-// POST /api/notes événement
-app.post("/api/notes", (req, res) => {
-    const { title, content, date } = req.body;
-    const newNote = { id: Date.now(), title, content, date: date || new Date().toISOString().split("T")[0],};
-    notesArray.push(newNote);
-    res.json(newNote);
-});
-
-// DELETE /api/notes/:id
-app.delete("/api/notes/:id", (req, res) => {
-  const id = parseInt(req.params.id);
-  const initialLength = notesArray.length;
-  notesArray = notesArray.filter((note) => note.id !== id);
-
-  if (notesArray.length < initialLength) {
-    res.status(200).json({ message: "Note supprimée" });
-  } else {
-    res.status(404).json({ message: "Note non trouvée" });
+  try {
+    const notes = loadNotes();
+    res.json(notes);
+  } catch (err) {
+    console.error("Erreur lecture notes :", err);
+    res.status(500).json({ message: "Erreur lecture notes" });
   }
 });
 
 
-// Notes — REORDER
+// POST /api/notes
+app.post("/api/notes", (req, res) => {
+  try {
+    const notes = loadNotes();
+    const { title, content, date } = req.body;
+    const newNote = { id: Date.now(), title, content, date: date || new Date().toISOString().split("T")[0] };
+    notes.push(newNote);
+    saveNotes(notes);
+    res.status(201).json(newNote);
+  } catch (err) {
+    console.error("Erreur ajout note :", err);
+    res.status(500).json({ message: "Erreur ajout note" });
+  }
+});
+
+
+// DELETE /api/notes/:id
+app.delete("/api/notes/:id", (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    let notes = loadNotes();
+    const initialLength = notes.length;
+    notes = notes.filter(note => note.id !== id);
+    if (notes.length === initialLength) {
+      return res.status(404).json({ message: "Note non trouvée" });
+    }
+    saveNotes(notes);
+    res.status(200).json({ message: "Note supprimée" });
+  } catch (err) {
+    console.error("Erreur suppression note :", err);
+    res.status(500).json({ message: "Erreur suppression note" });
+  }
+});
+
+
+// POST /api/notes/reorder
 app.post("/api/notes/reorder", (req, res) => {
   const newOrder = req.body;
 
@@ -203,7 +237,6 @@ app.post("/api/notes/reorder", (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 });
-
 
 
 

@@ -54,6 +54,9 @@ export default function Photos() {
           {notes.map((note, i) => (
             <div key={i} className="note-item" onClick={() => setOpenNote(openNote === i ? null : i)}>
               <div className="note-title">{note.title}</div>
+              {note.date && (
+                <div className="note-date">📅 {new Date(note.date).toLocaleDateString()}</div>
+              )}
               {openNote === i && <div className="note-content">{note.content}</div>}
             </div>
           ))}

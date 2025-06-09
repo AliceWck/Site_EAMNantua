@@ -162,21 +162,28 @@ export default function AdminPanel({ onLogout }) {
     //////////// ARCHIVES
 
     const handleAddNote = async () => {
-        if (!newNote.title.trim() || !newNote.content.trim()) return;
+        if (!newNote.title.trim()) return;
+
+        const noteToSend = {
+            title: newNote.title.trim(),
+            content: newNote.content.trim() || "",
+            date: newNote.date || new Date().toISOString().split("T")[0]
+        };
 
         const res = await fetch("http://localhost:5000/api/notes", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newNote),
+            body: JSON.stringify(noteToSend),
         });
 
         if (res.ok) {
             const savedNote = await res.json();
             setEventNotes([...eventNotes, savedNote]);
-            setNewNote({ title: "", content: "" });
+            setNewNote({ title: "", content: "", date: "" });
             setMessage("✅ Note ajoutée !");
         }
     };
+
 
     const handleDeleteNote = async (id) => {
         try {
@@ -437,7 +444,7 @@ export default function AdminPanel({ onLogout }) {
                         <div key={note.id} className="note-item-admin">
                         <strong>{note.title}</strong><br />
                         <em>{note.content}</em><br />
-                        {note.date && <small>📅 {note.date}</small>}<br />
+                        {note.date && <small>📅 {new Date(note.date).toLocaleDateString()}</small>}
                         <div className="note-actions">
                             <button disabled={index === 0} onClick={() => moveNote(index, -1)}>⬆️</button>
                             <button disabled={index === eventNotes.length - 1} onClick={() => moveNote(index, 1)}>⬇️</button>
