@@ -85,5 +85,6 @@ h1 {
 }
 
 .cta-button:hover {
-  background-color: #7c6fff;
+  background-color: #0e534d;
+  color: white;
 }

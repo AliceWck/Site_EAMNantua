@@ -34,8 +34,8 @@ export default function Presentation() {
           </div>
 
           <div className="info-card">
-            <h2>📆 Horaires & cours</h2>
-            <p>À compléter : horaires d’ouverture, types de cours (instruments, chant, éveil musical...) en vrai ou lien vers un document récap</p>
+            <h2>📆 Cours proposés</h2>
+            <p>Voici ci-dessous la liste des cours proposés. Les horaires sont quant à eux décidés en accords avec les professeurs lors de votre inscription.</p>
           </div>
         </section>
 
