@@ -5,12 +5,29 @@
   margin: 0 auto;
 }
 
+/* Mise en page full height avec footer collé en bas */
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.evenement-container {
+  flex: 1; /* prend tout l’espace restant */
+  padding: 2rem;
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
 .back-button {
   display: inline-block;
   margin-bottom: 2rem;
-  background-color: #B8B8FF;
+  background-color: #4e7b77;
   color: white;
   border: none;
+  margin-top: 3rem;
   padding: 0.6rem 1.2rem;
   font-size: 1rem;
   border-radius: 8px;
@@ -19,7 +36,7 @@
 }
 
 .back-button:hover {
-  background-color: #7a6ee0;
+  background-color: #0e534d;
 }
 
 .evenement-container h1 {

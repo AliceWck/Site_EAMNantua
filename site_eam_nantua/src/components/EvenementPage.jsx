@@ -37,10 +37,9 @@ export default function EvenementPage() {
   }
 
   return (
-    <div>
+    <div className="page-wrapper">
       <Header />
       <main className="evenement-container">
-        <button className="back-button" onClick={() => navigate(-1)}>← Retour</button>
         <h1>{gallery.title}</h1>
         <div className="photos-grid">
           {gallery.images?.map((src, i) => (
@@ -49,8 +48,10 @@ export default function EvenementPage() {
             </div>
           ))}
         </div>
+        <button className="back-button" onClick={() => navigate(-1)}>← Retour</button>
       </main>
       <Footer />
     </div>
   );
+
 }
