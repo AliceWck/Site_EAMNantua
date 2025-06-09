@@ -49,18 +49,23 @@ export default function Photos() {
           ))}
         </div>
 
-        <h2 className="section-title"><br />Carnet d'événements</h2>
-        <div className="notes-grid">
-          {notes.map((note, i) => (
-            <div key={i} className="note-item" onClick={() => setOpenNote(openNote === i ? null : i)}>
-              <div className="note-title">{note.title}</div>
-              {note.date && (
-                <div className="note-date">📅 {new Date(note.date).toLocaleDateString()}</div>
-              )}
-              {openNote === i && <div className="note-content">{note.content}</div>}
+        {notes.length > 0 && (
+          <>
+            <h2 className="section-title"><br />Carnet d'événements</h2>
+            <div className="notes-grid">
+              {notes.map((note, i) => (
+                <div key={i} className="note-item" onClick={() => setOpenNote(openNote === i ? null : i)}>
+                  <div className="note-title">{note.title}</div>
+                  {note.date && (
+                    <div className="note-date">📅 {new Date(note.date).toLocaleDateString()}</div>
+                  )}
+                  {openNote === i && <div className="note-content">{note.content}</div>}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        )}
+
       </main>
       <Footer />
     </div>
