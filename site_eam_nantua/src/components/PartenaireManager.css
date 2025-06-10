@@ -5,6 +5,11 @@
   font-family: Arial, sans-serif;
 }
 
+.partenaire-manager h4 {
+    font-family: Arial, sans-serif;
+    font-size:2rem;
+}
+
 .partenaire-manager-form {
   background-color: #fdfdff; /* même couleur que archive-section */
   padding: 1.5rem;
@@ -16,6 +21,7 @@
   width: 90%;
   font-family: Arial, sans-serif;
 }
+
 
 
 .partenaire-manager input[type="text"],

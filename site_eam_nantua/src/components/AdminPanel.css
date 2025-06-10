@@ -17,6 +17,8 @@
 
 .add-button-violet {
   padding: 0.6rem 1.2rem;
+  margin-top: 1rem;
+  margin-bottom: 3rem;
   font-weight: bold;
   border-radius: 6px;
   cursor: pointer;
@@ -37,9 +39,15 @@
   color: white;
 }
 
+.tab-tab {
+  text-align: center;
+  margin-top: 2rem;
+  margin: 1rem;
+}
+
 .formulaires-tab {
   text-align: center;
-  margin-top: 3rem;
+  margin: 1rem 6rem auto 6rem;
 }
 
 .formulaire-list {
@@ -260,3 +268,49 @@
 }
 
 
+
+
+
+/* === Responsive Layout Fixes === */
+@media (max-width: 768px) {
+  .admin-tabs {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    padding: 0 1rem;
+  }
+
+  .formulaires-tab,
+  .tab-tab {
+    margin: 1rem 1rem;
+  }
+
+  .form-input {
+    width: 90%;
+  }
+
+  .contact-admin-container,
+  .archive-section {
+    width: 95%;
+    margin: 1rem auto;
+    padding: 1rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+
+  .logout-button {
+    width: 90%;
+  }
+
+  .note-form input,
+  .note-form textarea {
+    font-size: 1rem;
+  }
+}

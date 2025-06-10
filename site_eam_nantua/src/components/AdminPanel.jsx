@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./AdminPanel.css";
 import GalleryManager from './GalleryManager';
 import PartenaireManager from './PartenaireManager';
-
+import AccueilManager from './AccueilManager';
 
 
 export default function AdminPanel({ onLogout }) {
@@ -329,10 +329,6 @@ export default function AdminPanel({ onLogout }) {
             });
     };
 
-
-
-
-
     return (
         <div className="admin-panel">
         <h1><center>Interface d'administration</center></h1>
@@ -348,11 +344,12 @@ export default function AdminPanel({ onLogout }) {
         </div>
 
         {activeTab === "accueil" && (
-            <div className="formulaires-tab">
-            <h2>🏠 Contenu de la page d’accueil</h2>
-            <p>Ici tu pourras modifier les textes ou éléments de la page d'accueil.</p>
+            <div className="accueil-tab">
+                <AccueilManager />
             </div>
         )}
+
+
 
         
         {activeTab === "formulaires" && (
@@ -399,7 +396,7 @@ export default function AdminPanel({ onLogout }) {
 
 
         {activeTab === "archives" && (
-            <div className="formulaires-tab">
+            <div className="tab-tab">
 
                 <div className="archive-section">
                 <h3>📷 Galerie photos</h3>
@@ -461,7 +458,7 @@ export default function AdminPanel({ onLogout }) {
 
 
         {activeTab === "equipe" && (
-            <div className="formulaires-tab">
+            <div className="tab-tab">
                 <h2>👥 Membres de l'équipe</h2>
 
                 {equipe.length === 0 ? (
@@ -567,7 +564,7 @@ export default function AdminPanel({ onLogout }) {
 
 
         {activeTab === "partenaires" && (
-            <div className="formulaires-tab">
+            <div className="tab-tab">
                 <h2>🤝 Logos des partenaires</h2>
                 <PartenaireManager />
             </div>

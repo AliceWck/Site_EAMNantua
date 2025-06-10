@@ -2,96 +2,152 @@ const express = require("express");
 const cors = require("cors");
 const fs = require("fs-extra");
 const path = require("path");
-
 const multer = require("multer");
-
-// Dossier de destination pour les images
-const uploadDir = path.join(__dirname, "..", "public", "images", "equipe");
-
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Configurer multer pour storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    // Nettoyer le nom du fichier pour éviter les conflits
-    const safeName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
-    cb(null, safeName);
-  },
-});
-
-const uploadEquipe = multer({ storage });
-const uploadTemp = multer({ dest: "temp_uploads/" }); // pour les galeries
-
-
-// mutler pour storagePartenaires
-const partenairesUploadDir = path.join(__dirname, "..", "public", "images", "partenaires");
-if (!fs.existsSync(partenairesUploadDir)) {
-  fs.mkdirSync(partenairesUploadDir, { recursive: true });
-}
-
-const storagePartenaires = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, partenairesUploadDir);
-  },
-  filename: (req, file, cb) => {
-    const safeName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
-    cb(null, safeName);
-  },
-});
-
-
-const uploadPartenaireLogo = multer({ storage: storagePartenaires });
-
 
 const app = express();
 const PORT = 5000;
 
-app.use(cors());
-app.use(express.json());
 
+
+
+// Constantes d’authentification
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = "secret123";
 
-const dataDir = path.join(__dirname, "..", "public", "data");
-const formulairesFilePath = path.join(dataDir, "formulaires.json");
 
-if (!fs.existsSync(formulairesFilePath)) {
-  fs.writeFileSync(formulairesFilePath, JSON.stringify([], null, 2));
-}
+
+// Dossiers importants
+const dataDir = path.join(__dirname, "..", "public", "data");
+const uploadDirEquipe = path.join(__dirname, "..", "public", "images", "equipe");
+const partenairesUploadDir = path.join(__dirname, "..", "public", "images", "partenaires");
+const accueilImageDir = path.join(__dirname, "public", "images", "accueil");
+
+
+
+// Création dossiers si inexistants
+if (!fs.existsSync(uploadDirEquipe)) fs.mkdirSync(uploadDirEquipe, { recursive: true });
+if (!fs.existsSync(partenairesUploadDir)) fs.mkdirSync(partenairesUploadDir, { recursive: true });
+if (!fs.existsSync(accueilImageDir)) fs.mkdirSync(accueilImageDir, { recursive: true });
+if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+
+
+
+
+// Fichiers JSON et initialisation si inexistant
+const formulairesFilePath = path.join(dataDir, "formulaires.json");
+if (!fs.existsSync(formulairesFilePath)) fs.writeFileSync(formulairesFilePath, JSON.stringify([], null, 2));
 
 const photosJsonPath = path.join(dataDir, "photos.json");
-if (!fs.existsSync(photosJsonPath)) {
-  fs.writeFileSync(photosJsonPath, JSON.stringify([], null, 2));
-}
+if (!fs.existsSync(photosJsonPath)) fs.writeFileSync(photosJsonPath, JSON.stringify([], null, 2));
 
-
-////////// NOTES début
-// Créer fichier notes.json si existe pas
 const notesFilePath = path.join(dataDir, "notes.json");
+if (!fs.existsSync(notesFilePath)) fs.writeFileSync(notesFilePath, JSON.stringify([], null, 2));
 
-if (!fs.existsSync(notesFilePath)) {
-  fs.writeFileSync(notesFilePath, JSON.stringify([], null, 2));
+const partenairesFilePath = path.join(dataDir, "partenaires.json");
+if (!fs.existsSync(partenairesFilePath)) fs.writeFileSync(partenairesFilePath, JSON.stringify([], null, 2));
+
+const accueilJsonPath = path.join(dataDir, "accueil.json");
+const uploadPath = path.join(__dirname, "..", "public", "images", "accueil");
+const factsJsonPath = path.join(dataDir, "facts.json");
+
+
+
+
+// Multer storage configs
+
+// Stockage images équipe
+const storageEquipe = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadDirEquipe),
+  filename: (req, file, cb) => {
+    const safeName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
+    cb(null, safeName);
+  },
+});
+const uploadEquipe = multer({ storage: storageEquipe });
+
+// Stockage temporaire pour galeries
+const uploadTemp = multer({ dest: "temp_uploads/" });
+
+// Stockage images partenaires
+const storagePartenaires = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, partenairesUploadDir),
+  filename: (req, file, cb) => {
+    const safeName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
+    cb(null, safeName);
+  },
+});
+
+const uploadPartenaireLogo = multer({ storage: storagePartenaires });
+
+// Stockage image accueil
+const storageAccueil = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "..", "public", "images", "accueil"));
+  },
+  filename: (req, file, cb) => {
+    // On récupère l'extension originale
+    const ext = path.extname(file.originalname);
+    // On crée un nom sûr avec timestamp + extension
+    cb(null, Date.now() + ext);
+  },
+});
+
+const uploadAccueil = multer({ 
+  storage: storageAccueil,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.match(/image\/(jpeg|png|jpg)/)) {
+      return cb(new Error("Seules les images JPG/PNG sont acceptées"));
+    }
+    cb(null, true);
+  }
+});
+
+
+
+
+
+
+// Fonctions helpers JSON
+function readJson(filePath) {
+  if (!fs.existsSync(filePath)) return null;
+  const data = fs.readFileSync(filePath, "utf-8");
+  return JSON.parse(data);
+}
+function writeJson(filePath, data) {
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
 }
 
+// Notes spécifiques
 function loadNotes() {
   const raw = fs.readFileSync(notesFilePath, "utf-8");
   return JSON.parse(raw);
 }
-
 function saveNotes(data) {
   fs.writeFileSync(notesFilePath, JSON.stringify(data, null, 2), "utf-8");
+}
+
+// Partenaires spécifiques
+function loadPartenaires() {
+  const raw = fs.readFileSync(partenairesFilePath, "utf-8");
+  return JSON.parse(raw);
+}
+function savePartenaires(data) {
+  fs.writeFileSync(partenairesFilePath, JSON.stringify(data, null, 2), "utf-8");
 }
 
 
 
 
+// Middleware
+app.use(cors());
+app.use(express.json());
 
 
+
+
+
+// Routes
 app.post("/api/login", (req, res) => {
   const { username, password } = req.body;
   if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
@@ -106,24 +162,9 @@ app.get("/", (req, res) => {
 });
 
 
-
-//////////// PARTENAIRES API
-const partenairesFilePath = path.join(dataDir, "partenaires.json");
-if (!fs.existsSync(partenairesFilePath)) {
-  fs.writeFileSync(partenairesFilePath, JSON.stringify([], null, 2));
-}
-
-function loadPartenaires() {
-  const raw = fs.readFileSync(partenairesFilePath, "utf-8");
-  return JSON.parse(raw);
-}
-
-function savePartenaires(data) {
-  fs.writeFileSync(partenairesFilePath, JSON.stringify(data, null, 2), "utf-8");
-}
-
-
-
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
 
 
 
@@ -643,3 +684,156 @@ app.put("/api/partenaires", (req, res) => {
   }
 });
 
+
+
+
+
+//////////// FACTS ACCUEIL
+
+if (!fs.existsSync(factsJsonPath)) {
+  fs.writeFileSync(factsJsonPath, JSON.stringify([], null, 2));
+}
+
+function loadFacts() {
+  const raw = fs.readFileSync(factsJsonPath, 'utf-8');
+  return JSON.parse(raw);
+}
+
+function saveFacts(data) {
+  fs.writeFileSync(factsJsonPath, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+
+
+// GET - récupérer tous les facts
+app.get('/api/facts', (req, res) => {
+  try {
+    const facts = loadFacts();
+    res.json(facts);
+  } catch (err) {
+    console.error('Erreur lecture facts :', err);
+    res.status(500).json({ message: 'Erreur lecture facts' });
+  }
+});
+
+// POST - ajouter un nouveau fact
+app.post('/api/facts', (req, res) => {
+  const { title, value, icon } = req.body;
+  if (!title || !value) {
+    return res.status(400).json({ message: 'Titre et valeur requis' });
+  }
+
+  try {
+    const facts = loadFacts();
+    const newFact = { id: Date.now(), title, value, icon: icon || null };
+    facts.push(newFact);
+    saveFacts(facts);
+    res.status(201).json(newFact);
+  } catch (err) {
+    console.error('Erreur ajout fact :', err);
+    res.status(500).json({ message: 'Erreur ajout fact' });
+  }
+});
+
+// PUT - modifier un fact existant
+app.put('/api/facts/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const { title, value, icon } = req.body;
+
+  if (!title || !value) {
+    return res.status(400).json({ message: 'Titre et valeur requis' });
+  }
+
+  try {
+    const facts = loadFacts();
+    const index = facts.findIndex(f => f.id === id);
+    if (index === -1) return res.status(404).json({ message: 'Fact non trouvé' });
+
+    facts[index] = { ...facts[index], title, value, icon };
+    saveFacts(facts);
+    res.status(200).json(facts[index]);
+  } catch (err) {
+    console.error('Erreur modification fact :', err);
+    res.status(500).json({ message: 'Erreur modification fact' });
+  }
+});
+
+// DELETE - supprimer un fact
+app.delete('/api/facts/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+
+  try {
+    let facts = loadFacts();
+    const initialLength = facts.length;
+    facts = facts.filter(f => f.id !== id);
+
+    if (facts.length === initialLength) {
+      return res.status(404).json({ message: 'Fact non trouvé' });
+    }
+
+    saveFacts(facts);
+    res.status(200).json({ message: 'Fact supprimé' });
+  } catch (err) {
+    console.error('Erreur suppression fact :', err);
+    res.status(500).json({ message: 'Erreur suppression fact' });
+  }
+});
+
+
+
+// POST - upload image d'accueil
+app.post("/api/upload-home-image", uploadAccueil.single("image"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "Aucun fichier envoyé" });
+  }
+
+  // Lire l'ancien JSON pour récupérer l'ancienne image
+  const oldData = readJson(accueilJsonPath);
+    if (oldData && oldData.imageUrl) {
+    // oldData.imageUrl = "/images/accueil/xxxxx.jpg"
+    const oldImagePath = path.join(__dirname, "..", "public", oldData.imageUrl);
+    if (fs.existsSync(oldImagePath)) {
+      try {
+        fs.unlinkSync(oldImagePath);
+      } catch (err) {
+        console.error("Erreur suppression ancienne image :", err);
+      }
+    }
+  }
+
+  // L'url relative de la nouvelle image (à adapter selon ta config serveur)
+  const imageUrl = `/images/accueil/${req.file.filename}`;
+
+  // Écrire la nouvelle info dans JSON (avec timestamp pour version)
+  const accueilData = { imageUrl, version: Date.now() };
+  writeJson(accueilJsonPath, accueilData);
+
+  // Répondre avec les données mises à jour
+  res.json(accueilData);
+});
+
+
+
+app.get("/api/image-version", (req, res) => {
+  try {
+    const accueilData = readJson(accueilJsonPath);
+    if (!accueilData || !accueilData.version) {
+      return res.status(404).json({ message: "Version non trouvée" });
+    }
+    res.json({ version: accueilData.version });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+app.get("/api/accueil-image", (req, res) => {
+  try {
+    const accueilData = readJson(accueilJsonPath);
+    if (!accueilData || !accueilData.imageUrl) {
+      return res.status(404).json({ message: "Image non trouvée" });
+    }
+    res.json({ imageUrl: accueilData.imageUrl, version: accueilData.version });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});

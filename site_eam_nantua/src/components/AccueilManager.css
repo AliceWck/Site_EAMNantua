@@ -1,0 +1,352 @@
+.accueil-manager {
+  max-width: 900px;
+  margin: 2rem ;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.facts-management ul {
+  list-style: none;
+  padding: 0;
+  align-items: center;
+}
+
+.facts-management li {
+  border: 1px solid #ccc;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+  border-radius: 6px;
+  background-color: #fafafa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fact-main {
+  flex: 1 1 auto;
+  text-align: left;
+  align-items: center;
+}
+
+.fact-main strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.fact-description {
+  font-size: 0.95rem;
+  color: #444;
+  white-space: normal; /* pour que ça puisse aller sur plusieurs lignes */
+  word-break: break-word; /* coupe si trop long */
+}
+
+.fact-actions {
+  display: flex;
+  flex-direction: column; /* empile verticalement */
+  gap: 0.5rem;            /* espace entre les boutons */
+  flex-shrink: 0;
+}
+
+.facts-form {
+  max-width: 700px;
+  margin: 0 auto;
+  display: block;
+}
+
+.fact-input {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 2rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+.facts-form-buttons {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 2rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+}
+
+
+
+/* Sections containers */
+.image-upload,
+.facts-management {
+  background-color: #fff;
+  padding: 1.8rem 2rem;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  margin: 2.5rem auto;
+  width: 100%;
+  max-width: 800vw;
+  box-sizing: border-box;
+}
+
+/* Section titles */
+.accueil-manager h2,
+.accueil-manager h3,
+.accueil-manager h4 {
+  color: #4a4a6a;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  user-select: none;
+}
+
+.accueil-manager h2 {
+  font-size: 2rem;
+  text-align: center;
+}
+
+.accueil-manager h3 {
+  font-size: 1.4rem;
+  border-bottom: 2px solid #B8B8FF;
+  padding-bottom: 0.3rem;
+}
+
+/* ===== Inputs ===== */
+.accueil-manager input[type="text"],
+.accueil-manager input[type="url"],
+.accueil-manager input[type="file"],
+.accueil-manager textarea,
+.facts-management input[type="text"] {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 1.2rem;
+  border-radius: 8px;
+  border: 1.8px solid #ccc;
+  font-size: 1rem;
+  transition: border-color 0.25s ease;
+  box-sizing: border-box;
+  resize: both;
+}
+
+
+.accueil-manager textarea {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 1.2rem;
+  border-radius: 8px;
+  border: 1.8px solid #ccc;
+  font-size: 1rem;
+  transition: border-color 0.25s ease;
+  box-sizing: border-box;
+}
+
+.accueil-manager input[type="text"]:focus,
+.accueil-manager input[type="url"]:focus,
+.accueil-manager input[type="file"]:focus,
+.accueil-manager textarea:focus,
+.facts-management input[type="text"]:focus {
+  outline: none;
+  border-color: #9381FF;
+  box-shadow: 0 0 8px rgba(147,129,255,0.4);
+}
+
+/* Facts inputs: inline with flex */
+.facts-management form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.facts-management input[type="text"] {
+  flex-grow: 1;
+  min-width: 130px;
+}
+
+/* ===== Buttons ===== */
+button {
+  cursor: pointer;
+  font-weight: 700;
+  border-radius: 8px;
+  border: none;
+  padding: 0.6rem 1.3rem;
+  font-size: 1rem;
+  min-width: 130px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  user-select: none;
+}
+
+button:focus {
+  outline: 3px solid #9381FF;
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.25s;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-cancel {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background-color: #a71d2a;
+}
+
+/* ===== Facts List ===== */
+.facts-management ul {
+  list-style: none;
+  padding-left: 0;
+  max-width: 800vw;
+  margin: 0 auto 1.5rem;
+}
+
+.facts-management ul li {
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1rem;
+  color: #333;
+  user-select: none;
+}
+
+/* Fact main content (title + value + icon) */
+.fact-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-grow: 1;
+  overflow-wrap: anywhere;
+}
+
+.fact-icon {
+  background-color: #B8B8FF;
+  color: white;
+  font-size: 1.7rem;
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+
+
+.fact-text {
+  font-weight: 600;
+  white-space: normal; /* autorise le retour à la ligne */
+  overflow-wrap: break-word; /* coupe les mots si trop longs */
+  word-break: break-word;
+  max-width: 100%; /* ou 100%, selon largeur souhaitée */
+}
+
+.fact-text span.icon-label {
+  margin-left: 6px;
+  color: #777;
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Actions buttons on each fact */
+.facts-management ul li .edit-btn,
+.facts-management ul li .delete-btn {
+  font-weight: 600;
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
+  min-width: 90px;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  user-select: none;
+  border: none;
+  margin-left: 0;
+  min-width: 90px;
+}
+
+.facts-management ul li .edit-btn {
+  background-color: #6b8cff;
+  color: white;
+}
+
+.facts-management ul li .edit-btn:hover,
+.facts-management ul li .edit-btn:focus {
+  background-color: #4a6bdd;
+}
+
+.facts-management ul li .delete-btn {
+  background-color: transparent;
+  color: #b53030;
+  border: 1.5px solid transparent;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.facts-management ul li .delete-btn:hover,
+.facts-management ul li .delete-btn:focus {
+  background-color: #f8d7da;
+  border-color: #b53030;
+  color: #721c24;
+}
+
+/* ===== Image preview styling ===== */
+.image-upload img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 14px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  margin-top: 1rem;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .facts-management ul li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .fact-main {
+    max-width: 100%;
+  }
+
+  .facts-management ul li .edit-btn,
+  .facts-management ul li .delete-btn {
+    min-width: 100%;
+    margin-left: 0;
+  }
+
+  .facts-management form {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .facts-management input[type="text"] {
+    max-width: 100%;
+    min-width: auto;
+  }
+}
