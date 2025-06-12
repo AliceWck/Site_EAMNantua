@@ -8,6 +8,8 @@ export default function Accueil() {
   const [facts, setFacts] = useState([]);
   const [imageUrl, setImageUrl] = useState(null);
   const [imageVersion, setImageVersion] = useState(null);
+  const [contactEmail, setContactEmail] = useState("");
+
 
   useEffect(() => {
     fetch("/api/facts")
@@ -28,6 +30,16 @@ export default function Accueil() {
         setImageUrl("/images/accueil/accueil.jpeg");
         setImageVersion(Date.now());
       });
+
+      // Récupérer l'email depuis contact.json via l'API
+      fetch("/api/contact")
+        .then(res => res.json())
+        .then(data => {
+          if (data.email) setContactEmail(data.email);
+        })
+        .catch(err => {
+          console.error("Erreur chargement contact:", err);
+        });
   }, []);
 
 
@@ -121,7 +133,7 @@ export default function Accueil() {
           >
             <img src="/images/logos/logo-insta-2.png" alt="Instagram" />
           </a>
-          <a href="mailto:ecole@artsmusique-hb.fr" className="reseau-link">
+          <a href={`mailto:${contactEmail}`} className="reseau-link">
             <img src="/images/logos/logo-mail.png" alt="Mail" />
           </a>
         </div>

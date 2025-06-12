@@ -1,7 +1,21 @@
 import { Link } from "react-router-dom";
 import "./Footer.css";
+import { useState, useEffect } from "react";
 
 export default function Footer() {
+  const [contactEmail, setContactEmail] = useState("");
+
+  useEffect(() => {
+    fetch("/api/contact")
+      .then(res => res.json())
+      .then(data => {
+        if (data.email) setContactEmail(data.email);
+      })
+      .catch(err => {
+        console.error("Erreur chargement contact dans footer:", err);
+      });
+  }, []);
+
   return (
     <footer className="footer">
       <div className="footer-logos">
@@ -11,7 +25,7 @@ export default function Footer() {
         <a href="https://www.instagram.com/ecoleartsetmusiquenantua/" target="_blank" rel="noopener noreferrer">
           <img src="/images/logos/logo-insta-2.png" alt="Instagram" />
         </a>
-        <a href="mailto:ecole@artsmusique-hb.fr">
+        <a href={`mailto:${contactEmail}`}>
           <img src="/images/logos/logo-mail.png" alt="Mail" />
         </a>
       </div>

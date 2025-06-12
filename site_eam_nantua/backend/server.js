@@ -873,6 +873,10 @@ app.get("/api/accueil-image", (req, res) => {
 });
 
 
+app.get("/api/contact", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "public", "data", "contact.json"));
+});
+
 
 
 
