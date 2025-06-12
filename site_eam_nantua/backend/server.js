@@ -205,8 +205,12 @@ app.listen(PORT, () => {
 /////////// CONTACT
 const contactFilePath = path.join(dataDir, "contact.json");
 
+// Au démarrage, si le fichier n'existe pas, on initialise avec les 4 champs
 if (!fs.existsSync(contactFilePath)) {
-  fs.writeFileSync(contactFilePath, JSON.stringify({ email: "", phone: "" }, null, 2));
+  fs.writeFileSync(
+    contactFilePath,
+    JSON.stringify({ email: "", phone: "", facebook: "", instagram: "" }, null, 2)
+  );
 }
 
 // Helper pour lire/écrire les contacts
@@ -232,11 +236,14 @@ app.get("/api/contact", (req, res) => {
 
 // PUT : mettre à jour les infos de contact dans contact.json
 app.put("/api/contact", (req, res) => {
-  const { email, phone } = req.body;
-  if (!email || !phone) return res.status(400).json({ message: "Email et téléphone requis" });
+  const { email, phone, facebook, instagram } = req.body;
+
+  if (!email || !phone) {
+    return res.status(400).json({ message: "Email et téléphone requis" });
+  }
 
   try {
-    const updated = { email, phone };
+    const updated = { email, phone, facebook: facebook || "", instagram: instagram || "" };
     saveContact(updated);
     res.status(200).json({ message: "Contact mis à jour" });
   } catch (err) {

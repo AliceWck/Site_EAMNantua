@@ -11,11 +11,10 @@ export default function AdminPanel({ onLogout }) {
     const [formulaires, setFormulaires] = useState([]);
 
     const [message, setMessage] = useState("");
-    const [contact, setContact] = useState({ phone: "", email: "" });
+    const [contact, setContact] = useState({ phone: "", email: "", facebook: "", instagram: "" });
 
     const [eventNotes, setEventNotes] = useState([]);
     const [newNote, setNewNote] = useState({ title: "", content: "", date: "" });
-
 
     const [newForm, setNewForm] = useState({ name: "", url: "" });
 
@@ -76,8 +75,8 @@ export default function AdminPanel({ onLogout }) {
     //////////// CONTACT
 
     const handleContactChange = (e) => {
-    const { name, value } = e.target;
-    setContact({ ...contact, [name]: value });
+        const { name, value } = e.target;
+        setContact({ ...contact, [name]: value });
     };
 
     const handleSaveContact = async () => {
@@ -560,6 +559,29 @@ export default function AdminPanel({ onLogout }) {
                     placeholder="ecole@artsmusique-hb.fr"
                 />
                 </label>
+
+                <label>
+                    Lien Facebook :
+                    <input
+                        type="url"
+                        name="facebook"
+                        value={contact.facebook}
+                        onChange={handleContactChange}
+                        placeholder="https://www.facebook.com/..."
+                    />
+                    </label>
+
+                    <label>
+                    Lien Instagram :
+                    <input
+                        type="url"
+                        name="instagram"
+                        value={contact.instagram}
+                        onChange={handleContactChange}
+                        placeholder="https://www.instagram.com/..."
+                    />
+                </label>
+
 
                 <button onClick={handleSaveContact} >💾 Enregistrer</button>
             </div>

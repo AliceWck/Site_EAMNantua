@@ -8,7 +8,11 @@ export default function Accueil() {
   const [facts, setFacts] = useState([]);
   const [imageUrl, setImageUrl] = useState(null);
   const [imageVersion, setImageVersion] = useState(null);
-  const [contactEmail, setContactEmail] = useState("");
+  const [contact, setContact] = useState({
+    email: "",
+    facebook: "",
+    instagram: ""
+  });
 
 
   useEffect(() => {
@@ -31,15 +35,17 @@ export default function Accueil() {
         setImageVersion(Date.now());
       });
 
-      // Récupérer l'email depuis contact.json via l'API
-      fetch("/api/contact")
-        .then(res => res.json())
-        .then(data => {
-          if (data.email) setContactEmail(data.email);
-        })
-        .catch(err => {
-          console.error("Erreur chargement contact:", err);
+    // Charger contact (email, facebook, instagram)
+    fetch("/api/contact")
+      .then(res => res.json())
+      .then(data => {
+        setContact({
+          email: data.email || "",
+          facebook: data.facebook || "",
+          instagram: data.instagram || ""
         });
+      })
+      .catch(err => console.error("Erreur chargement contact:", err));
   }, []);
 
 
@@ -117,25 +123,43 @@ export default function Accueil() {
         <h2>Réseaux sociaux</h2>
         <p>Vous pouvez également nous suivre sur ces différentes plateformes :</p>
         <div className="reseaux-icons">
-          <a
-            href="https://www.facebook.com/p/Ecole-Arts-et-Musique-du-Haut-Bugey-100038170507594/?locale=fr_FR"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="reseau-link"
-          >
-            <img src="/images/logos/logo-fb-2.png" alt="Facebook" />
-          </a>
-          <a
-            href="https://www.instagram.com/ecoleartsetmusiquenantua/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="reseau-link"
-          >
-            <img src="/images/logos/logo-insta-2.png" alt="Instagram" />
-          </a>
-          <a href={`mailto:${contactEmail}`} className="reseau-link">
-            <img src="/images/logos/logo-mail.png" alt="Mail" />
-          </a>
+          {contact.facebook && (
+            <a
+              href={contact.facebook}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="reseau-link"
+            >
+              <img
+                src="/images/logos/logo-fb-2.png"
+                alt="Facebook"
+                className="reseau-logo"
+              />
+            </a>
+          )}
+          {contact.instagram && (
+            <a
+              href={contact.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="reseau-link"
+            >
+              <img
+                src="/images/logos/logo-insta-2.png"
+                alt="Instagram"
+                className="reseau-logo"
+              />
+            </a>
+          )}
+          {contact.email && (
+            <a href={`mailto:${contact.email}`} className="reseau-link">
+              <img
+                src="/images/logos/logo-mail.png"
+                alt="Mail"
+                className="reseau-logo"
+              />
+            </a>
+          )}
         </div>
       </section>
 
