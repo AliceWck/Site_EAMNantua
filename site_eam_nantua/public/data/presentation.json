@@ -1,0 +1,22 @@
+{
+  "title": "École des Arts et Musique du Haut Bugey",
+  "subtitle": "Un lieu d’épanouissement artistique pour tous les âges",
+  "mission": "Offrir un enseignement musical et artistique de qualité, accessible à tous, dans un cadre bienveillant favorisant l’expression, la créativité et le développement personnel.",
+  "address": "31 rue du docteur Mercier, Nantua, France",
+  "mapEmbedUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2782.7327931790173!2d5.605994915801201!3d46.1547640791141!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x478c9a55fd989eab%3A0x8d86b3f037b97a0e!2s31%20Rue%20du%20Docteur%20Mercier%2C%2001100%20Nantua%2C%20France!5e0!3m2!1sfr!2sfr!4v1715958412345!5m2!1sfr!2sfr",
+  "courses": [
+    "Guitare",
+    "Violon",
+    "Batterie",
+    "Chant",
+    "Éveil musical",
+    "Formation musicale",
+    "Piano"
+  ],
+  "cta": {
+    "text": "Prêt·e à commencer ?",
+    "link": "/inscription",
+    "buttonText": "Inscrivez-vous ici"
+  },
+  "pdfUrl": "/data/documents/1749750586078-charte_2021.pdf"
+}

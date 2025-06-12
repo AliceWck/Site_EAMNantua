@@ -16,10 +16,11 @@ function Mentions() {
           <p className="mentionsSTitle">MENTIONS LÉGALES - ASSOCIATION DE LOI 1901 :</p>
           <p className="mentionsSubtitle">IDENTITÉ</p>
           <p>
-            Nom de l'association : xxxxxx<br />
-            Adresse Siège Social : xxxxxxxxxx <br />
-            Téléphone : xxxxxxxxxx<br />
-            Co-Présidents de l’Association : xxxxxxxxx<br />
+            Nom de l'association : Ecole Arts et Musique du Haut-Bugey<br />
+            Adresse Siège Social : 31 rue du Docteur Mercier 01130 NANTUA <br />
+            Téléphone : 04 74 75 00 81<br />
+            Président.e de l’Association : Karine ESCANDE<br />
+            Co-Président.e : Laila PINEDE<br />
             Association loi 1901
           </p>
 
@@ -60,14 +61,14 @@ function Mentions() {
           <p className="mentionsSTitle">DONNÉES PERSONNELLES</p>
           <p>
             Conformément au RGPD, vous disposez d’un droit d’accès, de rectification, de suppression et d’opposition à vos données personnelles.<br />
-            Les données collectées via Google Forms sont utilisées uniquement pour les inscriptions aux activités de l'association xxxxxxxxxxxxx. Elles ne sont ni revendues ni partagées.<br />
-            Contact : <a href="mailto:xxxx@xxx.fr">xxxx@xxx.fr</a>
+            Les données collectées via Google Forms sont utilisées uniquement pour les inscriptions aux activités de l'association Ecole Arts et Musique du Haut-Bugey. Elles ne sont ni revendues ni partagées.<br />
+            Contact : <a href="mailto:ecole@artsmusique-hb.fr">ecole@artsmusique-hb.fr</a>
           </p>
 
           <p className="mentionsSubtitle">PHOTOGRAPHIES ET DROIT À L’IMAGE</p>
           <p>
             Des photos prises lors d’événements peuvent apparaître sur ce site.<br />
-            Pour demander leur retrait, contactez : <a href="mailto:xxxx@xxx.fr">xxxx@xxx.fr</a>
+            Pour demander leur retrait, contactez : <a href="mailto:ecole@artsmusique-hb.fr">ecole@artsmusique-hb.fr</a>
           </p>
         </div>
       </div>

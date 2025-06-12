@@ -1,0 +1,134 @@
+.presentation-admin {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: Arial, sans-serif;
+}
+
+.presentation-admin h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.presentation-admin label {
+  display: block;
+  margin-bottom: 1.5rem;
+  font-weight: bold;
+}
+
+/* Inputs et textarea Titre, Sous-titre, Mission, Adresse */
+.presentation-admin input[type="text"],
+.presentation-admin textarea {
+  width: 100%;
+  max-width: 600px;
+  padding: 0.7rem;   /* un peu plus épais */
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  display: block;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+/* textarea Mission */
+.presentation-admin textarea {
+  min-height: 120px; /* plus haut pour la mission */
+  resize: vertical;
+}
+
+.presentation-admin .course-list {
+  margin-bottom: 1rem;
+}
+
+.presentation-admin .course-list div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.presentation-admin .course-list input[type="text"] {
+  flex-grow: 1;
+  padding: 0.7rem; /* même padding que les autres inputs */
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 800px;
+}
+
+.presentation-admin .course-list button {
+  padding: 0.3rem 0.6rem;
+  background-color: #000000;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.presentation-admin .course-list button:hover {
+  background-color: #e34c4c;
+}
+
+.presentation-admin .course-actions,
+.presentation-admin .form-actions {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.presentation-admin .course-actions button,
+.presentation-admin .form-actions button {
+  padding: 0.6rem 1.2rem;
+  background-color: #B8B8FF;
+  border: none;
+  color: rgb(0, 0, 0);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.presentation-admin .course-actions button:hover,
+.presentation-admin .form-actions button:hover {
+  background-color: #9381FF;
+}
+
+.presentation-admin p {
+  font-size: 1rem;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+
+.presentation-admin label input[name="title"],
+.presentation-admin label input[name="subtitle"],
+.presentation-admin label input[name="address"],
+.presentation-admin label textarea[name="mission"] {
+  width: 100%;
+  max-width: 800px;
+  padding: 0.8rem 1rem;
+  font-size: 1.1rem;
+  border: 2px solid #b8b8ff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(184, 184, 255, 0.3);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  display: block;
+  margin-top: 0.5rem;
+  box-sizing: border-box;
+}
+
+.presentation-admin label input[name="title"]:focus,
+.presentation-admin label input[name="subtitle"]:focus,
+.presentation-admin label input[name="address"]:focus,
+.presentation-admin label textarea[name="mission"]:focus {
+  border-color: #9381ff;
+  box-shadow: 0 0 8px 2px #9381ff88;
+  outline: none;
+}

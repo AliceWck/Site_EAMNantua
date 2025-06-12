@@ -23,7 +23,6 @@ const partenairesUploadDir = path.join(__dirname, "..", "public", "images", "par
 const accueilImageDir = path.join(__dirname, "public", "images", "accueil");
 
 
-
 // Création dossiers si inexistants
 if (!fs.existsSync(uploadDirEquipe)) fs.mkdirSync(uploadDirEquipe, { recursive: true });
 if (!fs.existsSync(partenairesUploadDir)) fs.mkdirSync(partenairesUploadDir, { recursive: true });
@@ -50,6 +49,16 @@ const accueilJsonPath = path.join(dataDir, "accueil.json");
 const uploadPath = path.join(__dirname, "..", "public", "images", "accueil");
 const factsJsonPath = path.join(dataDir, "facts.json");
 
+
+const presentationFilePath = path.join(dataDir, "presentation.json");
+if (!fs.existsSync(presentationFilePath)) {
+  fs.writeFileSync(presentationFilePath, JSON.stringify({ title: "", subtitle: "", mission: "", address: "", courses: [] }, null, 2));
+}
+
+
+// Fichier PDF et initialisation si inexistant (pour presentation)
+const documentsDir = path.join(dataDir, "documents");
+if (!fs.existsSync(documentsDir)) fs.mkdirSync(documentsDir, { recursive: true });
 
 
 
@@ -101,6 +110,27 @@ const uploadAccueil = multer({
     }
     cb(null, true);
   }
+});
+
+
+// Stockage PDF
+const storagePdf = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, documentsDir),
+  filename: (req, file, cb) => {
+    const safeName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
+    cb(null, safeName);
+  },
+});
+
+const uploadPdf = multer({ 
+  storage: storagePdf,
+  limits: { fileSize: 10 * 1024 * 1024 }, // max 10MB par exemple
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype !== "application/pdf") {
+      return cb(new Error("Seuls les fichiers PDF sont acceptés"));
+    }
+    cb(null, true);
+  },
 });
 
 
@@ -165,6 +195,10 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
+
+
+
+
 
 
 
@@ -836,4 +870,87 @@ app.get("/api/accueil-image", (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur" });
   }
+});
+
+
+
+
+
+
+
+/////////////////// PRESENTATION// 
+// GET - récupérer le contenu de présentation
+app.get("/api/presentation-content", (req, res) => {
+  fs.readFile(presentationFilePath, "utf8", (err, data) => {
+    if (err) return res.status(500).json({ error: "Erreur lecture." });
+    res.json(JSON.parse(data));
+  });
+});
+
+// POST - enregistrer les modifications
+app.post("/api/presentation-content", (req, res) => {
+  fs.writeFile(presentationFilePath, JSON.stringify(req.body, null, 2), "utf8", (err) => {
+    if (err) return res.status(500).json({ error: "Erreur écriture." });
+    res.json({ success: true });
+  });
+});
+
+// Route upload PDF
+app.post("/api/upload-pdf", uploadPdf.single("pdf"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "Fichier PDF manquant" });
+  }
+
+  const oldPdfUrl = req.body.oldPdfUrl;
+
+  // Supprimer ancien PDF si on a bien une URL relative attendue
+  if (oldPdfUrl && oldPdfUrl.startsWith("/data/documents/")) {
+    const oldPdfPath = path.join(__dirname, "..", "public", oldPdfUrl);
+    fs.unlink(oldPdfPath, (err) => {
+      if (err) {
+        console.warn("Erreur suppression ancien PDF :", err.message);
+      } else {
+        console.log("Ancien PDF supprimé :", oldPdfPath);
+      }
+    });
+  }
+
+  const pdfUrl = `/data/documents/${req.file.filename}`;
+  res.json({ pdfUrl });
+});
+
+
+app.post("/api/delete-pdf", (req, res) => {
+  const { pdfUrl } = req.body;
+
+  if (!pdfUrl || !pdfUrl.startsWith("/data/documents/")) {
+    return res.status(400).json({ error: "PDF invalide ou manquant" });
+  }
+
+  const pdfPath = path.join(__dirname, "..", "public", pdfUrl);
+  const jsonPath = path.join(__dirname, "..", "public", "data", "presentation.json");
+
+
+  // Supprime le fichier PDF
+  fs.unlink(pdfPath, (err) => {
+    if (err && err.code !== "ENOENT") {
+      console.warn("Erreur suppression PDF :", err.message);
+      return res.status(500).json({ error: "Erreur suppression PDF" });
+    }
+
+    console.log("PDF supprimé :", pdfPath);
+
+    // Met à jour le JSON
+    try {
+      const content = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
+      content.pdfUrl = null;
+      fs.writeFileSync(jsonPath, JSON.stringify(content, null, 2), "utf-8");
+      console.log("pdfUrl mis à null dans le JSON");
+    } catch (jsonErr) {
+      console.error("Erreur mise à jour JSON :", jsonErr.message);
+      return res.status(500).json({ error: "Erreur mise à jour JSON" });
+    }
+
+    res.json({ success: true });
+  });
 });

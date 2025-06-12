@@ -3,10 +3,11 @@ import "./AdminPanel.css";
 import GalleryManager from './GalleryManager';
 import PartenaireManager from './PartenaireManager';
 import AccueilManager from './AccueilManager';
+import PresentationManager from "./PresentationManager";
 
 
 export default function AdminPanel({ onLogout }) {
-    const [activeTab, setActiveTab] = useState("formulaires");
+    const [activeTab, setActiveTab] = useState("accueil");
     const [formulaires, setFormulaires] = useState([]);
 
     const [message, setMessage] = useState("");
@@ -54,6 +55,7 @@ export default function AdminPanel({ onLogout }) {
             .then((res) => res.json())
             .then((data) => setEquipe(data));
 
+            
     }, []);
 
 
@@ -337,6 +339,7 @@ export default function AdminPanel({ onLogout }) {
             <button onClick={() => setActiveTab("accueil")}>🏠 Accueil</button>
             <button onClick={() => setActiveTab("formulaires")}>📄 Formulaires</button>
             <button onClick={() => setActiveTab("archives")}>📁 Archives</button>
+            <button onClick={() => setActiveTab("presentation")}>🎨 Présentation</button>
             <button onClick={() => setActiveTab("equipe")}>👥 Équipe</button>
             <button onClick={() => setActiveTab("contact")}>📬 Contact</button>
             <button onClick={() => setActiveTab("partenaires")}>🤝 Partenaires</button>
@@ -568,6 +571,11 @@ export default function AdminPanel({ onLogout }) {
                 <h2>🤝 Logos des partenaires</h2>
                 <PartenaireManager />
             </div>
+        )}
+
+
+        {activeTab === "presentation" && (
+            <PresentationManager />
         )}
 
 
