@@ -88,3 +88,58 @@ h1 {
   background-color: #0e534d;
   color: white;
 }
+
+
+
+@media (max-width: 768px) {
+  .presentation-main {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .hero-section-pres {
+    padding: 2rem 1rem;
+    margin: 1.5rem 1rem 2rem;
+    border-radius: 0.8rem;
+  }
+
+  .hero-section-pres h1 {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    margin-top: 0.8rem;
+  }
+
+  .info-section {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .info-card {
+    padding: 1.2rem 1rem;
+    border-radius: 0.8rem;
+  }
+
+  .info-card h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .info-card p {
+    font-size: 0.9rem;
+  }
+
+  .cta-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .cta-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    border-radius: 1.5rem;
+  }
+}

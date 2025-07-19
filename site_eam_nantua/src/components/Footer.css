@@ -55,11 +55,39 @@
 }
 
 .footer-partenaires a {
-  color: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
   font-weight: 500;
   text-decoration: none;
 }
 
 .footer-partenaires a:hover {
   color: #ffffff;
+}
+
+
+@media (max-width: 768px) {
+  .footer {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .footer-logos {
+    left: 0.5rem; /* décale un peu moins à gauche */
+    gap: 0.2rem; /* plus d’espace entre les logos */
+  }
+
+  .footer-partenaires {
+    right: 0.5rem; /* coller un peu plus à droite */
+  }
+
+  .footer-text {
+    max-width: 60%; /* réduire un peu la largeur du footer du milieu */
+    margin: 0 auto;
+    font-size: 0.85rem; /* texte un peu plus petit */
+    
+    /* AJOUT pour remonter le texte */
+    position: relative;
+    top: -0.5rem; /* ajuste cette valeur pour plus ou moins remonter */
+  }
 }

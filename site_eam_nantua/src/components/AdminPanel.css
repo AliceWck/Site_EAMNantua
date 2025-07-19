@@ -282,7 +282,22 @@
 
   .formulaires-tab,
   .tab-tab {
-    margin: 1rem 1rem;
+    margin: 0rem;
+    padding: 0 1rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .formulaire-list li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    padding: 0.8rem;
+  }
+
+  .formulaire-list li button {
+    align-self: flex-end;
   }
 
   .form-input {

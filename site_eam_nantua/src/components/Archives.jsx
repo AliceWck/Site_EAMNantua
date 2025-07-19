@@ -10,8 +10,10 @@ export default function Photos() {
   const [openNote, setOpenNote] = useState(null);
 
   useEffect(() => {
+    const API = import.meta.env.VITE_API_URL;
+
     // Charger les galeries dynamiquement
-    fetch("/api/galleries")
+    fetch(`${API}/api/galleries`)
       .then((res) => res.json())
       // .then((data) => setGalleries(Array.isArray(data) ? data : []))
       .then((data) => {
@@ -21,7 +23,7 @@ export default function Photos() {
       .catch((err) => console.error("Erreur fetch galleries :", err));
 
     // Charger les notes
-    fetch("/api/notes")
+    fetch(`${API}/api/notes`)
       .then((res) => res.json())
       .then((data) => {
         console.log("Notes reçues :", data);

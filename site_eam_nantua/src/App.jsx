@@ -1,6 +1,7 @@
 // Penser à histoire de proxy
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom"; 
 import Accueil from "./components/Accueil";
 import Archives from "./components/Archives";
 import Inscription from "./components/Inscription";

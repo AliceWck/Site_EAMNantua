@@ -103,3 +103,50 @@
   display: inline-block;
   padding-bottom: 0.3rem;
 }
+
+
+@media (max-width: 768px) {
+  .hero-section-equipe {
+    padding: 2rem 1rem;
+    margin: 1.5rem 1rem 2rem;
+    border-radius: 0.8rem;
+  }
+
+  .hero-section-equipe h1 {
+    font-size: 1.8rem;
+  }
+
+  .equipe-main {
+    padding: 1rem 1rem 3rem;
+    max-width: 100%;
+    min-width: auto;
+  }
+
+  .equipe-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .equipe-card {
+    max-width: 100%;
+    padding: 1rem 1.5rem;
+  }
+
+  .equipe-photo {
+    height: 150px;
+  }
+
+  .equipe-nom {
+    font-size: 1rem;
+  }
+
+  .equipe-poste {
+    font-size: 0.85rem;
+  }
+
+  .equipe-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+}

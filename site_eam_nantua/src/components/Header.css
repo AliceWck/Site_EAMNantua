@@ -74,3 +74,38 @@
 .nav a:not(.logo-link):hover::after {
   width: 100%;
 }
+
+
+
+
+@media (max-width: 768px) {
+  .nav-right {
+    margin-left: 0 !important; /* forcer au cas où */
+    gap: 0;
+    padding-right: 0;
+    flex-wrap: nowrap;
+  }
+
+  .nav a {
+    white-space: nowrap;
+    flex-shrink: 1;
+    font-size: 0.5rem; /* réduire encore la taille de police */
+    padding: 0 0.2rem;
+  }
+
+  .nav {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  flex-wrap: nowrap;
+ }
+
+  .logo {
+    height: clamp(30px, 5vw, 40px);
+  }
+
+  .header {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}

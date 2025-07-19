@@ -1,6 +1,22 @@
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .inscription-container {
   background-color: #f4f4f8;
   color: #222;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .inscription-main {
@@ -8,6 +24,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex: 1;
 }
 
 .hero-section-inscr {
@@ -81,4 +98,38 @@
 
 .formulaire-item-bloc:hover {
   transform: translateY(-4px);
+}
+
+
+
+@media (max-width: 768px) {
+  .hero-section-inscr {
+    padding: 2rem 1rem;
+    margin: 1.5rem 1rem 2rem 1rem;
+    border-radius: 0.8rem;
+  }
+
+  .hero-section-inscr h1 {
+    font-size: 1.8rem;
+  }
+
+  .inscription-main {
+    padding: 2rem 1rem;
+  }
+
+  .inscription-form-wrapper {
+    max-width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .formulaire-item-bloc {
+    margin-bottom: 2rem;
+    padding: 1rem;
+  }
+
+  .formulaire-item-bloc iframe {
+    height: 600px; /* iframe moins haute pour mobile */
+  }
 }
