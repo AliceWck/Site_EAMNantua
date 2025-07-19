@@ -119,7 +119,7 @@ export default function Accueil() {
               </div>
             ))
           ) : (
-            <p>Chargement des actualités...</p>
+            <p>Chargement des actualités... Rafraichir la page si besoin.</p>
           )}
         </div>
       </section>

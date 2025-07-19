@@ -45,7 +45,8 @@ export default function Footer() {
       </div>
 
       <div className="footer-partenaires">
-        <a href="/partenaires">Partenaires</a>
+        {/* <a href="/partenaires">Partenaires</a> */}
+        <Link to="/partenaires">Partenaires</Link>
       </div>
 
       <div className="footer-text">
