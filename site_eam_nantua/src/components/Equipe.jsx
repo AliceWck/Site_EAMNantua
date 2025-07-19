@@ -9,7 +9,8 @@ export default function Equipe() {
   const [erreur, setErreur] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/equipe")
+    // fetch("http://localhost:5000/api/equipe")
+    fetch(`${import.meta.env.VITE_API_URL}/api/equipe`)
       .then((res) => {
         if (!res.ok) throw new Error("Erreur de chargement");
         return res.json();

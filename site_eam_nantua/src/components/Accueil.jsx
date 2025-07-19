@@ -16,13 +16,17 @@ export default function Accueil() {
 
 
   useEffect(() => {
-    fetch("/api/facts")
+    const API = import.meta.env.VITE_API_URL;
+
+    // fetch("/api/facts")
+    fetch(`${API}/api/facts`)
       .then(res => res.json())
       .then(data => setFacts(data))
       .catch(err => console.error("Erreur chargement facts:", err));
 
     // Récupérer image et version dynamiquement
-    fetch("/api/accueil-image")
+    // fetch("/api/accueil-image")
+    fetch(`${API}/api/accueil-image`)
       .then(res => res.json())
       .then(data => {
         setImageUrl(data.imageUrl);
@@ -36,7 +40,8 @@ export default function Accueil() {
       });
 
     // Charger contact (email, facebook, instagram)
-    fetch("/api/contact")
+    // fetch("/api/contact")
+    fetch(`${API}/api/contact`)
       .then(res => res.json())
       .then(data => {
         setContact({

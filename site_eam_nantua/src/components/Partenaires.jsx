@@ -7,7 +7,9 @@ export default function Partenaires() {
   const [logos, setLogos] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/partenaires")
+    
+    // fetch("http://localhost:5000/api/partenaires")
+    fetch(`${import.meta.env.VITE_API_URL}/api/partenaires`)
       .then(res => res.json())
       .then(data => setLogos(Array.isArray(data) ? data : []))
       .catch(err => console.error("Erreur fetch partenaires :", err));

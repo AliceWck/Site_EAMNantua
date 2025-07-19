@@ -7,7 +7,8 @@ export default function Presentation() {
   const [content, setContent] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/presentation-content")
+    // fetch("http://localhost:5000/api/presentation-content")
+    fetch(`${import.meta.env.VITE_API_URL}/api/presentation-content`)
       .then((res) => res.json())
       .then((data) => setContent(data));
   }, []);

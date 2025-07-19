@@ -13,7 +13,8 @@ export default function AjoutMembre() {
     const formData = new FormData();
     formData.append("photo", file);
 
-    const response = await axios.post("http://localhost:5000/api/upload-photo", formData);
+    // const response = await axios.post("http://localhost:5000/api/upload-photo", formData);
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/upload-photo`, formData);
     setPhoto(response.data.url);
   };
 
@@ -24,7 +25,8 @@ export default function AjoutMembre() {
     if (file && !photo) await handleUpload();
 
     const newMembre = { nom, poste, photo };
-    await axios.post("http://localhost:5000/api/equipe", newMembre);
+    // await axios.post("http://localhost:5000/api/equipe", newMembre);
+    await axios.post(`${import.meta.env.VITE_API_URL}/api/equipe`, newMembre);
     alert("Membre ajouté !");
   };
 

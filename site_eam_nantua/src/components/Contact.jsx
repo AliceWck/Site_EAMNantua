@@ -9,7 +9,8 @@ export default function Contact() {
 
   useEffect(() => {
     // 🔧 2. Récupération des infos de contact depuis l'API
-    fetch("http://localhost:5000/api/contact")
+    // fetch("http://localhost:5000/api/contact")
+    fetch(`${import.meta.env.VITE_API_URL}/api/contact`)
       .then((res) => res.json())
       .then((data) => setContact(data))
       .catch((err) => console.error("Erreur de chargement des contacts :", err));

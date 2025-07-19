@@ -6,7 +6,8 @@ export default function PresentationManager() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/presentation-content")
+    // fetch("http://localhost:5000/api/presentation-content")
+    fetch(`${import.meta.env.VITE_API_URL}/api/presentation-content`)
       .then((res) => res.json())
       .then(setFormData);
   }, []);
@@ -32,7 +33,8 @@ export default function PresentationManager() {
   }
 
   function handleSave() {
-    fetch("http://localhost:5000/api/presentation-content", {
+    // fetch("http://localhost:5000/api/presentation-content", {
+    fetch(`${import.meta.env.VITE_API_URL}/api/presentation-content`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
@@ -55,7 +57,8 @@ export default function PresentationManager() {
       formDataFile.append("oldPdfUrl", formData.pdfUrl); // important
     }
 
-    fetch("http://localhost:5000/api/upload-pdf", {
+    // fetch("http://localhost:5000/api/upload-pdf", {
+    fetch(`${import.meta.env.VITE_API_URL}/api/upload-pdf`, {
       method: "POST",
       body: formDataFile,
     })
@@ -67,7 +70,8 @@ export default function PresentationManager() {
             const updated = { ...prev, pdfUrl: data.pdfUrl };
 
             // 2. on sauvegarde aussi côté serveur dans le JSON
-            fetch("http://localhost:5000/api/presentation-content", {
+            // fetch("http://localhost:5000/api/presentation-content", {
+            fetch(`${import.meta.env.VITE_API_URL}/api/presentation-content`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(updated),
@@ -149,7 +153,8 @@ export default function PresentationManager() {
           onClick={() => {
             if (!formData.pdfUrl) return;
 
-            fetch("http://localhost:5000/api/delete-pdf", {
+            // fetch("http://localhost:5000/api/delete-pdf", {
+            fetch(`${import.meta.env.VITE_API_URL}/api/delete-pdf`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ pdfUrl: formData.pdfUrl }),

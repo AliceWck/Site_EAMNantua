@@ -8,7 +8,8 @@ export default function PartenaireManager() {
     const [logoFile, setLogoFile] = useState(null);
 
     useEffect(() => {
-        fetch("http://localhost:5000/api/partenaires")
+        // fetch("http://localhost:5000/api/partenaires")
+        fetch(`${import.meta.env.VITE_API_URL}/api/partenaires`)
             .then((res) => res.json())
             .then((data) => setLogos(data));
     }, []);
@@ -18,7 +19,8 @@ export default function PartenaireManager() {
         const formData = new FormData();
         formData.append("logo", logoFile);
 
-        const res = await fetch("http://localhost:5000/api/upload-logo", {
+        // const res = await fetch("http://localhost:5000/api/upload-logo", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/upload-logo`, {
             method: "POST",
             body: formData,
         });
@@ -39,7 +41,8 @@ export default function PartenaireManager() {
             if (!logoUrl) return;
         }
 
-        const res = await fetch("http://localhost:5000/api/partenaires", {
+        // const res = await fetch("http://localhost:5000/api/partenaires", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/partenaires`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -60,7 +63,8 @@ export default function PartenaireManager() {
     };
 
     const handleDeleteLogo = async (id) => {
-        const res = await fetch(`http://localhost:5000/api/partenaires/${id}`, {
+        // const res = await fetch(`http://localhost:5000/api/partenaires/${id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/partenaires/${id}`, {
             method: "DELETE",
         });
         if (res.ok) {

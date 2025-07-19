@@ -28,12 +28,14 @@ export default function AdminPanel({ onLogout }) {
 
     useEffect(() => {
         // Récupération des formulaires A FAIRE, ICI EXEMPLE
-        fetch("http://localhost:5000/api/formulaires")
+        // fetch("http://localhost:5000/api/formulaires")
+        fetch(`${import.meta.env.VITE_API_URL}/api/formulaires`)
             .then((res) => res.json())
             .then((data) => setFormulaires(data));
 
         // Récupération des infos de contact
-        fetch("http://localhost:5000/api/contact")
+        // fetch("http://localhost:5000/api/contact")
+        fetch(`${import.meta.env.VITE_API_URL}/api/contact`)
             .then((res) => res.json())
             .then((data) => setContact(data));
 
@@ -43,14 +45,16 @@ export default function AdminPanel({ onLogout }) {
         //         const sorted = data.sort((a, b) => new Date(a.date) - new Date(b.date));
         //         setEventNotes(sorted);
         //     });
-        fetch("http://localhost:5000/api/notes")
+        // fetch("http://localhost:5000/api/notes")
+        fetch(`${import.meta.env.VITE_API_URL}/api/notes`)
             .then((res) => res.json())
             .then((data) => {
                 setEventNotes(data); // ne pas trier ici
         });
 
 
-        fetch("http://localhost:5000/api/equipe")
+        // fetch("http://localhost:5000/api/equipe")
+        fetch(`${import.meta.env.VITE_API_URL}/api/equipe`)
             .then((res) => res.json())
             .then((data) => setEquipe(data));
 
@@ -80,7 +84,8 @@ export default function AdminPanel({ onLogout }) {
     };
 
     const handleSaveContact = async () => {
-    const res = await fetch("http://localhost:5000/api/contact", {
+    // const res = await fetch("http://localhost:5000/api/contact", {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/contact`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(contact),
@@ -121,7 +126,8 @@ export default function AdminPanel({ onLogout }) {
         }
 
         try {
-            const res = await fetch(`http://localhost:5000/api/formulaires/${id}`, {
+            // const res = await fetch(`http://localhost:5000/api/formulaires/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/formulaires/${id}`, {
                 method: "DELETE",
             });
 
@@ -141,7 +147,8 @@ export default function AdminPanel({ onLogout }) {
 
     const handleSaveFormulaires = async () => {
         try {
-            const res = await fetch("http://localhost:5000/api/formulaires/batch", {
+            // const res = await fetch("http://localhost:5000/api/formulaires/batch", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/formulaires/batch`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(formulaires),
@@ -171,7 +178,8 @@ export default function AdminPanel({ onLogout }) {
             date: newNote.date || new Date().toISOString().split("T")[0]
         };
 
-        const res = await fetch("http://localhost:5000/api/notes", {
+        // const res = await fetch("http://localhost:5000/api/notes", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notes`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(noteToSend),
@@ -188,7 +196,8 @@ export default function AdminPanel({ onLogout }) {
 
     const handleDeleteNote = async (id) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/notes/${id}`, {
+            // const res = await fetch(`http://localhost:5000/api/notes/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/${id}`, {
             method: "DELETE",
             });
 
@@ -216,7 +225,8 @@ export default function AdminPanel({ onLogout }) {
         setEventNotes(newNotes);
 
         // 📨 Enregistrement côté serveur
-        fetch("http://localhost:5000/api/notes/reorder", {
+        // fetch("http://localhost:5000/api/notes/reorder", {
+        fetch(`${import.meta.env.VITE_API_URL}/api/notes/reorder`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -245,7 +255,8 @@ export default function AdminPanel({ onLogout }) {
         const formData = new FormData();
         formData.append("photo", photoFile);
 
-        const res = await fetch("http://localhost:5000/api/upload-photo", {
+        // const res = await fetch("http://localhost:5000/api/upload-photo", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/upload-photo`, {
             method: "POST",
             body: formData,
         });
@@ -273,7 +284,8 @@ export default function AdminPanel({ onLogout }) {
 
         const membreToAdd = { ...nouveauMembre, photo: photoUrl };
 
-        const res = await fetch("http://localhost:5000/api/equipe", {
+        // const res = await fetch("http://localhost:5000/api/equipe", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/equipe`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(membreToAdd),
@@ -293,7 +305,8 @@ export default function AdminPanel({ onLogout }) {
 
 
     const handleDeleteMembre = async (id) => {
-        const res = await fetch(`http://localhost:5000/api/equipe/${id}`, { method: "DELETE" });
+        // const res = await fetch(`http://localhost:5000/api/equipe/${id}`, { method: "DELETE" });
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/equipe/${id}`, { method: "DELETE" });
         if (res.ok) {
             setEquipe(equipe.filter((m) => m.id !== id));
             setMessage("🗑️ Membre supprimé.");

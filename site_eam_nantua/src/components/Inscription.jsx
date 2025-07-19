@@ -7,7 +7,8 @@ export default function Inscription() {
   const [formulaires, setFormulaires] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/formulaires")
+    // fetch("http://localhost:5000/api/formulaires")
+    fetch(`${import.meta.env.VITE_API_URL}/api/formulaires`)
       .then((res) => res.json())
       .then((data) => setFormulaires(data));
   }, []);
