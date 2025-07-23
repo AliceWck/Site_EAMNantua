@@ -14,10 +14,13 @@ export default function Accueil() {
     instagram: ""
   });
 
+  const API = import.meta.env.VITE_API_URL;
+
+  const logoPath = (filename) => `${API}/uploads/logos/${filename}`;
+
+
 
   useEffect(() => {
-    const API = import.meta.env.VITE_API_URL;
-
     // fetch("/api/facts")
     fetch(`${API}/api/facts`)
       .then(res => res.json())
@@ -136,7 +139,8 @@ export default function Accueil() {
               className="reseau-link"
             >
               <img
-                src="/images/logos/logo-fb-2.png"
+                // src="/images/logos/logo-fb-2.png"
+                src={logoPath("logo-fb-2.png")}
                 alt="Facebook"
                 className="reseau-logo"
               />
@@ -150,7 +154,8 @@ export default function Accueil() {
               className="reseau-link"
             >
               <img
-                src="/images/logos/logo-insta-2.png"
+                // src="/images/logos/logo-insta-2.png"
+                src={logoPath("logo-insta-2.png")}
                 alt="Instagram"
                 className="reseau-logo"
               />
@@ -159,7 +164,8 @@ export default function Accueil() {
           {contact.email && (
             <a href={`mailto:${contact.email}`} className="reseau-link">
               <img
-                src="/images/logos/logo-mail.png"
+                // src="/images/logos/logo-mail.png"
+                src={logoPath("logo-mail.png")}
                 alt="Mail"
                 className="reseau-logo"
               />

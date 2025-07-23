@@ -7,7 +7,7 @@ export default function Header() {
       <nav className="nav">
         <div className="nav-left">
             <Link to="/" className="logo-link">
-                <img src="/images/logos/Logo.png" alt="Logo EAM" className="logo" />
+                <img src={`${import.meta.env.VITE_API_URL}/uploads/logos/Logo.png`} alt="Logo EAM" className="logo" />
             </Link>
         </div>
         <div className="nav-right">

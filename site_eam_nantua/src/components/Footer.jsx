@@ -9,8 +9,10 @@ export default function Footer() {
     instagram: ""
   });
 
+  const API = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
-    fetch("/api/contact")
+    fetch(`${API}/api/contact`)
       .then(res => res.json())
       .then(data => {
         setContact({
@@ -22,24 +24,24 @@ export default function Footer() {
       .catch(err => {
         console.error("Erreur chargement contact dans footer:", err);
       });
-  }, []);
+  }, [API]);
 
   return (
     <footer className="footer">
       <div className="footer-logos">
          {contact.facebook && (
             <a href={contact.facebook} target="_blank" rel="noopener noreferrer">
-              <img src="/images/logos/logo-fb-2.png" alt="Facebook" />
+              <img src={`${API}/uploads/logos/logo-fb-2.png`} alt="Facebook" />
             </a>
           )}
           {contact.instagram && (
             <a href={contact.instagram} target="_blank" rel="noopener noreferrer">
-              <img src="/images/logos/logo-insta-2.png" alt="Instagram" />
+              <img src={`${API}/uploads/logos/logo-insta-2.png`} alt="Instagram" />
             </a>
           )}
           {contact.email && (
             <a href={`mailto:${contact.email}`}>
-              <img src="/images/logos/logo-mail.png" alt="Mail" />
+              <img src={`${API}/uploads/logos/logo-mail.png`} alt="Mail" />
             </a>
           )}
       </div>

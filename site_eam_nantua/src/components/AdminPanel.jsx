@@ -24,18 +24,21 @@ export default function AdminPanel({ onLogout }) {
 
     const [saveMessage, setSaveMessage] = useState("");
 
+    const API = import.meta.env.VITE_API_URL;
+
+
 
 
     useEffect(() => {
         // Récupération des formulaires A FAIRE, ICI EXEMPLE
         // fetch("http://localhost:5000/api/formulaires")
-        fetch(`${import.meta.env.VITE_API_URL}/api/formulaires`)
+        fetch(`${API}/api/formulaires`)
             .then((res) => res.json())
             .then((data) => setFormulaires(data));
 
         // Récupération des infos de contact
         // fetch("http://localhost:5000/api/contact")
-        fetch(`${import.meta.env.VITE_API_URL}/api/contact`)
+        fetch(`${API}/api/contact`)
             .then((res) => res.json())
             .then((data) => setContact(data));
 
@@ -46,7 +49,7 @@ export default function AdminPanel({ onLogout }) {
         //         setEventNotes(sorted);
         //     });
         // fetch("http://localhost:5000/api/notes")
-        fetch(`${import.meta.env.VITE_API_URL}/api/notes`)
+        fetch(`${API}/api/notes`)
             .then((res) => res.json())
             .then((data) => {
                 setEventNotes(data); // ne pas trier ici
@@ -54,7 +57,7 @@ export default function AdminPanel({ onLogout }) {
 
 
         // fetch("http://localhost:5000/api/equipe")
-        fetch(`${import.meta.env.VITE_API_URL}/api/equipe`)
+        fetch(`${API}/api/equipe`)
             .then((res) => res.json())
             .then((data) => setEquipe(data));
 
@@ -85,7 +88,7 @@ export default function AdminPanel({ onLogout }) {
 
     const handleSaveContact = async () => {
     // const res = await fetch("http://localhost:5000/api/contact", {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/contact`, {
+    const res = await fetch(`${API}/api/contact`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(contact),
@@ -127,7 +130,7 @@ export default function AdminPanel({ onLogout }) {
 
         try {
             // const res = await fetch(`http://localhost:5000/api/formulaires/${id}`, {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/formulaires/${id}`, {
+            const res = await fetch(`${API}/api/formulaires/${id}`, {
                 method: "DELETE",
             });
 
@@ -148,7 +151,7 @@ export default function AdminPanel({ onLogout }) {
     const handleSaveFormulaires = async () => {
         try {
             // const res = await fetch("http://localhost:5000/api/formulaires/batch", {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/formulaires/batch`, {
+            const res = await fetch(`${API}/api/formulaires/batch`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(formulaires),
@@ -165,8 +168,6 @@ export default function AdminPanel({ onLogout }) {
     };
 
 
-
-
     //////////// ARCHIVES
 
     const handleAddNote = async () => {
@@ -178,26 +179,34 @@ export default function AdminPanel({ onLogout }) {
             date: newNote.date || new Date().toISOString().split("T")[0]
         };
 
-        // const res = await fetch("http://localhost:5000/api/notes", {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notes`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(noteToSend),
-        });
+        try {
+            // const res = await fetch("http://localhost:5000/api/notes", {
+            const res = await fetch(`${API}/api/notes`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(noteToSend),
+            });
 
-        if (res.ok) {
-            const savedNote = await res.json();
-            setEventNotes([...eventNotes, savedNote]);
-            setNewNote({ title: "", content: "", date: "" });
-            setMessage("✅ Note ajoutée !");
+            if (res.ok) {
+                const savedNote = await res.json();
+                setEventNotes([...eventNotes, savedNote]);
+                setNewNote({ title: "", content: "", date: "" });
+                setMessage("✅ Note ajoutée !");
+            } else {
+                setMessage("❌ Échec de l'ajout de la note.");
+            }
+        } catch (error) {
+            console.error("Erreur lors de l'ajout de la note :", error);
+            setMessage("❌ Une erreur est survenue lors de l'ajout.");
         }
     };
+
 
 
     const handleDeleteNote = async (id) => {
         try {
             // const res = await fetch(`http://localhost:5000/api/notes/${id}`, {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/${id}`, {
+            const res = await fetch(`${API}/api/notes/${id}`, {
             method: "DELETE",
             });
 
@@ -226,7 +235,7 @@ export default function AdminPanel({ onLogout }) {
 
         // 📨 Enregistrement côté serveur
         // fetch("http://localhost:5000/api/notes/reorder", {
-        fetch(`${import.meta.env.VITE_API_URL}/api/notes/reorder`, {
+        fetch(`${API}/api/notes/reorder`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -256,7 +265,7 @@ export default function AdminPanel({ onLogout }) {
         formData.append("photo", photoFile);
 
         // const res = await fetch("http://localhost:5000/api/upload-photo", {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/upload-photo`, {
+        const res = await fetch(`${API}/api/upload-photo`, {
             method: "POST",
             body: formData,
         });
@@ -269,6 +278,7 @@ export default function AdminPanel({ onLogout }) {
             return null;
         }
     };
+
 
 
     const handleAddMembre = async () => {
@@ -284,21 +294,26 @@ export default function AdminPanel({ onLogout }) {
 
         const membreToAdd = { ...nouveauMembre, photo: photoUrl };
 
-        // const res = await fetch("http://localhost:5000/api/equipe", {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/equipe`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(membreToAdd),
-        });
+        try {
+            // const res = await fetch("http://localhost:5000/api/equipe", {
+            const res = await fetch(`${API}/api/equipe`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(membreToAdd),
+            });
 
-        if (res.ok) {
-            const saved = await res.json();
-            setEquipe([...equipe, saved]);
-            setNouveauMembre({ nom: "", poste: "", photo: "" });
-            setPhotoFile(null);
-            setMessage("✅ Membre ajouté !");
-        } else {
-            setMessage("❌ Erreur ajout membre.");
+            if (res.ok) {
+                const saved = await res.json();
+                setEquipe([...equipe, saved]);
+                setNouveauMembre({ nom: "", poste: "", photo: "" });
+                setPhotoFile(null);
+                setMessage("✅ Membre ajouté !");
+            } else {
+                setMessage("❌ Erreur ajout membre.");
+            }
+        } catch (error) {
+            console.error("Erreur réseau lors de l'ajout du membre :", error);
+            setMessage("❌ Une erreur réseau est survenue.");
         }
     };
 
@@ -306,7 +321,7 @@ export default function AdminPanel({ onLogout }) {
 
     const handleDeleteMembre = async (id) => {
         // const res = await fetch(`http://localhost:5000/api/equipe/${id}`, { method: "DELETE" });
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/equipe/${id}`, { method: "DELETE" });
+        const res = await fetch(`${API}/api/equipe/${id}`, { method: "DELETE" });
         if (res.ok) {
             setEquipe(equipe.filter((m) => m.id !== id));
             setMessage("🗑️ Membre supprimé.");
@@ -327,7 +342,7 @@ export default function AdminPanel({ onLogout }) {
         setEquipe(newEquipe);
 
         // ✅ Envoie la nouvelle liste via fetch
-        fetch("/api/equipe/reorder", {
+        fetch(`${API}/api/equipe/reorder`, {
             method: "POST",
             headers: {
             "Content-Type": "application/json",

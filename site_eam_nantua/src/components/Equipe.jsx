@@ -48,7 +48,11 @@ export default function Equipe() {
                 <div className="equipe-card" key={personne.id}>
                   <div className="equipe-photo-wrapper">
                     <img
-                      src={personne.photo || "/images/equipe/avatardefaut.png"}
+                      src={
+                        personne.photo
+                          ? `${import.meta.env.VITE_API_URL}/uploads/${personne.photo}`
+                          : `${import.meta.env.VITE_API_URL}/uploads/equipe/avatardefaut.png`
+                      }
                       alt={personne.nom}
                       className="equipe-photo"
                     />
@@ -67,7 +71,11 @@ export default function Equipe() {
                 <div className="equipe-card" key={personne.id}>
                   <div className="equipe-photo-wrapper">
                     <img
-                      src={personne.photo || "/images/equipe/avatardefaut.png"}
+                      src={
+                        personne.photo
+                          ? `${import.meta.env.VITE_API_URL}/uploads/${personne.photo}`
+                          : `${import.meta.env.VITE_API_URL}/uploads/equipe/avatardefaut.png`
+                      }
                       alt={personne.nom}
                       className="equipe-photo"
                     />

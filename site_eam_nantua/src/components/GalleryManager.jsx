@@ -179,7 +179,8 @@ const deleteImage = async (imgUrl) => {
             {galleries.map((gal) => (
                 <div key={gal.id} className="gallery-card">
                 <div onClick={() => setSelectedGallery(gal)}>
-                    <img src={gal.images?.[0]?.url || gal.images?.[0] || "/placeholder.jpg"} alt="" />
+                    {/* <img src={gal.images?.[0]?.url || gal.images?.[0] || "/placeholder.jpg"} alt="" /> */}
+                    <img src={gal.images?.[0]?.url || gal.images?.[0] || `${import.meta.env.VITE_API_URL}/uploads/placeholder.jpg`} alt={gal.title} />
                     <div className="font-semibold">{gal.title}</div>
                     <div className="text-sm text-gray-600">{gal.id}</div>
                 </div>

@@ -1,14 +1,27 @@
-import "./Mentions.css";
+import { useEffect, useState } from "react";
 import Header from "./Header.jsx";
 import Footer from "./Footer.jsx";
+import "./Mentions.css";
 
 function Mentions() {
+  const [contactEmail, setContactEmail] = useState("");
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}/api/contact`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.email) setContactEmail(data.email);
+      })
+      .catch((err) => {
+        console.error("Erreur chargement email contact :", err);
+      });
+  }, []);
+
   return (
     <>
       <Header />
 
       <div id="mentions">
-
         <div id="contentMentions">
           <h3 id="mentionsTitle">Mentions Légales</h3>
           <hr />
@@ -62,21 +75,26 @@ function Mentions() {
           <p>
             Conformément au RGPD, vous disposez d’un droit d’accès, de rectification, de suppression et d’opposition à vos données personnelles.<br />
             Les données collectées via Google Forms sont utilisées uniquement pour les inscriptions aux activités de l'association Ecole Arts et Musique du Haut-Bugey. Elles ne sont ni revendues ni partagées.<br />
-            Contact : <a href="mailto:ecole@artsmusique-hb.fr">ecole@artsmusique-hb.fr</a>
+            Contact : {contactEmail ? (
+              <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
+            ) : (
+              "Chargement en cours..."
+            )}
           </p>
 
           <p className="mentionsSubtitle">PHOTOGRAPHIES ET DROIT À L’IMAGE</p>
           <p>
             Des photos prises lors d’événements peuvent apparaître sur ce site.<br />
-            Pour demander leur retrait, contactez : <a href="mailto:ecole@artsmusique-hb.fr">ecole@artsmusique-hb.fr</a>
+            Pour demander leur retrait, contactez : {contactEmail ? (
+              <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
+            ) : (
+              "Chargement en cours..."
+            )}
           </p>
         </div>
       </div>
 
-      <footer id="footerMentions">
-        <p>© {new Date().getFullYear()} Ecole Arts et Musique du Haut-Bugey — Tous droits réservés</p>
-        <p className="siteCredits">Site conçu et développé par Alice INVERNIZZI</p>
-      </footer>
+      <Footer />
     </>
   );
 }

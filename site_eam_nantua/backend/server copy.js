@@ -16,13 +16,11 @@ const ADMIN_PASSWORD = "secret123";
 
 
 
-// Dossiers importants (.., public, images = uploads)
-const dataDir = path.join(__dirname, "data");
-const uploadDirEquipe = path.join(__dirname, "uploads", "equipe");
-const partenairesUploadDir = path.join(__dirname, "uploads", "partenaires");
-const accueilImageDir = path.join(__dirname, "uploads", "accueil");
-
-
+// Dossiers importants
+const dataDir = path.join(__dirname, "..", "public", "data");
+const uploadDirEquipe = path.join(__dirname, "..", "public", "images", "equipe");
+const partenairesUploadDir = path.join(__dirname, "..", "public", "images", "partenaires");
+const accueilImageDir = path.join(__dirname, "public", "images", "accueil");
 
 
 // Création dossiers si inexistants
@@ -35,12 +33,6 @@ if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
 
 // Fichiers JSON et initialisation si inexistant
-const accueilJsonPath = path.join(dataDir, "accueil.json");
-if (!fs.existsSync(accueilJsonPath)) fs.writeFileSync(accueilJsonPath, JSON.stringify([], null, 2));
-
-const factsJsonPath = path.join(dataDir, "facts.json");
-if (!fs.existsSync(factsJsonPath)) fs.writeFileSync(factsJsonPath, JSON.stringify([], null, 2));
-
 const formulairesFilePath = path.join(dataDir, "formulaires.json");
 if (!fs.existsSync(formulairesFilePath)) fs.writeFileSync(formulairesFilePath, JSON.stringify([], null, 2));
 
@@ -53,6 +45,10 @@ if (!fs.existsSync(notesFilePath)) fs.writeFileSync(notesFilePath, JSON.stringif
 const partenairesFilePath = path.join(dataDir, "partenaires.json");
 if (!fs.existsSync(partenairesFilePath)) fs.writeFileSync(partenairesFilePath, JSON.stringify([], null, 2));
 
+const accueilJsonPath = path.join(dataDir, "accueil.json");
+const uploadPath = path.join(__dirname, "..", "public", "images", "accueil");
+const factsJsonPath = path.join(dataDir, "facts.json");
+
 
 const presentationFilePath = path.join(dataDir, "presentation.json");
 if (!fs.existsSync(presentationFilePath)) {
@@ -60,13 +56,9 @@ if (!fs.existsSync(presentationFilePath)) {
 }
 
 
-
-
 // Fichier PDF et initialisation si inexistant (pour presentation)
 const documentsDir = path.join(dataDir, "documents");
 if (!fs.existsSync(documentsDir)) fs.mkdirSync(documentsDir, { recursive: true });
-
-
 
 
 
@@ -98,7 +90,9 @@ const uploadPartenaireLogo = multer({ storage: storagePartenaires });
 
 // Stockage image accueil
 const storageAccueil = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, accueilImageDir),
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "..", "public", "images", "accueil"));
+  },
   filename: (req, file, cb) => {
     // On récupère l'extension originale
     const ext = path.extname(file.originalname);
@@ -178,7 +172,7 @@ function savePartenaires(data) {
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 
 
 
@@ -201,6 +195,7 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
+
 
 
 

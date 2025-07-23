@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./AccueilManager.css";
 
 export default function AccueilManager() {
+  const API = import.meta.env.VITE_API_URL;
+  
   const [facts, setFacts] = useState([]);
   const [editingFact, setEditingFact] = useState(null);
   const [title, setTitle] = useState("");
@@ -12,7 +14,7 @@ export default function AccueilManager() {
   const [imageVersion, setImageVersion] = useState(Date.now());
 
   useEffect(() => {
-    fetch("/api/facts")
+    fetch(`${API}/api/facts`)
       .then((res) => res.json())
       .then((data) => setFacts(data))
       .catch((err) => console.error("Erreur chargement facts:", err));
@@ -31,12 +33,11 @@ export default function AccueilManager() {
     formData.append("image", imageFile);
 
     try {
-      const res = await fetch("/api/upload-home-image", {
+      const res = await fetch(`${API}/api/upload-home-image`, {
         method: "POST",
         body: formData,
       });
       if (res.ok) {
-        const data = await res.json();
         alert("Image d'accueil mise à jour !");
         // Met à jour la version pour forcer le reload sur le site utilisateur
         setImageVersion(Date.now());
@@ -54,11 +55,16 @@ export default function AccueilManager() {
     if (!title.trim() || !value.trim()) {
       return alert("Le titre et la valeur sont obligatoires.");
     }
+
     try {
-      const res = await fetch("/api/facts", {
+      const res = await fetch(`${API}/api/facts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title.trim(), value: value.trim(), icon: icon.trim() || null }),
+        body: JSON.stringify({
+          title: title.trim(),
+          value: value.trim(),
+          icon: icon.trim() || null,
+        }),
       });
       if (res.ok) {
         const newFact = await res.json();
@@ -91,11 +97,16 @@ export default function AccueilManager() {
     if (!title.trim() || !value.trim()) {
       return alert("Le titre et la valeur sont obligatoires.");
     }
+
     try {
-      const res = await fetch(`/api/facts/${editingFact.id}`, {
+      const res = await fetch(`${API}/api/facts/${editingFact.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title.trim(), value: value.trim(), icon: icon.trim() || null }),
+        body: JSON.stringify({
+          title: title.trim(),
+          value: value.trim(),
+          icon: icon.trim() || null,
+        }),
       });
       if (res.ok) {
         const updatedFact = await res.json();
@@ -115,7 +126,7 @@ export default function AccueilManager() {
   const handleDeleteFact = async (id) => {
     if (!window.confirm("Voulez-vous vraiment supprimer ce fact ?")) return;
     try {
-      const res = await fetch(`/api/facts/${id}`, {
+      const res = await fetch(`${API}/api/facts/${id}`, {
         method: "DELETE",
       });
       if (res.ok) {

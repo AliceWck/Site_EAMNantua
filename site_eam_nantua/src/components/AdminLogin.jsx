@@ -7,20 +7,31 @@ export default function AdminLogin({ onLogin }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // const res = await fetch("http://localhost:5000/api/login", {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
-    if (res.ok) {
-      onLogin();
-    } else {
-      setError("Identifiants incorrects");
+    setError("");
+
+    try {
+      // const res = await fetch("http://localhost:5000/api/login", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (res.ok) {
+        onLogin();
+      } else {
+        const data = await res.json();
+        setError(data.message || "Identifiants incorrects");
+      }
+    } catch (err) {
+      console.error("Erreur réseau:", err);
+      setError("Impossible de se connecter au serveur.");
     }
   };
+
 
   return (
     <div className="login-container">
@@ -41,11 +52,10 @@ export default function AdminLogin({ onLogin }) {
           />
           <button type="submit">Se connecter</button>
         </form>
-        {error && <p className="error">{error}</p>}
 
+        {error && <p className="error">{error}</p>}
         <p></p>
         <Link to="/">⬅️ Retour au site</Link>
-
       </div>
     </div>
   );

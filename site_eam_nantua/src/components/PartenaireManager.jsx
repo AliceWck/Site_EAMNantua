@@ -11,7 +11,8 @@ export default function PartenaireManager() {
         // fetch("http://localhost:5000/api/partenaires")
         fetch(`${import.meta.env.VITE_API_URL}/api/partenaires`)
             .then((res) => res.json())
-            .then((data) => setLogos(data));
+            .then((data) => setLogos(data))
+            .catch((err) => console.error("Erreur chargement partenaires :", err));
     }, []);
 
     const uploadLogo = async () => {
@@ -41,6 +42,11 @@ export default function PartenaireManager() {
             if (!logoUrl) return;
         }
 
+        if (!newLogo.nom || !logoUrl) {
+            alert("⚠️ Veuillez fournir un nom et un logo (URL ou fichier)");
+            return;
+        }
+
         // const res = await fetch("http://localhost:5000/api/partenaires", {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/partenaires`, {
             method: "POST",
@@ -51,14 +57,25 @@ export default function PartenaireManager() {
             }),
         });
 
+    //     if (res.ok) {
+    //         const saved = await res.json();
+    //         setLogos([...logos, saved]);
+    //         setNewLogo({ nom: "", url: "" });
+    //         setLogoFile(null);
+    //     } else {
+    //         const error = await res.json();
+    //         alert(`❌ Erreur: ${error.message}`);
+    //     }
+    // };
+
         if (res.ok) {
-            const saved = await res.json();
-            setLogos([...logos, saved]);
-            setNewLogo({ nom: "", url: "" });
-            setLogoFile(null);
+        const saved = await res.json();
+        setLogos((prev) => [...prev, saved]);
+        setNewLogo({ nom: "", url: "" });
+        setLogoFile(null);
         } else {
-            const error = await res.json();
-            alert(`❌ Erreur: ${error.message}`);
+        const error = await res.json();
+        alert(`❌ Erreur: ${error.message}`);
         }
     };
 
@@ -69,6 +86,8 @@ export default function PartenaireManager() {
         });
         if (res.ok) {
             setLogos(logos.filter((l) => l.id !== id));
+        } else {
+            alert("❌ Échec de la suppression");
         }
     };
 

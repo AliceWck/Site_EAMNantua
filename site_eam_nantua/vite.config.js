@@ -14,11 +14,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': {
-        // target: 'http://localhost:5000', 
-        target: 'https://site-eamnantua-backend.onrender.com',
-        changeOrigin: true,
-      },
+      // '/api': {
+      //   // target: 'http://localhost:5000', 
+      //   target: 'https://site-eamnantua-backend.onrender.com',
+      //   changeOrigin: true,
+      // },
     },
   },
 })

@@ -12,7 +12,8 @@ export default function EvenementPage() {
   useEffect(() => {
     const fetchGallery = async () => {
       try {
-        const res = await fetch("/api/galleries");
+        const API = import.meta.env.VITE_API_URL;
+        const res = await fetch(`${API}/api/galleries`);
         const data = await res.json();
         const found = data.find((g) => g.id === slug);
         setGallery(found);
@@ -36,6 +37,8 @@ export default function EvenementPage() {
     );
   }
 
+  const API = import.meta.env.VITE_API_URL;
+
   return (
     <div className="page-wrapper">
       <Header />
@@ -44,7 +47,18 @@ export default function EvenementPage() {
         <div className="photos-grid">
           {gallery.images?.map((src, i) => (
             <div key={i} className="photo-item">
-              <img src={typeof src === "string" ? src : src.url} alt={`Photo ${i + 1}`} />
+              <img
+                src={
+                  typeof src === "string"
+                    ? src.startsWith("http")
+                      ? src
+                      : `${API}/uploads/${src}`
+                    : src.url.startsWith("http")
+                    ? src.url
+                    : `${API}/uploads/${src.url}`
+                }
+                alt={`Photo ${i + 1}`}
+              />
             </div>
           ))}
         </div>

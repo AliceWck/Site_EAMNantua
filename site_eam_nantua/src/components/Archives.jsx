@@ -45,7 +45,14 @@ export default function Photos() {
         <div className="photos-grid">
           {galleries.map((gallery, i) => (
             <Link to={`/evenements/${gallery.id}`} key={i} className="photo-item">
-              <img src={gallery.images?.[0]?.url || gallery.images?.[0] || "/placeholder.jpg"} alt={gallery.title} />
+              <img
+                src={
+                  gallery.images?.[0]?.url ||
+                  gallery.images?.[0] ||
+                  `${API}/uploads/placeholder.jpg`
+                }
+                alt={gallery.title}
+              />
               <div className="photo-caption">{gallery.title}</div>
             </Link>
           ))}
