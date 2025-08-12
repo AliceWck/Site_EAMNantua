@@ -29,15 +29,6 @@ export default function Accueil() {
     // fetch("/api/accueil-image")
     fetch(`${API}/api/accueil-image`)
       .then(res => res.json())
-      // .then(data => {
-      //   if (data.imageUrl) {
-      //     const fullUrl = data.imageUrl.startsWith("http")
-      //       ? data.imageUrl
-      //       : `${API}/uploads/accueil/${data.imageUrl}`;
-      //     setImageUrl(fullUrl);
-      //     setImageVersion(data.version || Date.now());
-      //   }
-      // })
       .then(data => {
         if (data.imageUrl) {
           setImageUrl(data.imageUrl);

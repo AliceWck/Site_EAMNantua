@@ -890,22 +890,17 @@ app.get("/api/accueil-image", (req, res) => {
     if (!accueilData || !accueilData.imageUrl) {
       return res.status(404).json({ message: "Image non trouvée" });
     }
-
-    // Si l'imageUrl est déjà complète (http...), on garde tel quel
-    const isFullUrl = accueilData.imageUrl.startsWith("http");
-    const fullUrl = isFullUrl
+    // Ici on construit l'URL complète avec BASE_URL
+    const fullImageUrl = accueilData.imageUrl.startsWith("http")
       ? accueilData.imageUrl
       : `${process.env.BASE_URL}${accueilData.imageUrl}`;
 
-    res.json({
-      imageUrl: fullUrl,
-      version: accueilData.version
-    });
+    res.json({ imageUrl: fullImageUrl, version: accueilData.version });
   } catch (error) {
-    console.error("Erreur /api/accueil-image:", error);
     res.status(500).json({ message: "Erreur serveur" });
   }
 });
+
 
 
 
