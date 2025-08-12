@@ -837,7 +837,7 @@ app.post("/api/upload-home-image", uploadAccueil.single("image"), (req, res) => 
   const oldData = readJson(accueilJsonPath);
     if (oldData && oldData.imageUrl) {
     // oldData.imageUrl = "/images/accueil/xxxxx.jpg"
-    const oldImagePath = path.join(__dirname, "..", "public", oldData.imageUrl);
+    const oldImagePath = path.join(__dirname, "uploads", "accueil", path.basename(oldData.imageUrl));
     if (fs.existsSync(oldImagePath)) {
       try {
         fs.unlinkSync(oldImagePath);
@@ -848,7 +848,9 @@ app.post("/api/upload-home-image", uploadAccueil.single("image"), (req, res) => 
   }
 
   // L'url relative de la nouvelle image (à adapter selon ta config serveur)
-  const imageUrl = `/images/accueil/${req.file.filename}`;
+  // const imageUrl = `/images/accueil/${req.file.filename}`;
+  const imageUrl = `/uploads/accueil/${req.file.filename}`;
+
 
   // Écrire la nouvelle info dans JSON (avec timestamp pour version)
   const accueilData = { imageUrl, version: Date.now() };

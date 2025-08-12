@@ -31,7 +31,12 @@ export default function Accueil() {
       .then(res => res.json())
       .then(data => {
         if (data.imageUrl) {
-          setImageUrl(data.imageUrl);
+          // Si imageUrl commence par "/", on ajoute l'API devant
+          const fullUrl = data.imageUrl.startsWith("http")
+            ? data.imageUrl
+            : `${API}${data.imageUrl}`;
+          console.log("Image URL complète:", fullUrl);
+          setImageUrl(fullUrl);
           setImageVersion(data.version || Date.now());
         }
       })

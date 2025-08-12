@@ -10,3 +10,9 @@ Currently, two official plugins are available:
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+
+
+Attention, penser à bien mettre dans le server backend la déclaration de la variable d'environnement BASE_URL.
+
+Aussi, backend sur render (https://dashboard.render.com/web/srv-d1ld787diees73fhvb6g/events), frontend sur ovh (http://cikhvst.cluster100.hosting.ovh.net/#/)
