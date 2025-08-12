@@ -887,10 +887,13 @@ app.get("/api/image-version", (req, res) => {
 app.get("/api/accueil-image", (req, res) => {
   try {
     const accueilData = readJson(accueilJsonPath);
+    console.log("BASE_URL =", process.env.BASE_URL); // <--- pour debug
+    console.log("accueilData.imageUrl =", accueilData.imageUrl);
+
     if (!accueilData || !accueilData.imageUrl) {
       return res.status(404).json({ message: "Image non trouvée" });
     }
-    // Ici on construit l'URL complète avec BASE_URL
+
     const fullImageUrl = accueilData.imageUrl.startsWith("http")
       ? accueilData.imageUrl
       : `${process.env.BASE_URL}${accueilData.imageUrl}`;
@@ -900,6 +903,7 @@ app.get("/api/accueil-image", (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 });
+
 
 
 
