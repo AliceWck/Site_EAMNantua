@@ -585,7 +585,8 @@ app.post("/api/upload-photo", uploadEquipe.single("photo"), (req, res) => {
     return res.status(400).json({ message: "Aucun fichier envoyé" });
   }
 
-  const publicUrl = `/images/equipe/${req.file.filename}`;
+  // const publicUrl = `/images/equipe/${req.file.filename}`;
+  const publicUrl = `/uploads/equipe/${req.file.filename}`;
   res.json({ url: publicUrl });
 });
 
@@ -603,8 +604,8 @@ app.delete("/api/equipe/:id", (req, res) => {
     }
 
     // Supprimer l’image physique si c’est une image stockée localement
-    if (membreToDelete.photo && membreToDelete.photo.startsWith("/images/equipe/")) {
-      const photoPath = path.join(__dirname, "..", "public", membreToDelete.photo.replace(/^\//, ""));
+    if (membreToDelete.photo && membreToDelete.photo.startsWith("/uploads/equipe/")) {
+      const photoPath = path.join(__dirname, "uploads", "equipe", path.basename(membreToDelete.photo));
       fs.unlink(photoPath, (err) => {
         if (err) {
           console.warn("Erreur suppression photo membre :", err.message);
