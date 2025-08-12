@@ -18,8 +18,6 @@ export default function Accueil() {
 
   const logoPath = (filename) => `${API}/uploads/logos/${filename}`;
 
-
-
   useEffect(() => {
     // fetch("/api/facts")
     fetch(`${API}/api/facts`)
@@ -31,14 +29,24 @@ export default function Accueil() {
     // fetch("/api/accueil-image")
     fetch(`${API}/api/accueil-image`)
       .then(res => res.json())
+      // .then(data => {
+      //   if (data.imageUrl) {
+      //     const fullUrl = data.imageUrl.startsWith("http")
+      //       ? data.imageUrl
+      //       : `${API}/uploads/accueil/${data.imageUrl}`;
+      //     setImageUrl(fullUrl);
+      //     setImageVersion(data.version || Date.now());
+      //   }
+      // })
       .then(data => {
-        setImageUrl(data.imageUrl);
-        setImageVersion(data.version);
+        if (data.imageUrl) {
+          setImageUrl(data.imageUrl);
+          setImageVersion(data.version || Date.now());
+        }
       })
       .catch(err => {
         console.error("Erreur chargement image accueil:", err);
-        // fallback si besoin
-        setImageUrl("/images/accueil/accueil.jpeg");
+        setImageUrl(`${API}/uploads/accueil/accueil.jpeg`);
         setImageVersion(Date.now());
       });
 

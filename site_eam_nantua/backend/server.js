@@ -872,17 +872,41 @@ app.get("/api/image-version", (req, res) => {
   }
 });
 
+// app.get("/api/accueil-image", (req, res) => {
+//   try {
+//     const accueilData = readJson(accueilJsonPath);
+//     if (!accueilData || !accueilData.imageUrl) {
+//       return res.status(404).json({ message: "Image non trouvée" });
+//     }
+//     res.json({ imageUrl: accueilData.imageUrl, version: accueilData.version });
+//   } catch (error) {
+//     res.status(500).json({ message: "Erreur serveur" });
+//   }
+// });
+
 app.get("/api/accueil-image", (req, res) => {
   try {
     const accueilData = readJson(accueilJsonPath);
     if (!accueilData || !accueilData.imageUrl) {
       return res.status(404).json({ message: "Image non trouvée" });
     }
-    res.json({ imageUrl: accueilData.imageUrl, version: accueilData.version });
+
+    // Si l'imageUrl est déjà complète (http...), on garde tel quel
+    const isFullUrl = accueilData.imageUrl.startsWith("http");
+    const fullUrl = isFullUrl
+      ? accueilData.imageUrl
+      : `${process.env.BASE_URL}${accueilData.imageUrl}`;
+
+    res.json({
+      imageUrl: fullUrl,
+      version: accueilData.version
+    });
   } catch (error) {
+    console.error("Erreur /api/accueil-image:", error);
     res.status(500).json({ message: "Erreur serveur" });
   }
 });
+
 
 
 app.get("/api/contact", (req, res) => {
