@@ -385,13 +385,13 @@ app.post("/api/galleries/:id/upload", uploadTemp.single("photo"), async (req, re
 
   const ext = path.extname(req.file.originalname);
   const newFileName = Date.now() + ext;
-  const galleryDir = path.join(__dirname, "..", "public", "images", "photos", gallery.id);
+  const galleryDir = path.join(__dirname, "uploads", "photos", gallery.id);
   const finalPath = path.join(galleryDir, newFileName);
 
   await fs.ensureDir(galleryDir);
   await fs.move(req.file.path, finalPath);
 
-  const publicUrl = `/images/photos/${gallery.id}/${newFileName}`;
+  const publicUrl = `/uploads/photos/${gallery.id}/${newFileName}`;
   gallery.images.push(publicUrl);
   await saveGalleries(galleries);
   res.json(gallery);
@@ -522,7 +522,9 @@ app.use((err, req, res, next) => {
 });
 
 
-app.use("/images", express.static(path.join(__dirname, "..", "public", "images")));
+// app.use("/images", express.static(path.join(__dirname, "..", "public", "images")));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 
 app.listen(PORT, () => {

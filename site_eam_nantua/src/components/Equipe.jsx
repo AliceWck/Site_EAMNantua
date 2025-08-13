@@ -8,6 +8,17 @@ export default function Equipe() {
   const [loading, setLoading] = useState(true);
   const [erreur, setErreur] = useState(null);
 
+  const API = import.meta.env.VITE_API_URL || "";
+
+  function getFullPhotoUrl(photo) {
+    if (!photo) {
+      return `${API}/uploads/equipe/avatardefaut.png`;
+    }
+    // Si photo commence par "http" (URL absolue) on la garde, sinon on préfixe API
+    return photo.startsWith("http") ? photo : `${API}${photo}`;
+  }
+
+
   useEffect(() => {
     // fetch("http://localhost:5000/api/equipe")
     fetch(`${import.meta.env.VITE_API_URL}/api/equipe`)
@@ -48,11 +59,12 @@ export default function Equipe() {
                 <div className="equipe-card" key={personne.id}>
                   <div className="equipe-photo-wrapper">
                     <img
-                      src={
-                        personne.photo
-                          ? `${import.meta.env.VITE_API_URL}/uploads/${personne.photo}`
-                          : `${import.meta.env.VITE_API_URL}/uploads/equipe/avatardefaut.png`
-                      }
+                      // src={
+                      //   personne.photo
+                      //     ? `${import.meta.env.VITE_API_URL}/uploads/${personne.photo}`
+                      //     : `${import.meta.env.VITE_API_URL}/uploads/equipe/avatardefaut.png`
+                      // }
+                      src={getFullPhotoUrl(personne.photo)}
                       alt={personne.nom}
                       className="equipe-photo"
                     />
@@ -71,11 +83,12 @@ export default function Equipe() {
                 <div className="equipe-card" key={personne.id}>
                   <div className="equipe-photo-wrapper">
                     <img
-                      src={
-                        personne.photo
-                          ? `${import.meta.env.VITE_API_URL}/uploads/${personne.photo}`
-                          : `${import.meta.env.VITE_API_URL}/uploads/equipe/avatardefaut.png`
-                      }
+                      // src={
+                      //   personne.photo
+                      //     ? `${import.meta.env.VITE_API_URL}/uploads/${personne.photo}`
+                      //     : `${import.meta.env.VITE_API_URL}/uploads/equipe/avatardefaut.png`
+                      // }
+                      src={getFullPhotoUrl(personne.photo)}
                       alt={personne.nom}
                       className="equipe-photo"
                     />

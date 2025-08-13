@@ -9,13 +9,29 @@ export default function GalleryManager() {
   const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
 
-  useEffect(() => {
+  const API = import.meta.env.VITE_API_URL;
+
+    useEffect(() => {
     fetchGalleries();
   }, []);
 
+  function getFullPhotoUrl(photo) {
+    if (!photo) return `${API}/uploads/placeholder.jpg`;
+    if (photo.startsWith("http")) return photo;
+    
+    // Corriger le chemin si besoin
+    if (photo.startsWith("/images/photos")) {
+      return `${API}/uploads/photos${photo.slice("/images/photos".length)}`;
+    }
+    
+    return `${API}${photo}`;
+  }
+
+
   const fetchGalleries = async () => {
     try {
-      const res = await fetch("/api/galleries");
+      // const res = await fetch("/api/galleries");
+      const res = await fetch(`${API}/api/galleries`);
       const data = await res.json();
       setGalleries(data);
     } catch (err) {
@@ -26,7 +42,8 @@ export default function GalleryManager() {
   const createGallery = async () => {
     if (!newGallery.id || !newGallery.title) return;
     try {
-      const res = await fetch("/api/galleries", {
+      // const res = await fetch("/api/galleries", {
+      const res = await fetch(`${API}/api/galleries`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newGallery),
@@ -48,14 +65,16 @@ export default function GalleryManager() {
         const formData = new FormData();
         formData.append("photo", file);
 
-        const res = await fetch(`/api/galleries/${selectedGallery.id}/upload`, {
+        // const res = await fetch(`/api/galleries/${selectedGallery.id}/upload`, {
+        const res = await fetch(`${API}/api/galleries/${selectedGallery.id}/upload`, {
           method: "POST",
           body: formData,
         });
         if (!res.ok) throw new Error(await res.text());
       }
 
-      const newRes = await fetch("/api/galleries");
+      // const newRes = await fetch("/api/galleries");
+      const newRes = await fetch(`${API}/api/galleries`);
       const updatedGalleries = await newRes.json();
       setGalleries(updatedGalleries);
 
@@ -75,7 +94,8 @@ export default function GalleryManager() {
   const addImageFromUrl = async () => {
     if (!imageUrl || !selectedGallery) return;
     try {
-      const res = await fetch(`/api/galleries/${selectedGallery.id}/add-url`, {
+      // const res = await fetch(`/api/galleries/${selectedGallery.id}/add-url`, {
+      const res = await fetch(`${API}/api/galleries/${selectedGallery.id}/add-url`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: imageUrl }),
@@ -99,7 +119,8 @@ const deleteGallery = (id) => {
   const confirmDelete = window.confirm("⚠️ Supprimer cette galerie ? Cette action est irréversible.");
   if (!confirmDelete) return;
 
-  fetch(`/api/galleries/${id}`, {
+  // fetch(`/api/galleries/${id}`, {
+  fetch(`${API}/api/galleries/${id}`, {
     method: "DELETE",
   })
     .then((res) => {
@@ -124,7 +145,8 @@ const deleteImage = async (imgUrl) => {
 
   try {
     const res = await fetch(
-      `/api/galleries/${selectedGallery.id}/delete-image`,
+      // `/api/galleries/${selectedGallery.id}/delete-image`,
+      `${API}/api/galleries/${selectedGallery.id}/delete-image`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -180,7 +202,8 @@ const deleteImage = async (imgUrl) => {
                 <div key={gal.id} className="gallery-card">
                 <div onClick={() => setSelectedGallery(gal)}>
                     {/* <img src={gal.images?.[0]?.url || gal.images?.[0] || "/placeholder.jpg"} alt="" /> */}
-                    <img src={gal.images?.[0]?.url || gal.images?.[0] || `${import.meta.env.VITE_API_URL}/uploads/placeholder.jpg`} alt={gal.title} />
+                    {/* <img src={gal.images?.[0]?.url || gal.images?.[0] || `${import.meta.env.VITE_API_URL}/uploads/placeholder.jpg`} alt={gal.title} /> ici ??? */}
+                    <img src={getFullPhotoUrl(gal.images?.[0]?.url || gal.images?.[0])} alt={gal.title} />
                     <div className="font-semibold">{gal.title}</div>
                     <div className="text-sm text-gray-600">{gal.id}</div>
                 </div>
@@ -205,7 +228,8 @@ const deleteImage = async (imgUrl) => {
                     const url = img.url || img;
                     return (
                         <div key={i} className="thumbnail-container">
-                        <img src={url} alt="" />
+                        {/* <img src={url} alt="" /> */}
+                        <img src={getFullPhotoUrl(url)} alt="" />
                         <button onClick={() => deleteImage(url)}>✕</button>
                         </div>
                     );

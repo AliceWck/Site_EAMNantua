@@ -8,10 +8,18 @@ export default function Photos() {
   const [galleries, setGalleries] = useState([]);
   const [notes, setNotes] = useState([]);
   const [openNote, setOpenNote] = useState(null);
+  const API = import.meta.env.VITE_API_URL;
+
+
+  function getFullPhotoUrl(photo) {
+    if (!photo) {
+      return `${API}/uploads/placeholder.jpg`;
+    }
+    return photo.startsWith("http") ? photo : `${API}${photo}`;
+  }
+
 
   useEffect(() => {
-    const API = import.meta.env.VITE_API_URL;
-
     // Charger les galeries dynamiquement
     fetch(`${API}/api/galleries`)
       .then((res) => res.json())
@@ -46,11 +54,12 @@ export default function Photos() {
           {galleries.map((gallery, i) => (
             <Link to={`/evenements/${gallery.id}`} key={i} className="photo-item">
               <img
-                src={
-                  gallery.images?.[0]?.url ||
-                  gallery.images?.[0] ||
-                  `${API}/uploads/placeholder.jpg`
-                }
+                // src={
+                //   gallery.images?.[0]?.url ||
+                //   gallery.images?.[0] ||
+                //   `${API}/uploads/placeholder.jpg`
+                // }
+                src={getFullPhotoUrl(gallery.images?.[0]?.url || gallery.images?.[0])}
                 alt={gallery.title}
               />
               <div className="photo-caption">{gallery.title}</div>
