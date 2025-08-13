@@ -39,6 +39,7 @@ export default function EvenementPage() {
 
   const API = import.meta.env.VITE_API_URL;
 
+  // console.log(gallery.images)
   return (
     <div className="page-wrapper">
       <Header />
@@ -52,10 +53,11 @@ export default function EvenementPage() {
                   typeof src === "string"
                     ? src.startsWith("http")
                       ? src
-                      : `${API}/uploads/${src}`
+                      : `${API}${src}`
+
                     : src.url.startsWith("http")
                     ? src.url
-                    : `${API}/uploads/${src.url}`
+                    : `${API}${src.url}`
                 }
                 alt={`Photo ${i + 1}`}
               />

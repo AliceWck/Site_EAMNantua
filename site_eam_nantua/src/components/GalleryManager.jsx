@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import "./GalleryManager.css";
 
 export default function GalleryManager() {
+  console.log("GalleryManager render");
+
   const [galleries, setGalleries] = useState([]);
   const [newGallery, setNewGallery] = useState({ id: "", title: "" });
   const [selectedGallery, setSelectedGallery] = useState(null);
@@ -12,20 +14,43 @@ export default function GalleryManager() {
   const API = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
-    fetchGalleries();
-  }, []);
+      console.log("ENV:", import.meta.env);
+      fetchGalleries();
+    }, []);
 
+  // function getFullPhotoUrl(photo) {
+  //   if (!photo) return `${API}/uploads/placeholder.jpg`;
+  //   if (photo.startsWith("http")) return photo;
+    
+  //   // Corriger le chemin si besoin
+  //   if (photo.startsWith("/images/photos")) {
+  //     return `${API}/uploads/photos${photo.slice("/images/photos".length)}`;
+  //   }
+    
+  //   return `${API}${photo}`;
+  // }
+
+  // function getFullPhotoUrl(photo) {
+  //   if (!photo) return `${API}/uploads/placeholder.jpg`;
+  //   if (photo.startsWith("http")) return photo;
+  //   return `${API}${photo}`;
+  // }
   function getFullPhotoUrl(photo) {
     if (!photo) return `${API}/uploads/placeholder.jpg`;
-    if (photo.startsWith("http")) return photo;
-    
-    // Corriger le chemin si besoin
-    if (photo.startsWith("/images/photos")) {
-      return `${API}/uploads/photos${photo.slice("/images/photos".length)}`;
+    if (photo.startsWith("http")) return photo; // URL complète
+
+    // Si c’est un chemin relatif qui commence par /uploads/photos/, on ajoute juste API avant
+    if (photo.startsWith("/uploads/photos/")) {
+      return `${API}${photo}`;
     }
-    
-    return `${API}${photo}`;
+
+    // Sinon, juste concaténer API + photo
+    return `${API}/${photo}`;
   }
+
+
+
+
 
 
   const fetchGalleries = async () => {
@@ -203,7 +228,10 @@ const deleteImage = async (imgUrl) => {
                 <div onClick={() => setSelectedGallery(gal)}>
                     {/* <img src={gal.images?.[0]?.url || gal.images?.[0] || "/placeholder.jpg"} alt="" /> */}
                     {/* <img src={gal.images?.[0]?.url || gal.images?.[0] || `${import.meta.env.VITE_API_URL}/uploads/placeholder.jpg`} alt={gal.title} /> ici ??? */}
-                    <img src={getFullPhotoUrl(gal.images?.[0]?.url || gal.images?.[0])} alt={gal.title} />
+                    
+                    {/* <img src={getFullPhotoUrl(gal.images?.[0]?.url || gal.images?.[0])} alt={gal.title} /> */}
+                    <img src={getFullPhotoUrl(img.url || img, gal.id)} alt={gal.title} />
+
                     <div className="font-semibold">{gal.title}</div>
                     <div className="text-sm text-gray-600">{gal.id}</div>
                 </div>
@@ -229,7 +257,10 @@ const deleteImage = async (imgUrl) => {
                     return (
                         <div key={i} className="thumbnail-container">
                         {/* <img src={url} alt="" /> */}
-                        <img src={getFullPhotoUrl(url)} alt="" />
+
+                        {/* <img src={getFullPhotoUrl(url)} alt="" /> */}
+                        <img src={getFullPhotoUrl(url, selectedGallery.id)} alt="" />
+
                         <button onClick={() => deleteImage(url)}>✕</button>
                         </div>
                     );
