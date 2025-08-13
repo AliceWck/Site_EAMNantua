@@ -525,7 +525,7 @@ app.use((err, req, res, next) => {
 // app.use("/images", express.static(path.join(__dirname, "..", "public", "images")));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-
+app.use('/uploads/pdf', express.static(path.join(__dirname, 'uploads/pdf')));
 
 app.listen(PORT, () => {
   console.log(`✅ Backend démarré sur http://localhost:${PORT}`);
@@ -947,9 +947,10 @@ app.post("/api/upload-pdf", uploadPdf.single("pdf"), (req, res) => {
 
   const oldPdfUrl = req.body.oldPdfUrl;
 
-  // Supprimer ancien PDF si on a bien une URL relative attendue
-  if (oldPdfUrl && oldPdfUrl.startsWith("/data/documents/")) {
-    const oldPdfPath = path.join(__dirname, "..", "public", oldPdfUrl);
+  if (oldPdfUrl && oldPdfUrl.startsWith("/uploads/pdf/")) {
+    const oldPdfFilename = oldPdfUrl.replace("/uploads/pdf/", "");
+    const oldPdfPath = path.join(__dirname, "uploads", "pdf", oldPdfFilename);
+
     fs.unlink(oldPdfPath, (err) => {
       if (err) {
         console.warn("Erreur suppression ancien PDF :", err.message);
@@ -959,23 +960,25 @@ app.post("/api/upload-pdf", uploadPdf.single("pdf"), (req, res) => {
     });
   }
 
-  const pdfUrl = `/data/documents/${req.file.filename}`;
+  const pdfUrl = `/uploads/pdf/${req.file.filename}`;
   res.json({ pdfUrl });
 });
+
 
 
 app.post("/api/delete-pdf", (req, res) => {
   const { pdfUrl } = req.body;
 
-  if (!pdfUrl || !pdfUrl.startsWith("/data/documents/")) {
+  if (!pdfUrl || !pdfUrl.startsWith("/uploads/pdf/")) {
     return res.status(400).json({ error: "PDF invalide ou manquant" });
   }
 
-  const pdfPath = path.join(__dirname, "..", "public", pdfUrl);
-  const jsonPath = path.join(__dirname, "..", "public", "data", "presentation.json");
+  // Chemin complet vers le fichier PDF à supprimer dans backend/uploads/pdf
+  const pdfPath = path.join(__dirname, "uploads", "pdf", pdfUrl.replace("/uploads/pdf/", ""));
 
+  // Chemin vers le fichier JSON dans backend/data/presentation.json
+  const jsonPath = path.join(__dirname, "data", "presentation.json");
 
-  // Supprime le fichier PDF
   fs.unlink(pdfPath, (err) => {
     if (err && err.code !== "ENOENT") {
       console.warn("Erreur suppression PDF :", err.message);
@@ -984,7 +987,6 @@ app.post("/api/delete-pdf", (req, res) => {
 
     console.log("PDF supprimé :", pdfPath);
 
-    // Met à jour le JSON
     try {
       const content = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
       content.pdfUrl = null;

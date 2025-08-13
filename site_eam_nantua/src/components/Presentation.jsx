@@ -7,14 +7,16 @@ export default function Presentation() {
   const [content, setContent] = useState(null);
 
   useEffect(() => {
-    // fetch("http://localhost:5000/api/presentation-content")
     fetch(`${import.meta.env.VITE_API_URL}/api/presentation-content`)
       .then((res) => res.json())
-      .then((data) => setContent(data));
+      .then((data) => setContent(data))
+      .catch((err) => {
+        console.error("Erreur chargement contenu présentation :", err);
+      });
   }, []);
 
-
   if (!content) return <p>Chargement...</p>;
+
   return (
     <div className="presentation-container">
       <Header />
@@ -46,30 +48,41 @@ export default function Presentation() {
 
           <div className="info-card">
             <h2>📆 Cours proposés</h2>
-            <p>Voici ci-dessous la liste des cours proposés. Les horaires sont
-              décidés en accord avec les professeurs.</p>
+            <p>
+              Voici ci-dessous la liste des cours proposés. Les horaires sont
+              décidés en accord avec les professeurs.
+            </p>
             <ul>
-              {content.courses.map((course, index) => (
+              {(content.courses || []).map((course, index) => (
                 <li key={index}>{course}</li>
               ))}
             </ul>
             {content.pdfUrl && content.pdfUrl.trim() !== "" ? (
               <div className="pdf-link">
-                <a href={content.pdfUrl} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={
+                    content.pdfUrl.startsWith("http")
+                      ? content.pdfUrl
+                      : `${import.meta.env.VITE_API_URL}${content.pdfUrl}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   📄 Voir le PDF des cours
                 </a>
               </div>
             ) : null}
-
           </div>
         </section>
 
-        <section className="cta-section">
-          <h2>{content.cta.text}</h2>
-          <a href={content.cta.link} className="cta-button">
-            {content.cta.buttonText}
-          </a>
-        </section>
+        {content.cta && (
+          <section className="cta-section">
+            <h2>{content.cta.text}</h2>
+            <a href={content.cta.link} className="cta-button">
+              {content.cta.buttonText}
+            </a>
+          </section>
+        )}
       </main>
       <Footer />
     </div>
