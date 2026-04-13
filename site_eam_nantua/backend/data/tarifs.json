@@ -1,0 +1,264 @@
+{
+  "coursParticuliers": [
+    {
+      "id": "cp_30min_fm",
+      "label": "30 Min hebdo + 60 Min FM / Orchestre",
+      "duree": "30min+FM",
+      "ageMin": 16,
+      "ageMax": null,
+      "duo": false,
+      "inclusFM": true,
+      "instruments": ["piano", "guitare", "violon", "alto", "batterie", "flute", "trompette", "clarinette", "chant"],
+      "tarifs": {
+        "mineur": { "trimestre": 237, "annuel": 711 },
+        "majeur": { "trimestre": 256, "annuel": 768 }
+      }
+    },
+    {
+      "id": "cp_45min_fm",
+      "label": "45 Min hebdo + 60 Min FM / Orchestre",
+      "duree": "45min+FM",
+      "ageMin": 12,
+      "ageMax": null,
+      "duo": false,
+      "inclusFM": true,
+      "instruments": ["piano", "guitare", "violon", "alto", "batterie", "flute", "trompette", "clarinette", "chant"],
+      "tarifs": {
+        "mineur": { "trimestre": 356, "annuel": 1068 },
+        "majeur": { "trimestre": 356, "annuel": 1068 }
+      }
+    },
+    {
+      "id": "cp_45min_duo_fm",
+      "label": "45 Min hebdo en DUO + 60 Min FM / Orchestre",
+      "duree": "45min DUO+FM",
+      "ageMin": 12,
+      "ageMax": null,
+      "duo": true,
+      "inclusFM": true,
+      "noteParEleve": true,
+      "instruments": ["piano", "guitare", "violon", "alto", "batterie", "flute", "trompette", "clarinette", "chant"],
+      "tarifs": {
+        "mineur": { "trimestre": 197, "annuel": 591 },
+        "majeur": { "trimestre": 213, "annuel": 639 }
+      }
+    },
+    {
+      "id": "cp_45min_seul",
+      "label": "45 Min hebdo — Instrument seul",
+      "duree": "45min",
+      "ageMin": 12,
+      "ageMax": null,
+      "duo": false,
+      "inclusFM": false,
+      "instruments": ["piano", "guitare", "violon", "alto", "batterie", "flute", "trompette", "clarinette", "chant"],
+      "tarifs": {
+        "mineur": { "trimestre": 284, "annuel": 852 },
+        "majeur": { "trimestre": 284, "annuel": 852 }
+      }
+    }
+  ],
+  "pratiquesCollectives": [
+    {
+      "id": "pc_education_musicale",
+      "label": "Éducation Musicale",
+      "duree": 60,
+      "ageMin": 7,
+      "ageMax": null,
+      "reducDisponible": true,
+      "yogaChorale": false,
+      "tarifs": {
+        "mineur": { "trimestre": 112, "annuel": 336 },
+        "majeur": { "trimestre": 121, "annuel": 363 }
+      }
+    },
+    {
+      "id": "pc_eveil_musical",
+      "label": "Éveil Musical",
+      "duree": 60,
+      "ageMin": 3,
+      "ageMax": 10,
+      "reducDisponible": true,
+      "yogaChorale": false,
+      "tarifs": {
+        "mineur": { "trimestre": 112, "annuel": 336 },
+        "majeur": null
+      }
+    },
+    {
+      "id": "pc_eveil_hiphop",
+      "label": "Éveil Corporel / Hip-hop",
+      "duree": 60,
+      "ageMin": 3,
+      "ageMax": 10,
+      "reducDisponible": true,
+      "yogaChorale": false,
+      "tarifs": {
+        "mineur": { "trimestre": 112, "annuel": 336 },
+        "majeur": null
+      }
+    },
+    {
+      "id": "pc_danse_contemporaine",
+      "label": "Danse Contemporaine",
+      "duree": 60,
+      "ageMin": 7,
+      "ageMax": null,
+      "reducDisponible": true,
+      "yogaChorale": false,
+      "tarifs": {
+        "mineur": { "trimestre": 112, "annuel": 336 },
+        "majeur": { "trimestre": 121, "annuel": 363 }
+      }
+    },
+    {
+      "id": "pc_hiphop_breakdance_60",
+      "label": "Hip-Hop Breakdance (60 min)",
+      "duree": 60,
+      "ageMin": 7,
+      "ageMax": 15,
+      "reducDisponible": true,
+      "yogaChorale": false,
+      "tarifs": {
+        "mineur": { "trimestre": 112, "annuel": 336 },
+        "majeur": null
+      }
+    },
+    {
+      "id": "pc_chorale",
+      "label": "Chorale — Chœur d'enfants",
+      "duree": 60,
+      "ageMin": 7,
+      "ageMax": 15,
+      "reducDisponible": false,
+      "yogaChorale": true,
+      "tarifs": {
+        "mineur": { "trimestre": 80, "annuel": 240 },
+        "majeur": null
+      }
+    },
+    {
+      "id": "pc_arts_plastiques_60",
+      "label": "Arts Plastiques (60 min)",
+      "duree": 60,
+      "supplementMateriel": 42,
+      "ageMin": 7,
+      "ageMax": null,
+      "reducDisponible": true,
+      "yogaChorale": false,
+      "tarifs": {
+        "mineur": { "trimestre": 112, "annuel": 336 },
+        "majeur": null
+      }
+    },
+    {
+      "id": "pc_theatre_60",
+      "label": "Atelier Théâtre (60 min)",
+      "duree": 60,
+      "ageMin": 7,
+      "ageMax": 15,
+      "reducDisponible": true,
+      "yogaChorale": false,
+      "tarifs": {
+        "mineur": { "trimestre": 112, "annuel": 336 },
+        "majeur": null
+      }
+    },
+    {
+      "id": "pc_yoga_enfants",
+      "label": "Childplay Yoga",
+      "duree": 60,
+      "ageMin": 4,
+      "ageMax": 11,
+      "reducDisponible": false,
+      "yogaChorale": true,
+      "tarifs": {
+        "mineur": { "trimestre": 80, "annuel": 240 },
+        "majeur": null
+      }
+    },
+    {
+      "id": "pc_hiphop_breakdance_75",
+      "label": "Hip-Hop Breakdance (75 min)",
+      "duree": 75,
+      "ageMin": 12,
+      "ageMax": null,
+      "reducDisponible": true,
+      "yogaChorale": false,
+      "tarifs": {
+        "mineur": { "trimestre": 123, "annuel": 369 },
+        "majeur": { "trimestre": 133, "annuel": 399 }
+      }
+    },
+    {
+      "id": "pc_arts_plastiques_90",
+      "label": "Arts Plastiques (90 min)",
+      "duree": 90,
+      "supplementMateriel": 42,
+      "ageMin": 12,
+      "ageMax": null,
+      "reducDisponible": true,
+      "yogaChorale": false,
+      "tarifs": {
+        "mineur": { "trimestre": 140, "annuel": 420 },
+        "majeur": { "trimestre": 151, "annuel": 453 }
+      }
+    },
+    {
+      "id": "pc_theatre_90",
+      "label": "Atelier Théâtre (90 min)",
+      "duree": 90,
+      "ageMin": 16,
+      "ageMax": null,
+      "reducDisponible": true,
+      "yogaChorale": false,
+      "tarifs": {
+        "mineur": { "trimestre": 140, "annuel": 420 },
+        "majeur": { "trimestre": 151, "annuel": 453 }
+      }
+    },
+    {
+      "id": "pc_groupe_vocal",
+      "label": "Groupe Vocal",
+      "duree": 90,
+      "ageMin": 16,
+      "ageMax": null,
+      "reducDisponible": true,
+      "yogaChorale": false,
+      "tarifs": {
+        "mineur": { "trimestre": 140, "annuel": 420 },
+        "majeur": { "trimestre": 151, "annuel": 453 }
+      }
+    },
+    {
+      "id": "pc_yoga_adultes",
+      "label": "Yoga",
+      "duree": 90,
+      "ageMin": 16,
+      "ageMax": null,
+      "reducDisponible": false,
+      "yogaChorale": true,
+      "tarifs": {
+        "mineur": { "trimestre": 101, "annuel": 303 },
+        "majeur": { "trimestre": 110, "annuel": 330 }
+      }
+    }
+  ],
+  "instruments": [
+    { "id": "piano", "label": "Piano", "emoji": "🎹" },
+    { "id": "guitare", "label": "Guitare", "emoji": "🎸" },
+    { "id": "violon", "label": "Violon", "emoji": "🎻" },
+    { "id": "alto", "label": "Alto", "emoji": "🎻" },
+    { "id": "batterie", "label": "Batterie", "emoji": "🥁" },
+    { "id": "flute", "label": "Flûte", "emoji": "🎶" },
+    { "id": "trompette", "label": "Trompette", "emoji": "🎺" },
+    { "id": "clarinette", "label": "Clarinette", "emoji": "🎷" },
+    { "id": "chant", "label": "Chant", "emoji": "🎤" }
+  ],
+  "cotisationAnnuelle": 25,
+  "reductions": {
+    "foyer10pct": 0.10,
+    "deuxiemeDiscipline33pct": 0.33,
+    "exclureYogaChorale": true
+  }
+}

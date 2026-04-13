@@ -12,6 +12,7 @@ import EvenementPage from "./components/EvenementPage";
 import Equipe from "./components/Equipe";
 import Mentions from "./components/Mentions";
 import Partenaires from "./components/Partenaires";
+import InscriptionForm from "./components/InscriptionForm";
 
 
 export default function App() {
@@ -20,7 +21,8 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Accueil />} />
-          <Route path="/inscription" element={<Inscription />} />
+          {/* <Route path="/inscription" element={<Inscription />} /> */}
+          <Route path="/inscription" element={<InscriptionForm />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/presentation" element={<Presentation />} />

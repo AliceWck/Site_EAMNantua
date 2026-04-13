@@ -198,10 +198,6 @@ app.get("/", (req, res) => {
 });
 
 
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
-
 
 
 
@@ -999,4 +995,103 @@ app.post("/api/delete-pdf", (req, res) => {
 
     res.json({ success: true });
   });
+});
+
+
+/////////////// FORMS INSCROPTION
+// ─── Fichiers JSON nécessaires ─────────────────────────────────────────────────
+const tarifsFilePath = path.join(dataDir, "tarifs.json");
+const inscriptionsFilePath = path.join(dataDir, "inscriptions.json");
+
+// Init fichiers si inexistants
+if (!fs.existsSync(tarifsFilePath)) {
+  // Copier le tarifs.json depuis le dossier source (à adapter selon votre structure)
+  // Sinon, initialiser avec un objet vide et l'admin remplira
+  fs.writeFileSync(tarifsFilePath, JSON.stringify({
+    coursParticuliers: [],
+    pratiquesCollectives: [],
+    instruments: [],
+    cotisationAnnuelle: 25,
+    reductions: { foyer10pct: 0.10, deuxiemeDiscipline33pct: 0.33, exclureYogaChorale: true }
+  }, null, 2));
+}
+if (!fs.existsSync(inscriptionsFilePath)) {
+  fs.writeFileSync(inscriptionsFilePath, JSON.stringify([], null, 2));
+}
+
+function loadTarifs() {
+  return JSON.parse(fs.readFileSync(tarifsFilePath, "utf-8"));
+}
+function saveTarifs(data) {
+  fs.writeFileSync(tarifsFilePath, JSON.stringify(data, null, 2), "utf-8");
+}
+function loadInscriptions() {
+  return JSON.parse(fs.readFileSync(inscriptionsFilePath, "utf-8"));
+}
+function saveInscriptions(data) {
+  fs.writeFileSync(inscriptionsFilePath, JSON.stringify(data, null, 2), "utf-8");
+}
+
+// ─── GET tarifs ───────────────────────────────────────────────────────────────
+app.get("/api/tarifs", (req, res) => {
+  try {
+    res.json(loadTarifs());
+  } catch (err) {
+    console.error("Erreur lecture tarifs :", err);
+    res.status(500).json({ message: "Erreur lecture tarifs" });
+  }
+});
+
+// ─── PUT tarifs (admin) ───────────────────────────────────────────────────────
+app.put("/api/tarifs", (req, res) => {
+  try {
+    saveTarifs(req.body);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Erreur sauvegarde tarifs :", err);
+    res.status(500).json({ message: "Erreur sauvegarde tarifs" });
+  }
+});
+
+// ─── GET inscriptions (admin) ─────────────────────────────────────────────────
+app.get("/api/inscriptions", (req, res) => {
+  try {
+    const inscriptions = loadInscriptions();
+    res.json(inscriptions);
+  } catch (err) {
+    console.error("Erreur lecture inscriptions :", err);
+    res.status(500).json({ message: "Erreur lecture inscriptions" });
+  }
+});
+
+// ─── POST inscription (formulaire utilisateur) ────────────────────────────────
+app.post("/api/inscriptions", (req, res) => {
+  try {
+    const inscriptions = loadInscriptions();
+    const newInscription = {
+      id: Date.now(),
+      ...req.body,
+      dateInscription: req.body.dateInscription || new Date().toISOString(),
+    };
+    inscriptions.push(newInscription);
+    saveInscriptions(inscriptions);
+    res.status(201).json({ success: true, id: newInscription.id });
+  } catch (err) {
+    console.error("Erreur ajout inscription :", err);
+    res.status(500).json({ message: "Erreur lors de l'inscription" });
+  }
+});
+
+// ─── DELETE inscription (admin) ───────────────────────────────────────────────
+app.delete("/api/inscriptions/:id", (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    let inscriptions = loadInscriptions();
+    inscriptions = inscriptions.filter((i) => i.id !== id);
+    saveInscriptions(inscriptions);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Erreur suppression inscription :", err);
+    res.status(500).json({ message: "Erreur suppression inscription" });
+  }
 });

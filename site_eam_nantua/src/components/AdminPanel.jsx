@@ -4,6 +4,7 @@ import GalleryManager from './GalleryManager';
 import PartenaireManager from './PartenaireManager';
 import AccueilManager from './AccueilManager';
 import PresentationManager from "./PresentationManager";
+import InscriptionAdmin from './InscriptionAdmin';
 
 
 export default function AdminPanel({ onLogout }) {
@@ -364,6 +365,7 @@ export default function AdminPanel({ onLogout }) {
 
         <div className="admin-tabs">
             <button onClick={() => setActiveTab("accueil")}>🏠 Accueil</button>
+            <button onClick={() => setActiveTab("inscriptions")}>📝 Inscriptions</button>
             <button onClick={() => setActiveTab("formulaires")}>📄 Formulaires</button>
             <button onClick={() => setActiveTab("archives")}>📁 Archives</button>
             <button onClick={() => setActiveTab("presentation")}>🎨 Présentation</button>
@@ -629,6 +631,11 @@ export default function AdminPanel({ onLogout }) {
         )}
 
 
+        {activeTab === "inscriptions" && (
+            <div className="tab-tab">
+                <InscriptionAdmin />
+            </div>
+        )}
 
 
         {message && <div className="admin-message">{message}</div>}
