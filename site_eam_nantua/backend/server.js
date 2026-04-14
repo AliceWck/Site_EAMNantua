@@ -1002,6 +1002,7 @@ app.post("/api/delete-pdf", (req, res) => {
 // ─── Fichiers JSON nécessaires ─────────────────────────────────────────────────
 const tarifsFilePath = path.join(dataDir, "tarifs.json");
 const inscriptionsFilePath = path.join(dataDir, "inscriptions.json");
+const anneesFilePath = path.join(dataDir, "annees.json");
 
 // Init fichiers si inexistants
 if (!fs.existsSync(tarifsFilePath)) {
@@ -1018,6 +1019,10 @@ if (!fs.existsSync(tarifsFilePath)) {
 if (!fs.existsSync(inscriptionsFilePath)) {
   fs.writeFileSync(inscriptionsFilePath, JSON.stringify([], null, 2));
 }
+if (!fs.existsSync(anneesFilePath)) {
+  const a = `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`;
+  fs.writeFileSync(anneesFilePath, JSON.stringify({ courante: a, liste: [a] }, null, 2));
+}
 
 function loadTarifs() {
   return JSON.parse(fs.readFileSync(tarifsFilePath, "utf-8"));
@@ -1031,6 +1036,13 @@ function loadInscriptions() {
 function saveInscriptions(data) {
   fs.writeFileSync(inscriptionsFilePath, JSON.stringify(data, null, 2), "utf-8");
 }
+function loadAnnees() { 
+  return JSON.parse(fs.readFileSync(anneesFilePath, "utf-8")); 
+}
+function saveAnnees(d) { 
+  fs.writeFileSync(anneesFilePath, JSON.stringify(d, null, 2), "utf-8"); 
+}
+ 
 
 // ─── GET tarifs ───────────────────────────────────────────────────────────────
 app.get("/api/tarifs", (req, res) => {
@@ -1068,8 +1080,10 @@ app.get("/api/inscriptions", (req, res) => {
 app.post("/api/inscriptions", (req, res) => {
   try {
     const inscriptions = loadInscriptions();
+    const annees = loadAnnees();
     const newInscription = {
       id: Date.now(),
+      annee: annees.courante || null,
       ...req.body,
       dateInscription: req.body.dateInscription || new Date().toISOString(),
     };
@@ -1094,4 +1108,49 @@ app.delete("/api/inscriptions/:id", (req, res) => {
     console.error("Erreur suppression inscription :", err);
     res.status(500).json({ message: "Erreur suppression inscription" });
   }
+});
+
+
+app.post("/api/inscriptions/archiver", (req, res) => {
+  try {
+    const { annee } = req.body;
+    if (!annee) return res.status(400).json({ message: "Année requise" });
+    const updated = loadInscriptions().map((i) => i.annee === annee ? { ...i, archived: true } : i);
+    saveInscriptions(updated);
+    res.json({ success: true });
+  } catch { res.status(500).json({ message: "Erreur archivage" }); }
+});
+ 
+
+
+// ANNÉES SCOLAIRES
+app.get("/api/annees", (req, res) => {
+  try { res.json(loadAnnees().liste || []); } catch { res.json([]); }
+});
+
+app.get("/api/annee-courante", (req, res) => {
+  try { res.json({ annee: loadAnnees().courante || null }); } catch { res.json({ annee: null }); }
+});
+
+app.put("/api/annee-courante", (req, res) => {
+  try {
+    const { annee } = req.body;
+    if (!annee) return res.status(400).json({ message: "Année requise" });
+    const data = loadAnnees();
+    data.courante = annee;
+    if (!data.liste.includes(annee)) data.liste.push(annee);
+    saveAnnees(data);
+    res.json({ success: true, annee });
+  } catch { res.status(500).json({ message: "Erreur" }); }
+});
+
+app.post("/api/annees", (req, res) => {
+  try {
+    const { annee } = req.body;
+    if (!annee) return res.status(400).json({ message: "Année requise" });
+    const data = loadAnnees();
+    if (!data.liste.includes(annee)) data.liste.push(annee);
+    saveAnnees(data);
+    res.json({ success: true, annees: data.liste });
+  } catch { res.status(500).json({ message: "Erreur" }); }
 });
