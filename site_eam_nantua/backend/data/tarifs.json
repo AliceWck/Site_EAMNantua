@@ -7,7 +7,7 @@
       "duo": false,
       "inclusFM": true,
       "noteParEleve": false,
-      "tags": ["ado_16plus", "adulte"],
+      "tags": ["eveil_3_5", "enfant_6_10", "enfant_11_15","ado_16plus", "adulte"],
       "instruments": ["piano","guitare","violon","alto","batterie","flute","trompette","clarinette","chant"],
       "tarifs": {
         "mineur": { "trimestre": 237, "annuel": 711 },
@@ -21,7 +21,7 @@
       "duo": false,
       "inclusFM": true,
       "noteParEleve": false,
-      "tags": ["enfant_12_15", "ado_16plus", "adulte"],
+      "tags": ["enfant_11_15", "ado_16plus", "adulte"],
       "instruments": ["piano","guitare","violon","alto","batterie","flute","trompette","clarinette","chant"],
       "tarifs": {
         "mineur": { "trimestre": 356, "annuel": 1068 },
@@ -35,7 +35,7 @@
       "duo": true,
       "inclusFM": true,
       "noteParEleve": true,
-      "tags": ["enfant_12_15", "ado_16plus", "adulte"],
+      "tags": ["eveil_3_5", "enfant_6_10", "enfant_11_15","ado_16plus", "adulte"],
       "instruments": ["piano","guitare","violon","alto","batterie","flute","trompette","clarinette","chant"],
       "tarifs": {
         "mineur": { "trimestre": 197, "annuel": 591 },
@@ -49,7 +49,7 @@
       "duo": false,
       "inclusFM": false,
       "noteParEleve": false,
-      "tags": ["enfant_12_15", "ado_16plus", "adulte"],
+      "tags": ["enfant_11_15", "ado_16plus", "adulte"],
       "instruments": ["piano","guitare","violon","alto","batterie","flute","trompette","clarinette","chant"],
       "tarifs": {
         "mineur": { "trimestre": 284, "annuel": 852 },
@@ -62,7 +62,7 @@
       "id": "pc_education_musicale",
       "label": "Éducation Musicale",
       "duree": 60,
-      "tags": ["enfant_7_10", "enfant_11_15", "ado_16plus", "adulte"],
+      "tags": ["enfant_6_10", "enfant_11_15", "ado_16plus", "adulte"],
       "reducDisponible": true,
       "yogaChorale": false,
       "tarifs": {
@@ -74,7 +74,7 @@
       "id": "pc_eveil_musical",
       "label": "Éveil Musical",
       "duree": 60,
-      "tags": ["eveil_3_5", "enfant_6_10"],
+      "tags": ["eveil_3_5"],
       "reducDisponible": true,
       "yogaChorale": false,
       "tarifs": {
@@ -86,7 +86,7 @@
       "id": "pc_eveil_hiphop",
       "label": "Éveil Corporel / Hip-hop",
       "duree": 60,
-      "tags": ["eveil_3_5", "enfant_6_10"],
+      "tags": ["eveil_3_5"],
       "reducDisponible": true,
       "yogaChorale": false,
       "tarifs": {
@@ -98,7 +98,7 @@
       "id": "pc_danse_contemporaine",
       "label": "Danse Contemporaine",
       "duree": 60,
-      "tags": ["enfant_7_10", "enfant_11_15", "ado_16plus", "adulte"],
+      "tags": ["enfant_6_10", "enfant_11_15", "ado_16plus", "adulte"],
       "reducDisponible": true,
       "yogaChorale": false,
       "tarifs": {
@@ -110,7 +110,7 @@
       "id": "pc_hiphop_breakdance_60",
       "label": "Hip-Hop Breakdance (60 min)",
       "duree": 60,
-      "tags": ["enfant_7_10", "enfant_11_15"],
+      "tags": ["enfant_6_10"],
       "reducDisponible": true,
       "yogaChorale": false,
       "tarifs": {
@@ -122,7 +122,7 @@
       "id": "pc_chorale",
       "label": "Chorale — Chœur d'enfants",
       "duree": 60,
-      "tags": ["enfant_7_10", "enfant_11_15"],
+      "tags": ["enfant_6_10", "enfant_11_15"],
       "reducDisponible": false,
       "yogaChorale": true,
       "tarifs": {
@@ -135,7 +135,7 @@
       "label": "Arts Plastiques (60 min)",
       "duree": 60,
       "supplementMateriel": 42,
-      "tags": ["enfant_7_10", "enfant_11_15"],
+      "tags": ["enfant_6_10", "enfant_11_15"],
       "reducDisponible": true,
       "yogaChorale": false,
       "tarifs": {
@@ -147,7 +147,7 @@
       "id": "pc_theatre_60",
       "label": "Atelier Théâtre (60 min)",
       "duree": 60,
-      "tags": ["enfant_7_10", "enfant_11_15"],
+      "tags": ["enfant_6_10", "enfant_11_15"],
       "reducDisponible": true,
       "yogaChorale": false,
       "tarifs": {
@@ -159,7 +159,7 @@
       "id": "pc_yoga_enfants",
       "label": "Childplay Yoga",
       "duree": 60,
-      "tags": ["eveil_3_5", "enfant_6_10"],
+      "tags": ["eveil_3_5", "enfant_6_10", "enfant_11_15"],
       "reducDisponible": false,
       "yogaChorale": true,
       "tarifs": {
@@ -184,7 +184,7 @@
       "label": "Arts Plastiques (90 min)",
       "duree": 90,
       "supplementMateriel": 42,
-      "tags": ["ado_16plus", "adulte"],
+      "tags": ["enfant_11_15", "ado_16plus", "adulte"],
       "reducDisponible": true,
       "yogaChorale": false,
       "tarifs": {
