@@ -458,3 +458,64 @@
 .annee-row { display: flex; align-items: center; gap: 0.75rem; }
 .annee-row strong { flex: 1; }
 .annee-active { border-color: #6b21a8 !important; background: #faf5ff !important; }
+
+/* TagSelector */
+.tag-selector { margin: 0.75rem 0; }
+.tag-selector-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #374151;
+  margin: 0 0 0.5rem;
+}
+.tag-selector-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.tag-btn {
+  padding: 0.3rem 0.75rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 20px;
+  background: white;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tag-btn:hover { border-color: #a855f7; color: #6b21a8; }
+.tag-btn.active {
+  border-color: #6b21a8;
+  background: #6b21a8;
+  color: white;
+}
+.tag-warning {
+  font-size: 0.75rem;
+  color: #d97706;
+  margin: 0.4rem 0 0;
+  font-weight: 600;
+}
+
+/* Validation inscription */
+.ia-btn-valider {
+  padding: 0.3rem 0.75rem;
+  border: 1.5px solid #059669;
+  border-radius: 6px;
+  background: #f0fdf4;
+  color: #065f46;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.ia-btn-valider:hover { background: #059669; color: white; }
+
+.ia-card-valide {
+  border-color: #a7f3d0 !important;
+  background: #f0fdf4 !important;
+}
+
+.ia-tag.amber { background: #fef3c7; color: #92400e; }

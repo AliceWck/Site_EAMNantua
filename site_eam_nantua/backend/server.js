@@ -1006,11 +1006,9 @@ const anneesFilePath = path.join(dataDir, "annees.json");
 
 // Init fichiers si inexistants
 if (!fs.existsSync(tarifsFilePath)) {
-  // Copier le tarifs.json depuis le dossier source (à adapter selon votre structure)
-  // Sinon, initialiser avec un objet vide et l'admin remplira
   fs.writeFileSync(tarifsFilePath, JSON.stringify({
-    coursParticuliers: [],
-    pratiquesCollectives: [],
+    coursParticuliers: [], 
+    pratiquesCollectives: [], 
     instruments: [],
     cotisationAnnuelle: 25,
     reductions: { foyer10pct: 0.10, deuxiemeDiscipline33pct: 0.33, exclureYogaChorale: true }
@@ -1046,33 +1044,35 @@ function saveAnnees(d) {
 
 // ─── GET tarifs ───────────────────────────────────────────────────────────────
 app.get("/api/tarifs", (req, res) => {
-  try {
-    res.json(loadTarifs());
-  } catch (err) {
-    console.error("Erreur lecture tarifs :", err);
-    res.status(500).json({ message: "Erreur lecture tarifs" });
-  }
+  try { res.json(loadTarifs()); }
+  catch (err) { console.error(err); res.status(500).json({ message: "Erreur lecture tarifs" }); }
 });
 
 // ─── PUT tarifs (admin) ───────────────────────────────────────────────────────
 app.put("/api/tarifs", (req, res) => {
-  try {
-    saveTarifs(req.body);
-    res.json({ success: true });
-  } catch (err) {
-    console.error("Erreur sauvegarde tarifs :", err);
-    res.status(500).json({ message: "Erreur sauvegarde tarifs" });
-  }
+  try { saveTarifs(req.body); res.json({ success: true }); }
+  catch (err) { console.error(err); res.status(500).json({ message: "Erreur sauvegarde tarifs" }); }
 });
 
-// ─── GET inscriptions (admin) ─────────────────────────────────────────────────
+// ─── INSCRIPTIONS ─────────────────────────────────────────────────────────────
+
+// GET toutes les inscriptions (admin)
 app.get("/api/inscriptions", (req, res) => {
+  try { res.json(loadInscriptions()); }
+  catch (err) { console.error(err); res.status(500).json({ message: "Erreur" }); }
+});
+
+// GET par code (utilisateur qui retrouve son dossier)
+app.get("/api/inscriptions/code/:code", (req, res) => {
   try {
+    const code = req.params.code.toUpperCase().trim();
     const inscriptions = loadInscriptions();
-    res.json(inscriptions);
+    const found = inscriptions.find((i) => i.code === code);
+    if (!found) return res.status(404).json({ message: "Aucune inscription trouvée" });
+    res.json(found);
   } catch (err) {
-    console.error("Erreur lecture inscriptions :", err);
-    res.status(500).json({ message: "Erreur lecture inscriptions" });
+    console.error(err);
+    res.status(500).json({ message: "Erreur serveur" });
   }
 });
 
@@ -1081,55 +1081,125 @@ app.post("/api/inscriptions", (req, res) => {
   try {
     const inscriptions = loadInscriptions();
     const annees = loadAnnees();
-    const newInscription = {
+
+    // Vérifier que le code généré côté client n'existe pas déjà (très improbable mais sécurité)
+    const code = req.body.code || genCode();
+    if (inscriptions.find((i) => i.code === code)) {
+      // Régénérer si collision
+      req.body.code = genCode();
+    }
+
+    const newIns = {
       id: Date.now(),
       annee: annees.courante || null,
+      statut: "en_attente",
       ...req.body,
+      code: req.body.code || code,
       dateInscription: req.body.dateInscription || new Date().toISOString(),
     };
-    inscriptions.push(newInscription);
+    inscriptions.push(newIns);
     saveInscriptions(inscriptions);
-    res.status(201).json({ success: true, id: newInscription.id });
+    res.status(201).json({ success: true, id: newIns.id, code: newIns.code });
   } catch (err) {
-    console.error("Erreur ajout inscription :", err);
-    res.status(500).json({ message: "Erreur lors de l'inscription" });
+    console.error(err);
+    res.status(500).json({ message: "Erreur inscription" });
   }
 });
 
-// ─── DELETE inscription (admin) ───────────────────────────────────────────────
-app.delete("/api/inscriptions/:id", (req, res) => {
+// PUT mise à jour d'une inscription existante (modification par l'utilisateur via son code)
+app.put("/api/inscriptions/:id", (req, res) => {
   try {
     const id = Number(req.params.id);
-    let inscriptions = loadInscriptions();
-    inscriptions = inscriptions.filter((i) => i.id !== id);
+    const inscriptions = loadInscriptions();
+    const idx = inscriptions.findIndex((i) => i.id === id);
+    if (idx === -1) return res.status(404).json({ message: "Inscription non trouvée" });
+
+    const existing = inscriptions[idx];
+
+    // Si l'inscription est déjà validée, bloquer la modification côté serveur
+    if (existing.statut === "valide") {
+      return res.status(403).json({ message: "Cette inscription a été validée par le bureau et ne peut plus être modifiée en ligne." });
+    }
+
+    // Mettre à jour en conservant id, code, annee, statut, dateInscription originale
+    inscriptions[idx] = {
+      ...existing,
+      ...req.body,
+      id: existing.id,
+      code: existing.code,
+      annee: existing.annee,
+      statut: existing.statut,
+      dateInscription: existing.dateInscription,
+      dateModification: new Date().toISOString(),
+    };
     saveInscriptions(inscriptions);
     res.json({ success: true });
   } catch (err) {
-    console.error("Erreur suppression inscription :", err);
-    res.status(500).json({ message: "Erreur suppression inscription" });
+    console.error(err);
+    res.status(500).json({ message: "Erreur mise à jour" });
   }
 });
 
+// PUT valider une inscription (admin uniquement)
+app.put("/api/inscriptions/:id/valider", (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const inscriptions = loadInscriptions();
+    const idx = inscriptions.findIndex((i) => i.id === id);
+    if (idx === -1) return res.status(404).json({ message: "Inscription non trouvée" });
 
+    inscriptions[idx] = {
+      ...inscriptions[idx],
+      statut: "valide",
+      dateValidation: new Date().toISOString(),
+    };
+    saveInscriptions(inscriptions);
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur validation" });
+  }
+});
+
+// DELETE inscription (admin)
+app.delete("/api/inscriptions/:id", (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    saveInscriptions(loadInscriptions().filter((i) => i.id !== id));
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur suppression" });
+  }
+});
+
+// POST archiver les inscriptions d'une année (les marquer archived: true)
 app.post("/api/inscriptions/archiver", (req, res) => {
   try {
     const { annee } = req.body;
     if (!annee) return res.status(400).json({ message: "Année requise" });
-    const updated = loadInscriptions().map((i) => i.annee === annee ? { ...i, archived: true } : i);
+    const updated = loadInscriptions().map((i) =>
+      i.annee === annee ? { ...i, archived: true } : i
+    );
     saveInscriptions(updated);
     res.json({ success: true });
-  } catch { res.status(500).json({ message: "Erreur archivage" }); }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur archivage" });
+  }
 });
  
 
 
 // ANNÉES SCOLAIRES
 app.get("/api/annees", (req, res) => {
-  try { res.json(loadAnnees().liste || []); } catch { res.json([]); }
+  try { res.json(loadAnnees().liste || []); }
+  catch { res.json([]); }
 });
 
 app.get("/api/annee-courante", (req, res) => {
-  try { res.json({ annee: loadAnnees().courante || null }); } catch { res.json({ annee: null }); }
+  try { res.json({ annee: loadAnnees().courante || null }); }
+  catch { res.json({ annee: null }); }
 });
 
 app.put("/api/annee-courante", (req, res) => {
@@ -1141,7 +1211,10 @@ app.put("/api/annee-courante", (req, res) => {
     if (!data.liste.includes(annee)) data.liste.push(annee);
     saveAnnees(data);
     res.json({ success: true, annee });
-  } catch { res.status(500).json({ message: "Erreur" }); }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur" });
+  }
 });
 
 app.post("/api/annees", (req, res) => {
@@ -1152,5 +1225,14 @@ app.post("/api/annees", (req, res) => {
     if (!data.liste.includes(annee)) data.liste.push(annee);
     saveAnnees(data);
     res.json({ success: true, annees: data.liste });
-  } catch { res.status(500).json({ message: "Erreur" }); }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur" });
+  }
 });
+
+// ─── Helper : génération de code unique ───────────────────────────────────────
+function genCode() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  return Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+}

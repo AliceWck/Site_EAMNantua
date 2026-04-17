@@ -3,6 +3,36 @@ import "./InscriptionAdmin.css";
 
 const API = import.meta.env.VITE_API_URL;
 
+// Tags canoniques (synchros avec InscriptionForm.jsx)
+const TAGS_DEF = [
+  { id: "eveil_3_5",    label: "Éveil 3–5 ans",    desc: "3 à 5 ans" },
+  { id: "enfant_6_10",  label: "Enfant 6–10 ans",  desc: "6 à 10 ans" },
+  { id: "enfant_7_10",  label: "Enfant 7–10 ans",  desc: "7 à 10 ans" },
+  { id: "enfant_11_15", label: "Enfant 11–15 ans", desc: "11 à 15 ans" },
+  { id: "enfant_12_15", label: "Enfant 12–15 ans", desc: "12 à 15 ans" },
+  { id: "ado_16plus",   label: "Ado 16–17 ans",    desc: "16 à 17 ans" },
+  { id: "adulte",       label: "Adulte 18+",        desc: "18 ans et plus" },
+];
+
+function TagSelector({ tags = [], onChange }) {
+  const toggle = (id) =>
+    onChange(tags.includes(id) ? tags.filter((t) => t !== id) : [...tags, id]);
+  return (
+    <div className="tag-selector">
+      <p className="tag-selector-label">Tranches d'âge éligibles :</p>
+      <div className="tag-selector-btns">
+        {TAGS_DEF.map((t) => (
+          <button key={t.id} type="button" className={`tag-btn ${tags.includes(t.id) ? "active" : ""}`}
+            onClick={() => toggle(t.id)} title={t.desc}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+      {tags.length === 0 && <p className="tag-warning">⚠️ Aucun tag = cours visible pour tous les âges</p>}
+    </div>
+  );
+}
+
 export default function InscriptionAdmin() {
   const [tarifs, setTarifs] = useState(null);
   const [activeSection, setActiveSection] = useState("cp");
@@ -143,6 +173,7 @@ export default function InscriptionAdmin() {
                     <C label="Inclut FM / Orchestre" checked={!!cp.inclusFM} onChange={(v) => updateCP(idx, "inclusFM", v)} />
                     <C label='Afficher "par élève"' checked={!!cp.noteParEleve} onChange={(v) => updateCP(idx, "noteParEleve", v)} />
                   </div>
+                  <TagSelector tags={cp.tags || []} onChange={(newTags) => updateCP(idx, "tags", newTags)} />
                   <button className="ia-btn-save" onClick={() => { save(tarifs); setEditingItem(null); }}>💾 Enregistrer</button>
                 </div>
               )}
@@ -207,6 +238,7 @@ export default function InscriptionAdmin() {
                     <C label="Exclu des réductions multi-activités (Yoga / Chorale)" checked={!!pc.yogaChorale} onChange={(v) => updatePC(idx, "yogaChorale", v)} />
                     <C label="Réduction 33% multi-activités applicable" checked={!!pc.reducDisponible} onChange={(v) => updatePC(idx, "reducDisponible", v)} />
                   </div>
+                  <TagSelector tags={pc.tags || []} onChange={(newTags) => updatePC(idx, "tags", newTags)} />
                   <div className="ia-groups-section">
                     <p className="ia-subheading">📋 Groupes d'âge (informatifs, affichés à l'élève)</p>
                     <GroupesEditor groupes={pc.groupes || []} onChange={(g) => updatePC(idx, "groupes", g)} />
@@ -455,15 +487,28 @@ function ListeInscrits({ showMsg }) {
       {loading && <p>Chargement…</p>}
       {!loading && filtered.length === 0 && <p className="ia-hint">Aucune inscription trouvée.</p>}
       {filtered.map((ins, i) => (
-        <div key={i} className="ia-card">
+        <div key={i} className={`ia-card ${ins.statut === "valide" ? "ia-card-valide" : ""}`}>
           <div className="ia-card-header">
             <div style={{ flex: 1 }}>
               <strong>{ins.eleves?.map((e) => `${e.prenom} ${e.nom}`).join(" · ")}</strong>
               <span className="ia-date"> — {new Date(ins.dateInscription).toLocaleDateString("fr-FR")}</span>
               {ins.annee && <span className="ia-tag blue" style={{ marginLeft: "0.5rem" }}>{ins.annee}</span>}
+              {ins.statut === "valide"
+                ? <span className="ia-tag green" style={{ marginLeft: "0.5rem" }}>✅ Validée</span>
+                : <span className="ia-tag amber" style={{ marginLeft: "0.5rem" }}>⏳ En attente</span>}
             </div>
-            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
               <span className="total-badge">{ins.totalGeneral} €</span>
+              {ins.statut !== "valide" && (
+                <button className="ia-btn-valider" onClick={async () => {
+                  if (!confirm(`Valider l'inscription de ${ins.eleves?.map((e) => e.prenom).join(", ")} ? L'inscrit ne pourra plus la modifier en ligne.`)) return;
+                  const res = await fetch(`${API}/api/inscriptions/${ins.id}/valider`, { method: "PUT" });
+                  if (res.ok) {
+                    setInscrits((p) => p.map((x) => x.id === ins.id ? { ...x, statut: "valide" } : x));
+                    showMsg("✅ Inscription validée.");
+                  } else showMsg("❌ Erreur lors de la validation.");
+                }}>✅ Valider</button>
+              )}
               <button className="ia-btn-sm" onClick={() => setExpanded(expanded === i ? null : i)}>{expanded === i ? "▲" : "▼"}</button>
               <button className="ia-btn-sm danger" onClick={async () => {
                 if (!confirm("Supprimer ?")) return;
