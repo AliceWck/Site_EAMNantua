@@ -20,16 +20,21 @@
   background: var(--inscr-bg);
 }
 
-/* Hero */
+
 .inscr-hero {
-  background: linear-gradient(135deg, var(--inscr-primary) 0%, #4c1d95 100%);
-  color: white;
   text-align: center;
-  padding: 3rem 1rem 2.5rem;
+  padding: 2.5rem 2rem;
+  background: linear-gradient(120deg, #4e7b77, #a6b6b4);
+  color: white;
+  border-radius: 1rem;
+  margin-bottom: rem;
+  margin-top: 0.5rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
 }
+
 .inscr-hero h1 {
   font-size: 2.2rem;
-  font-weight: 800;
   margin: 0 0 0.5rem;
   letter-spacing: -0.03em;
 }
@@ -587,6 +592,7 @@
   cursor: pointer;
   transition: all 0.15s;
   width: 100%;
+  color: black;
 }
 .cours-choice-card:hover:not(:disabled) {
   border-color: var(--inscr-primary);

@@ -208,7 +208,7 @@ export default function InscriptionForm() {
     setEleves((prev) => 
       prev.map((e, i) =>
       i === eleveActif 
-          ? { ...e, coursChoisis: [...e.coursChoisis, newCours] }
+          ? { ...e, coursChoisis: [...e.coursChoisis, { coursData, instrumentId, id: Date.now() }] }
           : e
       )
     );
@@ -482,7 +482,7 @@ export default function InscriptionForm() {
                   <div className="field field-sexe">
                     <label>Sexe</label>
                     <div className="sexe-btns">
-                      {["F", "M"].map((s) => (
+                      {["F", "M", "Autre"].map((s) => (
                         <button key={s} className={`sexe-btn ${eleveCourant.sexe === s ? "active" : ""}`}
                           onClick={() => updateEleve(eleveActif, "sexe", s)}>{s}</button>
                       ))}
