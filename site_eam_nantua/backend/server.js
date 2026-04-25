@@ -18,19 +18,23 @@ const ADMIN_PASSWORD = "secret123";
 
 // Dossiers importants (.., public, images = uploads)
 const dataDir = path.join(__dirname, "data");
-const uploadDirEquipe = path.join(__dirname, "uploads", "equipe");
-const partenairesUploadDir = path.join(__dirname, "uploads", "partenaires");
-const accueilImageDir = path.join(__dirname, "uploads", "accueil");
+const uploadDirEquipe = path.join(dataDir, "images", "equipe");
+const partenairesUploadDir = path.join(dataDir, "images", "partenaires");
+const accueilImageDir = path.join(dataDir, "images", "accueil");
 
 
 
 
 // Création dossiers si inexistants
-if (!fs.existsSync(uploadDirEquipe)) fs.mkdirSync(uploadDirEquipe, { recursive: true });
-if (!fs.existsSync(partenairesUploadDir)) fs.mkdirSync(partenairesUploadDir, { recursive: true });
-if (!fs.existsSync(accueilImageDir)) fs.mkdirSync(accueilImageDir, { recursive: true });
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-
+[
+  path.join(dataDir, "images", "equipe"),
+  path.join(dataDir, "images", "partenaires"),
+  path.join(dataDir, "images", "accueil"),
+  path.join(dataDir, "images", "photos"),
+  path.join(dataDir, "images", "logos"),
+  dataDir,
+  documentsDir,
+].forEach((d) => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
 
 
 
@@ -381,7 +385,7 @@ app.post("/api/galleries/:id/upload", uploadTemp.single("photo"), async (req, re
 
   const ext = path.extname(req.file.originalname);
   const newFileName = Date.now() + ext;
-  const galleryDir = path.join(__dirname, "uploads", "photos", gallery.id);
+  const galleryDir = path.join(dataDir, "images", "photos", gallery.id);
   const finalPath = path.join(galleryDir, newFileName);
 
   await fs.ensureDir(galleryDir);
@@ -436,9 +440,9 @@ app.post("/api/galleries/:id/delete-image", async (req, res) => {
   }
 
   // Supprimer physiquement l'image si c'est un fichier local
-  const localPrefix = `/images/photos/${gallery.id}/`;
+  const localPrefix = `/uploads/photos/${gallery.id}/`;
   if (url.startsWith(localPrefix)) {
-    const localPath = path.join(__dirname, "..", "public", url.replace(/^\//, ""));
+    const localPath = path.join(dataDir, "images", "photos", gallery.id, path.basename(url));
     fs.unlink(localPath, (err) => {
       if (err) console.warn("Erreur suppression fichier :", err.message);
     });
@@ -519,9 +523,9 @@ app.use((err, req, res, next) => {
 
 
 // app.use("/images", express.static(path.join(__dirname, "..", "public", "images")));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(dataDir, 'images')));
 
-app.use('/uploads/pdf', express.static(path.join(__dirname, 'uploads/pdf')));
+app.use('/documents', express.static(documentsDir));
 
 app.listen(PORT, () => {
   console.log(`✅ Backend démarré sur http://localhost:${PORT}`);
@@ -603,7 +607,7 @@ app.delete("/api/equipe/:id", (req, res) => {
 
     // Supprimer l’image physique si c’est une image stockée localement
     if (membreToDelete.photo && membreToDelete.photo.startsWith("/uploads/equipe/")) {
-      const photoPath = path.join(__dirname, "uploads", "equipe", path.basename(membreToDelete.photo));
+      const photoPath = path.join(dataDir, "uploads", "equipe", path.basename(membreToDelete.photo));
       fs.unlink(photoPath, (err) => {
         if (err) {
           console.warn("Erreur suppression photo membre :", err.message);
@@ -676,7 +680,7 @@ app.post("/api/upload-logo", uploadPartenaireLogo.single("logo"), (req, res) => 
     return res.status(400).json({ message: "Aucun fichier envoyé" });
   }
 
-  const publicUrl = `/images/partenaires/${req.file.filename}`;
+  const publicUrl = `/uploads/partenaires/${req.file.filename}`;
   res.json({ url: publicUrl });
 });
 
@@ -836,7 +840,7 @@ app.post("/api/upload-home-image", uploadAccueil.single("image"), (req, res) => 
   const oldData = readJson(accueilJsonPath);
     if (oldData && oldData.imageUrl) {
     // oldData.imageUrl = "/images/accueil/xxxxx.jpg"
-    const oldImagePath = path.join(__dirname, "uploads", "accueil", path.basename(oldData.imageUrl));
+    const oldImagePath = path.join(accueilImageDir, path.basename(oldData.imageUrl));
     if (fs.existsSync(oldImagePath)) {
       try {
         fs.unlinkSync(oldImagePath);
@@ -956,7 +960,7 @@ app.post("/api/upload-pdf", uploadPdf.single("pdf"), (req, res) => {
     });
   }
 
-  const pdfUrl = `/uploads/pdf/${req.file.filename}`;
+  const pdfUrl = `/documents/${req.file.filename}`;
   res.json({ pdfUrl });
 });
 
@@ -965,12 +969,12 @@ app.post("/api/upload-pdf", uploadPdf.single("pdf"), (req, res) => {
 app.post("/api/delete-pdf", (req, res) => {
   const { pdfUrl } = req.body;
 
-  if (!pdfUrl || !pdfUrl.startsWith("/uploads/pdf/")) {
+  if (!pdfUrl || !pdfUrl.startsWith("/documents/")) {
     return res.status(400).json({ error: "PDF invalide ou manquant" });
   }
 
   // Chemin complet vers le fichier PDF à supprimer dans backend/uploads/pdf
-  const pdfPath = path.join(__dirname, "uploads", "pdf", pdfUrl.replace("/uploads/pdf/", ""));
+  const pdfPath = path.join(documentsDir, pdfUrl.replace("/documents/", ""));
 
   // Chemin vers le fichier JSON dans backend/data/presentation.json
   const jsonPath = path.join(__dirname, "data", "presentation.json");
@@ -1178,11 +1182,21 @@ app.post("/api/inscriptions/archiver", (req, res) => {
   try {
     const { annee } = req.body;
     if (!annee) return res.status(400).json({ message: "Année requise" });
-    const updated = loadInscriptions().map((i) =>
+
+    const inscriptions = loadInscriptions();
+    const aArchiver = inscriptions.filter((i) => i.annee === annee);
+
+    // Sauvegarder une copie dédiée à cette année
+    const archivePath = path.join(dataDir, `inscriptions_${annee}.json`);
+    fs.writeFileSync(archivePath, JSON.stringify(aArchiver, null, 2), "utf-8");
+
+    // Marquer archived: true dans le fichier principal
+    const updated = inscriptions.map((i) =>
       i.annee === annee ? { ...i, archived: true } : i
     );
     saveInscriptions(updated);
-    res.json({ success: true });
+
+    res.json({ success: true, nb: aArchiver.length });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Erreur archivage" });

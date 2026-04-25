@@ -3,7 +3,7 @@ import "./InscriptionAdmin.css";
 
 const API = import.meta.env.VITE_API_URL;
 
-// Tags canoniques (synchros avec InscriptionForm.jsx)
+// Tags canoniques — synchronisés avec InscriptionForm.jsx
 const TAGS_DEF = [
   { id: "eveil_3_5",    label: "Éveil 3–5 ans",    desc: "3 à 5 ans" },
   { id: "enfant_6_10",  label: "Enfant 6–10 ans",  desc: "6 à 10 ans" },
@@ -475,7 +475,12 @@ function ListeInscrits({ showMsg }) {
     <div className="ia-section">
       <div className="ia-section-header">
         <h3>Inscriptions ({filtered.length}/{inscrits.length})</h3>
-        <button className="ia-btn-add" onClick={exportCSV}>⬇️ Export CSV complet</button>
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          <button className="ia-btn-add" onClick={() => exportCSV("toutes")}>⬇️ Export CSV complet</button>
+          {annees.map((a) => (
+            <button key={a} className="ia-btn-sm" onClick={() => exportCSV(a)}>⬇️ {a}</button>
+          ))}
+        </div>
       </div>
       <div className="ia-filters">
         <input className="ia-search" style={{ flex: 1 }} placeholder="Rechercher par nom, prénom, email…" value={search} onChange={(e) => setSearch(e.target.value)} />

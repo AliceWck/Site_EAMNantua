@@ -78,9 +78,9 @@ function calculerTotal(eleves, paiementType, nbFoyerTotal) {
         disciplineCount++;
         if (disciplineCount >= 2) {
           // 33% de réduction
-          const reduc33 = Math.round(prixBase * 0.33);
+          const reduc33 = (prixBase * 0.33);
           // 10% foyer
-          const reduc10 = nbFoyerTotal >= 2 ? Math.round(prixBase * 0.10) : 0;
+          const reduc10 = nbFoyerTotal >= 2 ?  (prixBase * 0.10) : 0;
           // On applique la plus avantageuse
           if (reduc33 >= reduc10) { 
             prixFinal = prixBase - reduc33;
@@ -91,13 +91,13 @@ function calculerTotal(eleves, paiementType, nbFoyerTotal) {
           }
         } else if (nbFoyerTotal >= 2) {
           // 10% foyer sur la 1ère discipline aussi
-          const reduc10 = Math.round(prixBase * 0.10);
+          const reduc10 = (prixBase * 0.10);
           prixFinal = prixBase - reduc10;
           reductionAppliquee = "−10% foyer";
         }
       } else if (nbFoyerTotal >= 2) {
         // Yoga/Chorale : seulement 10% foyer si applicable
-        const reduc10 = Math.round(prixBase * 0.10);
+        const reduc10 = (prixBase * 0.10);
         prixFinal = prixBase - reduc10;
         reductionAppliquee = "−10% foyer";
       }
@@ -650,9 +650,13 @@ export default function InscriptionForm() {
                       return (
                         <tr key={i}>
                           <td>{instr && <span>{instr.emoji} </span>}{instr ? `${instr.label} — ` : ""}{c.coursData.label}{c.coursData.supplementMateriel && <span className="sup-tag"> +{c.coursData.supplementMateriel}€ mat.</span>}</td>
-                          <td>{c.prixBase} €</td>
+                          <td>{typeof c.prixBase === "number" ? c.prixBase.toFixed(2) : c.prixBase} €</td>
                           <td>{c.reductionAppliquee || "—"}</td>
-                          <td className="prix-final">{c.prixFinal + (c.coursData.supplementMateriel || 0)} €</td>
+                          <td className="prix-final">
+                            {typeof c.prixFinal === "number"
+                              ? (c.prixFinal + (c.coursData.supplementMateriel || 0)).toFixed(2)
+                              : c.prixFinal} €
+                          </td>
                         </tr>
                       );
                     })}

@@ -230,7 +230,7 @@ const deleteImage = async (imgUrl) => {
                     {/* <img src={gal.images?.[0]?.url || gal.images?.[0] || `${import.meta.env.VITE_API_URL}/uploads/placeholder.jpg`} alt={gal.title} /> ici ??? */}
                     
                     {/* <img src={getFullPhotoUrl(gal.images?.[0]?.url || gal.images?.[0])} alt={gal.title} /> */}
-                    <img src={getFullPhotoUrl(img.url || img, gal.id)} alt={gal.title} />
+                    <img src={getFullPhotoUrl(gal.images?.[0]?.url || gal.images?.[0])} alt={gal.title} />
 
                     <div className="font-semibold">{gal.title}</div>
                     <div className="text-sm text-gray-600">{gal.id}</div>
