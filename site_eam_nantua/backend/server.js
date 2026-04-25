@@ -17,7 +17,8 @@ const ADMIN_PASSWORD = "secret123";
 
 
 // Dossiers importants (.., public, images = uploads)
-const dataDir = path.join(__dirname, "data");
+// const dataDir = path.join(__dirname, "data");
+const dataDir = process.env.DATA_PATH || path.join(__dirname, "data");
 const uploadDirEquipe = path.join(dataDir, "images", "equipe");
 const partenairesUploadDir = path.join(dataDir, "images", "partenaires");
 const accueilImageDir = path.join(dataDir, "images", "accueil");
@@ -181,7 +182,8 @@ function savePartenaires(data) {
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(path.join(dataDir, "images")));
 
 
 
