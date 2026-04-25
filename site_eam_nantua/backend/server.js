@@ -33,7 +33,6 @@ const accueilImageDir = path.join(dataDir, "images", "accueil");
   path.join(dataDir, "images", "photos"),
   path.join(dataDir, "images", "logos"),
   dataDir,
-  documentsDir,
 ].forEach((d) => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
 
 
