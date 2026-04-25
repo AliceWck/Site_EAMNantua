@@ -707,7 +707,7 @@
   font-weight: 700;
   letter-spacing: 0.15em;
   text-align: center;
-  color: var(--inscr-primary);
+  color: white;
   text-transform: uppercase;
 }
 .code-input:focus { outline: none; border-color: var(--inscr-primary); }
@@ -763,4 +763,38 @@
 
 @media (max-width: 600px) {
   .accueil-choix { grid-template-columns: 1fr; }
+}
+
+/* Bouton Tout cocher */
+.inscr-btn-tout-cocher {
+  background: white;
+  color: var(--inscr-primary);
+  border: 1.5px solid var(--inscr-primary-light);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.inscr-btn-tout-cocher:hover {
+  background: var(--inscr-primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(107, 33, 168, 0.2);
+}
+
+.inscr-btn-tout-cocher:active {
+  transform: translateY(1px);
+}
+
+.engagements-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }

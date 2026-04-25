@@ -101,6 +101,11 @@ export default function PresentationManager() {
       </label>
 
       <label>
+        Sous-titre petit :
+        <input name="subtitle2" value={formData.subtitle2} onChange={handleChange} />
+      </label>
+
+      <label>
         Sous-titre :
         <input name="subtitle" value={formData.subtitle} onChange={handleChange} />
       </label>

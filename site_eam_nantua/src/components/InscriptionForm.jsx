@@ -129,7 +129,7 @@ function genId() {
 
 export default function InscriptionForm() {
   const [tarifs, setTarifs] = useState(null);
-  const [etape, setEtape] = useState("foyer"); // foyer | eleves | recap | confirmation
+  const [etape, setEtape] = useState("accueil"); // accueil | foyer | eleves | recap | confirmation
   
   // Foyer
   const [nbMembres, setNbMembres] = useState(1);
@@ -309,6 +309,26 @@ export default function InscriptionForm() {
       <Footer />
     </div>
   );
+
+
+  const basculerTout = () => {
+              const tousCoches = Object.entries(engagements)
+                .filter(([key]) => key !== "droitImage")
+                .every(([_, v]) => v === true);
+
+              const nouvelleValeur = !tousCoches; // Si tout est coché, on met false, sinon true.
+
+              setEngagements(prev => ({
+                ...prev,
+                whatsapp: nouvelleValeur,
+                assurance: nouvelleValeur,
+                mineurs: nouvelleValeur,
+                responsabilite: nouvelleValeur,
+                absences: nouvelleValeur,
+                paiement: nouvelleValeur,
+                reglement: nouvelleValeur,
+              }));
+            };
 
   const eleveCourant = eleves[eleveActif] || null;
   const ageCourant = eleveCourant ? getAge(eleveCourant.dateNaissance) : null;
@@ -650,8 +670,27 @@ export default function InscriptionForm() {
 
             {/* Engagements */}
             <section className="engagements-section">
-              <h3>Déclarations et engagements</h3>
+              {/* 1. Le Header avec Titre + Bouton Bascule */}
+              <div className="engagements-header">
+                <h3>Déclarations et engagements</h3>
+                {(() => {
+                  const tousCoches = Object.entries(engagements)
+                    .filter(([key]) => key !== "droitImage")
+                    .every(([_, v]) => v === true);
 
+                  return (
+                    <button 
+                      type="button" 
+                      className={`inscr-btn-tout-cocher ${tousCoches ? 'active' : ''}`}
+                      onClick={basculerTout}
+                    >
+                      {tousCoches ? "❌ Tout décocher" : "✅ Tout cocher"}
+                    </button>
+                  );
+                })()}
+              </div>
+
+              {/* 2. Le Droit à l'image (Exclu du "Tout cocher") */}
               <div className="droit-image">
                 <p><strong>Droits à l'image :</strong> Autorisez-vous l'École à photographier ou filmer votre enfant / vous-même, et à utiliser ces images sur ses supports de communication ?</p>
                 <div className="oui-non-btns">

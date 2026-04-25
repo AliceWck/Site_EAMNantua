@@ -23,6 +23,7 @@ export default function Presentation() {
       <main className="presentation-main">
         <section className="hero-section-pres">
           <h1>{content.title}</h1>
+          <p className="subtitle2">{content.subtitle2}</p>
           <p className="subtitle">{content.subtitle}</p>
         </section>
 

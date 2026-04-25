@@ -451,7 +451,7 @@
   padding: 1.25rem 1.5rem;
   margin-bottom: 1.25rem;
 }
-.annee-courante-box h4 { margin: 0 0 0.25rem; font-size: 0.85rem; opacity: 0.8; }
+.annee-courante-box h4 { margin: 0 0 0.25rem; font-size: 0.85rem; opacity: 0.8; color:white;}
 .annee-active-label { font-size: 1.6rem; font-weight: 800; margin: 0 0 0.25rem; }
 .annee-courante-box .ia-hint { color: rgba(255,255,255,0.75); margin: 0; }
 

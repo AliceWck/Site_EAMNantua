@@ -108,6 +108,7 @@
 
 .presentation-admin label input[name="title"],
 .presentation-admin label input[name="subtitle"],
+.presentation-admin label input[name="subtitle2"],
 .presentation-admin label input[name="address"],
 .presentation-admin label textarea[name="mission"] {
   width: 100%;
