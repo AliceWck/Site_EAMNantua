@@ -73,6 +73,27 @@ if (!fs.existsSync(documentsDir)) fs.mkdirSync(documentsDir, { recursive: true }
 
 
 
+// Debug persistent disk
+app.get("/api/debug/files", (req, res) => {
+  const walk = (dir) => {
+    const result = {};
+    const items = fs.readdirSync(dir);
+
+    items.forEach((item) => {
+      const full = path.join(dir, item);
+      if (fs.lstatSync(full).isDirectory()) {
+        result[item] = walk(full);
+      } else {
+        result[item] = "file";
+      }
+    });
+
+    return result;
+  };
+
+  res.json(walk(dataDir));
+});
+
 
 // Multer storage configs
 

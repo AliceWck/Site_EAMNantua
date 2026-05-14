@@ -25,5 +25,6 @@ dist-ssr
 
 # backend/data/
 backend/temp_uploads/
+backend/data/
 
 .env
