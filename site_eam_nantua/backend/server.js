@@ -72,7 +72,7 @@ if (!fs.existsSync(documentsDir)) fs.mkdirSync(documentsDir, { recursive: true }
 
 
 
-
+// TEMPORAIRE
 // Debug persistent disk
 app.get("/api/debug/files", (req, res) => {
   const walk = (dir) => {
@@ -93,6 +93,28 @@ app.get("/api/debug/files", (req, res) => {
 
   res.json(walk(dataDir));
 });
+
+app.get("/debug/disk", (req, res) => {
+  const fs = require("fs");
+  const path = require("path");
+
+  const dataDir = process.env.DATA_PATH || path.join(process.cwd(), "backend", "data");
+
+  const files = fs.readdirSync(dataDir);
+
+  const content = {};
+
+  files.forEach((file) => {
+    const fullPath = path.join(dataDir, file);
+
+    if (fs.lstatSync(fullPath).isFile()) {
+      content[file] = JSON.parse(fs.readFileSync(fullPath, "utf-8"));
+    }
+  });
+
+  res.json(content);
+});
+
 
 
 // Multer storage configs
