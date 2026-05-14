@@ -410,8 +410,8 @@ app.delete("/api/galleries/:id", async (req, res) => {
   const removed = galleries.splice(index, 1)[0];
   await saveGalleries(galleries);
 
-  // ✅ Définir le chemin du dossier à supprimer
-  const galleryDir = path.join(__dirname, "..", "public", "images", "photos", galleryId);
+  // Définir le chemin du dossier à supprimer
+  const galleryDir = path.join(dataDir, "images", "photos", galleryId);
 
   fs.rm(galleryDir, { recursive: true, force: true }, (err) => {
     if (err) console.error("Erreur suppression dossier galerie :", err);
@@ -699,7 +699,7 @@ app.delete("/api/partenaires/:id", (req, res) => {
 
     // Supprimer le fichier logo physiquement
     if (partenaireToDelete.logo) {
-      const logoPath = path.join(__dirname, "..", "public", partenaireToDelete.logo.replace(/^\//, ""));
+      const logoPath = path.join(dataDir, "images", "partenaires", path.basename(partenaireToDelete.logo));
       fs.unlink(logoPath, (err) => {
         if (err) {
           console.warn("Erreur suppression fichier logo :", err.message);
@@ -914,13 +914,6 @@ app.get("/api/accueil-image", (req, res) => {
 
 
 
-app.get("/api/contact", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "public", "data", "contact.json"));
-});
-
-
-
-
 
 
 /////////////////// PRESENTATION// 
@@ -978,7 +971,7 @@ app.post("/api/delete-pdf", (req, res) => {
   const pdfPath = path.join(documentsDir, pdfUrl.replace("/documents/", ""));
 
   // Chemin vers le fichier JSON dans backend/data/presentation.json
-  const jsonPath = path.join(__dirname, "data", "presentation.json");
+  const jsonPath = presentationFilePath;
 
   fs.unlink(pdfPath, (err) => {
     if (err && err.code !== "ENOENT") {
