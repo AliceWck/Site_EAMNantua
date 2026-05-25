@@ -4,6 +4,9 @@ const fs = require("fs-extra");
 const path = require("path");
 const multer = require("multer");
 
+const app = express();
+const PORT = 5000;
+
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
@@ -13,9 +16,14 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const app = express();
-const PORT = 5000;
-
+function deleteFromCloudinary(url) {
+  if (!url || !url.includes('cloudinary')) return;
+  const parts = url.split('/');
+  const filename = parts[parts.length - 1].split('.')[0];
+  const folder = parts[parts.length - 2];
+  const publicId = `eam/${folder}/${filename}`;
+  cloudinary.uploader.destroy(publicId).catch(console.warn);
+}
 
 
 
@@ -494,6 +502,26 @@ app.post("/api/galleries/:id/upload", uploadTemp.single("photo"), async (req, re
 
 
 // Supprimer la gallerie entière
+// Obsolète avec Cloudinary
+// app.delete("/api/galleries/:id", async (req, res) => {
+//   const galleries = await loadGalleries();
+//   const galleryId = req.params.id;
+
+//   const index = galleries.findIndex((g) => g.id === galleryId);
+//   if (index === -1) return res.status(404).json({ message: "Galerie non trouvée" });
+
+//   const removed = galleries.splice(index, 1)[0];
+//   await saveGalleries(galleries);
+
+//   // Définir le chemin du dossier à supprimer
+//   const galleryDir = path.join(dataDir, "images", "photos", galleryId);
+
+//   fs.rm(galleryDir, { recursive: true, force: true }, (err) => {
+//     if (err) console.error("Erreur suppression dossier galerie :", err);
+//   });
+
+//   res.status(200).json({ message: "Galerie supprimée", galerie: removed });
+// });
 app.delete("/api/galleries/:id", async (req, res) => {
   const galleries = await loadGalleries();
   const galleryId = req.params.id;
@@ -502,21 +530,49 @@ app.delete("/api/galleries/:id", async (req, res) => {
   if (index === -1) return res.status(404).json({ message: "Galerie non trouvée" });
 
   const removed = galleries.splice(index, 1)[0];
-  await saveGalleries(galleries);
 
-  // Définir le chemin du dossier à supprimer
-  const galleryDir = path.join(dataDir, "images", "photos", galleryId);
-
-  fs.rm(galleryDir, { recursive: true, force: true }, (err) => {
-    if (err) console.error("Erreur suppression dossier galerie :", err);
+  // Supprimer toutes les images de la galerie sur Cloudinary
+  (removed.images || []).forEach((img) => {
+    deleteFromCloudinary(img.url || img);
   });
 
+  await saveGalleries(galleries);
   res.status(200).json({ message: "Galerie supprimée", galerie: removed });
 });
 
 
 
 // POST - supprimer une image d'une galerie
+// Obsolète avec Cloudinary
+// app.post("/api/galleries/:id/delete-image", async (req, res) => {
+//   const { id } = req.params;
+//   const { url } = req.body;
+
+//   if (!url) return res.status(400).json({ error: "URL manquante" });
+
+//   const galleries = await loadGalleries();
+//   const gallery = galleries.find((g) => g.id === id);
+//   if (!gallery) return res.status(404).json({ error: "Galerie non trouvée" });
+
+//   const oldLength = gallery.images.length;
+//   gallery.images = gallery.images.filter((img) => (img.url || img) !== url);
+
+//   if (gallery.images.length === oldLength) {
+//     return res.status(404).json({ error: "Image non trouvée dans la galerie" });
+//   }
+
+//   // Supprimer physiquement l'image si c'est un fichier local
+//   const localPrefix = `/uploads/photos/${gallery.id}/`;
+//   if (url.startsWith(localPrefix)) {
+//     const localPath = path.join(dataDir, "images", "photos", gallery.id, path.basename(url));
+//     fs.unlink(localPath, (err) => {
+//       if (err) console.warn("Erreur suppression fichier :", err.message);
+//     });
+//   }
+
+//   await saveGalleries(galleries);
+//   res.status(200).json({ message: "Image supprimée" });
+// });
 app.post("/api/galleries/:id/delete-image", async (req, res) => {
   const { id } = req.params;
   const { url } = req.body;
@@ -534,19 +590,11 @@ app.post("/api/galleries/:id/delete-image", async (req, res) => {
     return res.status(404).json({ error: "Image non trouvée dans la galerie" });
   }
 
-  // Supprimer physiquement l'image si c'est un fichier local
-  const localPrefix = `/uploads/photos/${gallery.id}/`;
-  if (url.startsWith(localPrefix)) {
-    const localPath = path.join(dataDir, "images", "photos", gallery.id, path.basename(url));
-    fs.unlink(localPath, (err) => {
-      if (err) console.warn("Erreur suppression fichier :", err.message);
-    });
-  }
+  deleteFromCloudinary(url);
 
   await saveGalleries(galleries);
   res.status(200).json({ message: "Image supprimée" });
 });
-
 
 
 
@@ -695,6 +743,38 @@ app.post("/api/upload-photo", uploadEquipe.single("photo"), (req, res) => {
 
 
 // DELETE membre
+// Obsolète Cloudinary
+// app.delete("/api/equipe/:id", (req, res) => {
+//   try {
+//     const id = parseInt(req.params.id);
+//     const equipe = loadEquipe();
+//     const membreToDelete = equipe.find(m => m.id === id);
+
+//     if (!membreToDelete) {
+//       return res.status(404).json({ message: "Membre non trouvé" });
+//     }
+
+//     // Supprimer l’image physique si c’est une image stockée localement
+//     if (membreToDelete.photo && membreToDelete.photo.startsWith("/uploads/equipe/")) {
+//       const photoPath = path.join(dataDir, "uploads", "equipe", path.basename(membreToDelete.photo));
+//       fs.unlink(photoPath, (err) => {
+//         if (err) {
+//           console.warn("Erreur suppression photo membre :", err.message);
+//           // Non bloquant
+//         }
+//       });
+//     }
+
+//     const updatedEquipe = equipe.filter(m => m.id !== id);
+//     saveEquipe(updatedEquipe);
+
+//     res.status(200).json({ message: "Membre supprimé" });
+//   } catch (err) {
+//     console.error("Erreur suppression membre :", err);
+//     res.status(500).json({ message: "Erreur suppression membre" });
+//   }
+// });
+
 app.delete("/api/equipe/:id", (req, res) => {
   try {
     const id = parseInt(req.params.id);
@@ -705,20 +785,10 @@ app.delete("/api/equipe/:id", (req, res) => {
       return res.status(404).json({ message: "Membre non trouvé" });
     }
 
-    // Supprimer l’image physique si c’est une image stockée localement
-    if (membreToDelete.photo && membreToDelete.photo.startsWith("/uploads/equipe/")) {
-      const photoPath = path.join(dataDir, "uploads", "equipe", path.basename(membreToDelete.photo));
-      fs.unlink(photoPath, (err) => {
-        if (err) {
-          console.warn("Erreur suppression photo membre :", err.message);
-          // Non bloquant
-        }
-      });
-    }
+    deleteFromCloudinary(membreToDelete.photo);
 
     const updatedEquipe = equipe.filter(m => m.id !== id);
     saveEquipe(updatedEquipe);
-
     res.status(200).json({ message: "Membre supprimé" });
   } catch (err) {
     console.error("Erreur suppression membre :", err);
@@ -791,6 +861,38 @@ app.post("/api/upload-logo", uploadPartenaireLogo.single("logo"), (req, res) => 
 
 
 // DELETE - supprimer un partenaire
+// Obsolète avec migration Cloudinary
+// app.delete("/api/partenaires/:id", (req, res) => {
+//   const id = parseInt(req.params.id);
+//   try {
+//     const partenaires = loadPartenaires();
+//     const partenaireToDelete = partenaires.find(p => p.id === id);
+
+//     if (!partenaireToDelete) {
+//       return res.status(404).json({ message: "Partenaire non trouvé" });
+//     }
+
+//     // Supprimer le fichier logo physiquement
+//     if (partenaireToDelete.logo) {
+//       const logoPath = path.join(dataDir, "images", "partenaires", path.basename(partenaireToDelete.logo));
+//       fs.unlink(logoPath, (err) => {
+//         if (err) {
+//           console.warn("Erreur suppression fichier logo :", err.message);
+//           // Pas bloquant, on continue la suppression
+//         }
+//       });
+//     }
+
+//     // Supprimer du tableau
+//     const updated = partenaires.filter(p => p.id !== id);
+//     savePartenaires(updated);
+
+//     res.status(200).json({ message: "Partenaire supprimé" });
+//   } catch (err) {
+//     console.error("Erreur suppression partenaire :", err);
+//     res.status(500).json({ message: "Erreur serveur" });
+//   }
+// });
 app.delete("/api/partenaires/:id", (req, res) => {
   const id = parseInt(req.params.id);
   try {
@@ -801,21 +903,10 @@ app.delete("/api/partenaires/:id", (req, res) => {
       return res.status(404).json({ message: "Partenaire non trouvé" });
     }
 
-    // Supprimer le fichier logo physiquement
-    if (partenaireToDelete.logo) {
-      const logoPath = path.join(dataDir, "images", "partenaires", path.basename(partenaireToDelete.logo));
-      fs.unlink(logoPath, (err) => {
-        if (err) {
-          console.warn("Erreur suppression fichier logo :", err.message);
-          // Pas bloquant, on continue la suppression
-        }
-      });
-    }
+    deleteFromCloudinary(partenaireToDelete.logo);
 
-    // Supprimer du tableau
     const updated = partenaires.filter(p => p.id !== id);
     savePartenaires(updated);
-
     res.status(200).json({ message: "Partenaire supprimé" });
   } catch (err) {
     console.error("Erreur suppression partenaire :", err);
