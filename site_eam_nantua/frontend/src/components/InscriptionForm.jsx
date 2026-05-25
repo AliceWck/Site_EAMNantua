@@ -484,6 +484,7 @@ export default function InscriptionForm() {
               <section className="eleve-section">
                 <h3>Informations de l'élève {eleves.length > 1 ? `(${eleveActif + 1}/${eleves.length})` : ""}</h3>
                 <p className="inscr-hint">⚠️ Renseignez d'abord la date de naissance pour voir les cours disponibles s'afficher dans "Activités choisies" ci-dessous.</p>
+                <p className="inscr-hint">⚠️ Les champs marqués d'un astérisque (*) sont obligatoires.</p>
                 <div className="form-grid">
                   <div className="field">
                     <label>Nom *</label>
