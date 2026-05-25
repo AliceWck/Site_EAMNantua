@@ -4,6 +4,15 @@ const fs = require("fs-extra");
 const path = require("path");
 const multer = require("multer");
 
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 const app = express();
 const PORT = 5000;
 
@@ -19,19 +28,21 @@ const ADMIN_PASSWORD = "secret123";
 // Dossiers importants (.., public, images = uploads)
 // const dataDir = path.join(__dirname, "data");
 const dataDir = process.env.DATA_PATH || path.join(__dirname, "data");
-const uploadDirEquipe = path.join(dataDir, "images", "equipe");
-const partenairesUploadDir = path.join(dataDir, "images", "partenaires");
-const accueilImageDir = path.join(dataDir, "images", "accueil");
+// Dossiersdisques inutiles maintenant que Cloudinary
+// const uploadDirEquipe = path.join(dataDir, "images", "equipe");
+// const partenairesUploadDir = path.join(dataDir, "images", "partenaires");
+// const accueilImageDir = path.join(dataDir, "images", "accueil");
 
 
 
 
 // Création dossiers si inexistants
 [
-  path.join(dataDir, "images", "equipe"),
-  path.join(dataDir, "images", "partenaires"),
-  path.join(dataDir, "images", "accueil"),
-  path.join(dataDir, "images", "photos"),
+  // Inutile avec Cloudinary
+  // path.join(dataDir, "images", "equipe"),
+  // path.join(dataDir, "images", "partenaires"),
+  // path.join(dataDir, "images", "accueil"),
+  // path.join(dataDir, "images", "photos"),
   path.join(dataDir, "images", "logos"),
   dataDir,
 ].forEach((d) => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
@@ -119,50 +130,80 @@ app.get("/debug/disk", (req, res) => {
 
 // Multer storage configs
 
-// Stockage images équipe
-const storageEquipe = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDirEquipe),
-  filename: (req, file, cb) => {
-    const safeName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
-    cb(null, safeName);
-  },
+// Stockage images équipe ----- obsolète avec Cloudinary, à supprimer après migration complète
+// const storageEquipe = multer.diskStorage({
+//   destination: (req, file, cb) => cb(null, uploadDirEquipe),
+//   filename: (req, file, cb) => {
+//     const safeName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
+//     cb(null, safeName);
+//   },
+// });
+// const uploadEquipe = multer({ storage: storageEquipe });
+
+// // Stockage temporaire pour galeries
+// const uploadTemp = multer({ dest: "temp_uploads/" });
+
+// // Stockage images partenaires
+// const storagePartenaires = multer.diskStorage({
+//   destination: (req, file, cb) => cb(null, partenairesUploadDir),
+//   filename: (req, file, cb) => {
+//     const safeName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
+//     cb(null, safeName);
+//   },
+// });
+
+// const uploadPartenaireLogo = multer({ storage: storagePartenaires });
+
+// // Stockage image accueil
+// const storageAccueil = multer.diskStorage({
+//   destination: (req, file, cb) => cb(null, accueilImageDir),
+//   filename: (req, file, cb) => {
+//     // On récupère l'extension originale
+//     const ext = path.extname(file.originalname);
+//     // On crée un nom sûr avec timestamp + extension
+//     cb(null, Date.now() + ext);
+//   },
+// });
+
+// const uploadAccueil = multer({ 
+//   storage: storageAccueil,
+//   limits: { fileSize: 5 * 1024 * 1024 },
+//   fileFilter: (req, file, cb) => {
+//     if (!file.mimetype.match(/image\/(jpeg|png|jpg)/)) {
+//       return cb(new Error("Seules les images JPG/PNG sont acceptées"));
+//     }
+//     cb(null, true);
+//   }
+// });
+
+
+// Migration vers Cloudinary
+const uploadEquipe = multer({
+  storage: new CloudinaryStorage({
+    cloudinary,
+    params: { folder: 'eam/equipe', allowed_formats: ['jpg', 'jpeg', 'png', 'webp'] },
+  }),
 });
-const uploadEquipe = multer({ storage: storageEquipe });
 
-// Stockage temporaire pour galeries
-const uploadTemp = multer({ dest: "temp_uploads/" });
-
-// Stockage images partenaires
-const storagePartenaires = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, partenairesUploadDir),
-  filename: (req, file, cb) => {
-    const safeName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
-    cb(null, safeName);
-  },
+const uploadTemp = multer({
+  storage: new CloudinaryStorage({
+    cloudinary,
+    params: { folder: 'eam/galeries', allowed_formats: ['jpg', 'jpeg', 'png', 'webp'] },
+  }),
 });
 
-const uploadPartenaireLogo = multer({ storage: storagePartenaires });
-
-// Stockage image accueil
-const storageAccueil = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, accueilImageDir),
-  filename: (req, file, cb) => {
-    // On récupère l'extension originale
-    const ext = path.extname(file.originalname);
-    // On crée un nom sûr avec timestamp + extension
-    cb(null, Date.now() + ext);
-  },
+const uploadPartenaireLogo = multer({
+  storage: new CloudinaryStorage({
+    cloudinary,
+    params: { folder: 'eam/partenaires', allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'svg'] },
+  }),
 });
 
-const uploadAccueil = multer({ 
-  storage: storageAccueil,
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    if (!file.mimetype.match(/image\/(jpeg|png|jpg)/)) {
-      return cb(new Error("Seules les images JPG/PNG sont acceptées"));
-    }
-    cb(null, true);
-  }
+const uploadAccueil = multer({
+  storage: new CloudinaryStorage({
+    cloudinary,
+    params: { folder: 'eam/accueil', allowed_formats: ['jpg', 'jpeg', 'png', 'webp'] },
+  }),
 });
 
 
@@ -422,21 +463,31 @@ app.post("/api/galleries/:id/add-url", async (req, res) => {
 });
 
 // POST - upload image locale
+// Obsolète avec migration Cloudinary
+// app.post("/api/galleries/:id/upload", uploadTemp.single("photo"), async (req, res) => {
+//   const galleries = await loadGalleries();
+//   const gallery = galleries.find((g) => g.id === req.params.id);
+//   if (!gallery) return res.status(404).json({ error: "Gallery not found" });
+
+//   const ext = path.extname(req.file.originalname);
+//   const newFileName = Date.now() + ext;
+//   const galleryDir = path.join(dataDir, "images", "photos", gallery.id);
+//   const finalPath = path.join(galleryDir, newFileName);
+
+//   await fs.ensureDir(galleryDir);
+//   await fs.move(req.file.path, finalPath);
+
+//   const publicUrl = `/uploads/photos/${gallery.id}/${newFileName}`;
+//   gallery.images.push(publicUrl);
+//   await saveGalleries(galleries);
+//   res.json(gallery);
+// });
 app.post("/api/galleries/:id/upload", uploadTemp.single("photo"), async (req, res) => {
   const galleries = await loadGalleries();
   const gallery = galleries.find((g) => g.id === req.params.id);
   if (!gallery) return res.status(404).json({ error: "Gallery not found" });
 
-  const ext = path.extname(req.file.originalname);
-  const newFileName = Date.now() + ext;
-  const galleryDir = path.join(dataDir, "images", "photos", gallery.id);
-  const finalPath = path.join(galleryDir, newFileName);
-
-  await fs.ensureDir(galleryDir);
-  await fs.move(req.file.path, finalPath);
-
-  const publicUrl = `/uploads/photos/${gallery.id}/${newFileName}`;
-  gallery.images.push(publicUrl);
+  gallery.images.push(req.file.path); // URL Cloudinary directe
   await saveGalleries(galleries);
   res.json(gallery);
 });
@@ -626,14 +677,19 @@ app.post("/api/equipe", (req, res) => {
 
 
 // Endpoint pour uploader une photo de membre d'équipe
-app.post("/api/upload-photo", uploadEquipe.single("photo"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: "Aucun fichier envoyé" });
-  }
+// Version obsolète avant migration Cloudinary
+// app.post("/api/upload-photo", uploadEquipe.single("photo"), (req, res) => {
+//   if (!req.file) {
+//     return res.status(400).json({ message: "Aucun fichier envoyé" });
+//   }
 
-  // const publicUrl = `/images/equipe/${req.file.filename}`;
-  const publicUrl = `/uploads/equipe/${req.file.filename}`;
-  res.json({ url: publicUrl });
+//   // const publicUrl = `/images/equipe/${req.file.filename}`;
+//   const publicUrl = `/uploads/equipe/${req.file.filename}`;
+//   res.json({ url: publicUrl });
+// });
+app.post("/api/upload-photo", uploadEquipe.single("photo"), (req, res) => {
+  if (!req.file) return res.status(400).json({ message: "Aucun fichier envoyé" });
+  res.json({ url: req.file.path }); // URL Cloudinary complète
 });
 
 
@@ -719,13 +775,18 @@ app.post("/api/partenaires", (req, res) => {
   }
 });
 
-app.post("/api/upload-logo", uploadPartenaireLogo.single("logo"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: "Aucun fichier envoyé" });
-  }
+// Obsolète avec migration Cloudinary
+// app.post("/api/upload-logo", uploadPartenaireLogo.single("logo"), (req, res) => {
+//   if (!req.file) {
+//     return res.status(400).json({ message: "Aucun fichier envoyé" });
+//   }
 
-  const publicUrl = `/uploads/partenaires/${req.file.filename}`;
-  res.json({ url: publicUrl });
+//   const publicUrl = `/uploads/partenaires/${req.file.filename}`;
+//   res.json({ url: publicUrl });
+// });
+app.post("/api/upload-logo", uploadPartenaireLogo.single("logo"), (req, res) => {
+  if (!req.file) return res.status(400).json({ message: "Aucun fichier envoyé" });
+  res.json({ url: req.file.path });
 });
 
 
@@ -875,35 +936,51 @@ app.delete('/api/facts/:id', (req, res) => {
 
 
 // POST - upload image d'accueil
+// Version obsolète avec migration Cloudinary
+// app.post("/api/upload-home-image", uploadAccueil.single("image"), (req, res) => {
+//   if (!req.file) {
+//     return res.status(400).json({ message: "Aucun fichier envoyé" });
+//   }
+
+//   // Lire l'ancien JSON pour récupérer l'ancienne image
+//   const oldData = readJson(accueilJsonPath);
+//     if (oldData && oldData.imageUrl) {
+//     // oldData.imageUrl = "/images/accueil/xxxxx.jpg"
+//     const oldImagePath = path.join(accueilImageDir, path.basename(oldData.imageUrl));
+//     if (fs.existsSync(oldImagePath)) {
+//       try {
+//         fs.unlinkSync(oldImagePath);
+//       } catch (err) {
+//         console.error("Erreur suppression ancienne image :", err);
+//       }
+//     }
+//   }
+
+//   // L'url relative de la nouvelle image (à adapter selon ta config serveur)
+//   // const imageUrl = `/images/accueil/${req.file.filename}`;
+//   const imageUrl = `/uploads/accueil/${req.file.filename}`;
+
+
+//   // Écrire la nouvelle info dans JSON (avec timestamp pour version)
+//   const accueilData = { imageUrl, version: Date.now() };
+//   writeJson(accueilJsonPath, accueilData);
+
+//   // Répondre avec les données mises à jour
+//   res.json(accueilData);
+// });
 app.post("/api/upload-home-image", uploadAccueil.single("image"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: "Aucun fichier envoyé" });
-  }
+  if (!req.file) return res.status(400).json({ message: "Aucun fichier envoyé" });
 
-  // Lire l'ancien JSON pour récupérer l'ancienne image
+  // Supprimer l'ancienne image Cloudinary si elle existe
   const oldData = readJson(accueilJsonPath);
-    if (oldData && oldData.imageUrl) {
-    // oldData.imageUrl = "/images/accueil/xxxxx.jpg"
-    const oldImagePath = path.join(accueilImageDir, path.basename(oldData.imageUrl));
-    if (fs.existsSync(oldImagePath)) {
-      try {
-        fs.unlinkSync(oldImagePath);
-      } catch (err) {
-        console.error("Erreur suppression ancienne image :", err);
-      }
-    }
+  if (oldData?.imageUrl && oldData.imageUrl.includes('cloudinary')) {
+    const parts = oldData.imageUrl.split('/');
+    const publicId = 'eam/accueil/' + parts[parts.length - 1].split('.')[0];
+    cloudinary.uploader.destroy(publicId).catch(console.warn);
   }
 
-  // L'url relative de la nouvelle image (à adapter selon ta config serveur)
-  // const imageUrl = `/images/accueil/${req.file.filename}`;
-  const imageUrl = `/uploads/accueil/${req.file.filename}`;
-
-
-  // Écrire la nouvelle info dans JSON (avec timestamp pour version)
-  const accueilData = { imageUrl, version: Date.now() };
+  const accueilData = { imageUrl: req.file.path, version: Date.now() };
   writeJson(accueilJsonPath, accueilData);
-
-  // Répondre avec les données mises à jour
   res.json(accueilData);
 });
 
