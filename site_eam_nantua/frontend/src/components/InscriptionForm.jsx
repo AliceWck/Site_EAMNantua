@@ -483,6 +483,7 @@ export default function InscriptionForm() {
               {/* Infos personnelles */}
               <section className="eleve-section">
                 <h3>Informations de l'élève {eleves.length > 1 ? `(${eleveActif + 1}/${eleves.length})` : ""}</h3>
+                <p className="inscr-hint">⚠️ Renseignez d'abord la date de naissance pour voir les cours disponibles s'afficher dans "Activités choisies" ci-dessous.</p>
                 <div className="form-grid">
                   <div className="field">
                     <label>Nom *</label>
@@ -502,7 +503,7 @@ export default function InscriptionForm() {
                   <div className="field field-sexe">
                     <label>Sexe</label>
                     <div className="sexe-btns">
-                      {["F", "M", "Autre"].map((s) => (
+                      {["F", "M"].map((s) => (
                         <button key={s} className={`sexe-btn ${eleveCourant.sexe === s ? "active" : ""}`}
                           onClick={() => updateEleve(eleveActif, "sexe", s)}>{s}</button>
                       ))}
