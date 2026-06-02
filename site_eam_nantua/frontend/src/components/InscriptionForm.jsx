@@ -5,6 +5,10 @@ import "./InscriptionForm.css";
 
 const API = import.meta.env.VITE_API_URL;
 
+function arrondir(val) {
+  return Math.round(val);
+}
+
 // -------- Définition des tags avec leurs tranches d'âge 
 const TAGS_DEF = [
   { id: "eveil_3_5",     label: "Éveil 3–5 ans",     ageMin: 3,  ageMax: 5  },
@@ -50,13 +54,7 @@ function calculerTarif(cours, age, paiementType) {
   return paiementType === "annuel" ? t.annuel : t.trimestre;
 }
 
-function calculerTotal(eleves, paiementType, nbFoyerTotal) {
-  // Pour chaque élève, calculer la somme des cours
-  // Règles de réduction :
-  // - 10% par activité si membre d'un même foyer (nbFoyerTotal >= 2)
-  // - 33% sur chaque discipline à partir de la 2e, sauf yoga et chorale
-  // - Non-cumul : seule la réduction la plus avantageuse
-  
+function calculerTotal(eleves, paiementType, nbFoyerTotal, cotisation = 25) {
   let totalGeneral = 0;
   const details = eleves.map((eleve) => {
     const age = getAge(eleve.dateNaissance);
@@ -65,53 +63,50 @@ function calculerTotal(eleves, paiementType, nbFoyerTotal) {
       .sort((a, b) => b.prix - a.prix);
 
     let totalEleve = 0;
-    let disciplineCount = 0; // compte les disciplines éligibles 33%
+    let disciplineEligibleCount = 0; // compte disciplines éligibles aux réductions (hors yoga/chorale)
 
     const coursDetails = coursAvecPrix.map((c) => {
       const prixBase = c.prix;
       let prixFinal = prixBase;
       let reductionAppliquee = null;
 
-      const eligible33 = !c.coursData.yogaChorale;
-      
-      if (eligible33) {
-        disciplineCount++;
-        if (disciplineCount >= 2) {
-          // 33% de réduction
-          const reduc33 = (prixBase * 0.33);
-          // 10% foyer
-          const reduc10 = nbFoyerTotal >= 2 ?  (prixBase * 0.10) : 0;
-          // On applique la plus avantageuse
-          if (reduc33 >= reduc10) { 
-            prixFinal = prixBase - reduc33;
-            reductionAppliquee = "−33%"; 
-          } else { 
-            prixFinal = prixBase - reduc10; 
-            reductionAppliquee = "−10% foyer"; 
+      const estYogaChorale = !!c.coursData.yogaChorale;
+
+      if (!estYogaChorale) {
+        // Discipline éligible aux réductions multi-activités
+        disciplineEligibleCount++;
+        
+        if (disciplineEligibleCount >= 2) {
+          // À partir de la 2e discipline : 33% OU 10% foyer, le plus avantageux, non cumulé
+          const reduc33 = prixBase * 0.33;
+          const reduc10 = nbFoyerTotal >= 2 ? prixBase * 0.10 : 0;
+          if (reduc33 >= reduc10) {
+            prixFinal = arrondir(prixBase - reduc33);
+            reductionAppliquee = "−33%";
+          } else {
+            prixFinal = arrondir(prixBase - reduc10);
+            reductionAppliquee = "−10% foyer";
           }
         } else if (nbFoyerTotal >= 2) {
-          // 10% foyer sur la 1ère discipline aussi
-          const reduc10 = (prixBase * 0.10);
-          prixFinal = prixBase - reduc10;
+          // 1ère discipline éligible : seulement 10% foyer
+          prixFinal = arrondir(prixBase - prixBase * 0.10);
           reductionAppliquee = "−10% foyer";
         }
-      } else if (nbFoyerTotal >= 2) {
-        // Yoga/Chorale : seulement 10% foyer si applicable
-        const reduc10 = (prixBase * 0.10);
-        prixFinal = prixBase - reduc10;
-        reductionAppliquee = "−10% foyer";
+        // sinon pas de réduction (foyer = 1 personne, 1ère discipline)
       }
+      // Yoga/Chorale : jamais de réduction (reducDisponible: false)
 
       totalEleve += prixFinal;
-      // Supplément matériel arts plastiques
-      if (c.coursData.supplementMateriel) {
-        totalEleve += c.coursData.supplementMateriel;
-      }
-      
       return { ...c, prixBase, prixFinal, reductionAppliquee };
     });
 
-    totalEleve += 25; // cotisation annuelle
+    // Suppléments matériel séparés (jamais réduits)
+    let totalSupMateriel = 0;
+    coursDetails.forEach(c => {
+      if (c.coursData.supplementMateriel) totalSupMateriel += c.coursData.supplementMateriel;
+    });
+    totalEleve += totalSupMateriel;
+    totalEleve += cotisation;
     totalGeneral += totalEleve;
 
     return { ...eleve, coursDetails, totalEleve };
@@ -120,9 +115,42 @@ function calculerTotal(eleves, paiementType, nbFoyerTotal) {
   return { details, totalGeneral };
 }
 
-function genId() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  return Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+function genId(eleves = []) {
+  // Prend le premier élève pour générer le code
+  const eleve = eleves[0];
+  let prefix = "";
+  
+  if (eleve) {
+    const nom = (eleve.nom || "").toUpperCase().replace(/[^A-Z]/g, "");
+    const prenom = (eleve.prenom || "").toUpperCase().replace(/[^A-Z]/g, "");
+    
+    if (nom.length >= 4) {
+      prefix = nom.substring(0, 4);
+    } else if (nom.length >= 3) {
+      prefix = nom + prenom.substring(0, 1);
+    } else if (nom.length >= 2) {
+      prefix = nom + prenom.substring(0, 2);
+    } else {
+      prefix = (nom + prenom).substring(0, 4);
+    }
+    // Compléter si trop court
+    prefix = prefix.padEnd(4, "X").substring(0, 4);
+    
+    // Date de naissance : JJMM
+    const dob = eleve.dateNaissance || "";
+    if (dob && dob.length === 10) {
+      const [annee, mois, jour] = dob.split("-");
+      prefix += jour + mois;
+    } else {
+      const chars = "0123456789";
+      prefix += Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+    }
+  } else {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    prefix = Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  }
+  
+  return prefix;
 }
 
 // --- Composant principal ------------------------------------------------
@@ -152,6 +180,7 @@ export default function InscriptionForm() {
     absences: false, 
     paiement: false,
     reglement: false, 
+    demission: false,
     droitImage: null, // oui / non / null = non rep
   });
 
@@ -170,6 +199,32 @@ export default function InscriptionForm() {
     .then((r) => r.json())
     .then(setTarifs)
     .catch(() => console.error("Impossible de charger les tarifs"));
+  }, []);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    const params = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
+    const editId = params.get('edit');
+    const editCode = params.get('code');
+    
+    if (editId && editCode) {
+      fetch(`${API}/api/inscriptions/code/${editCode}`)
+        .then(r => r.json())
+        .then(ins => {
+          if (ins) {
+            setNbMembres(ins.foyer?.nbMembres || 1);
+            setPaiementType(ins.foyer?.paiementType || "annuel");
+            setEleves(ins.eleves || []);
+            setEngagements(ins.engagements || { whatsapp:false, assurance:false, mineurs:false, responsabilite:false, absences:false, paiement:false, reglement:false, droitImage:null });
+            setModePaiement(ins.modePaiement || { type:"", nbFois:1 });
+            setInscriptionId(ins.id);
+            setInscriptionCode(ins.code);
+            setEleveActif(0);
+            setEtape("eleves");
+          }
+        })
+        .catch(() => {});
+    }
   }, []);
 
   // Init élèves quand on valide le nombre
@@ -198,6 +253,11 @@ export default function InscriptionForm() {
     setEleveActif(0);
     setEtape("eleves");
   };
+
+  const [modePaiement, setModePaiement] = useState({
+    type: "", // cheque | especes | virement
+    nbFois: 1,
+  })
 
   const updateEleve = (idx, field, value) =>
     setEleves((prev) => 
@@ -231,11 +291,12 @@ export default function InscriptionForm() {
 
     // Si on modifie une inscription existante → PUT, sinon POST avec nouveau code
     const isModification = !!inscriptionId;
-    const code = inscriptionCode || genId();
+    const code = inscriptionCode || genId(eleves);
 
     const payload = {
       code,
       foyer: { nbMembres, paiementType },
+      modePaiement,
       eleves: details,
       engagements,
       totalGeneral,
@@ -295,12 +356,13 @@ export default function InscriptionForm() {
     setNbMembres(ins.foyer?.nbMembres || 1);
     setPaiementType(ins.foyer?.paiementType || "annuel");
     setEleves(ins.eleves || []);
-    setEngagements(ins.engagements || { whatsapp: false, assurance: false, mineurs: false, responsabilite: false, absences: false, paiement: false, reglement: false, droitImage: null });
+    setEngagements(ins.engagements || { whatsapp: false, assurance: false, mineurs: false, responsabilite: false, absences: false, paiement: false, reglement: false, droitImage: null, demission: false });
     setInscriptionId(ins.id);
     setInscriptionCode(ins.code);
     setEleveActif(0);
     setEtape("eleves");
     setInscriptionTrouvee(null);
+    setModePaiement(ins.modePaiement || { type: "", nbFois: 1 });
   };
 
   if (!tarifs) return (
@@ -312,29 +374,30 @@ export default function InscriptionForm() {
 
 
   const basculerTout = () => {
-              const tousCoches = Object.entries(engagements)
-                .filter(([key]) => key !== "droitImage")
-                .every(([_, v]) => v === true);
+    const tousCoches = Object.entries(engagements)
+      .filter(([key]) => key !== "droitImage")
+      .every(([_, v]) => v === true);
 
-              const nouvelleValeur = !tousCoches; // Si tout est coché, on met false, sinon true.
+    const nouvelleValeur = !tousCoches; // Si tout est coché, on met false, sinon true.
 
-              setEngagements(prev => ({
-                ...prev,
-                whatsapp: nouvelleValeur,
-                assurance: nouvelleValeur,
-                mineurs: nouvelleValeur,
-                responsabilite: nouvelleValeur,
-                absences: nouvelleValeur,
-                paiement: nouvelleValeur,
-                reglement: nouvelleValeur,
-              }));
-            };
+    setEngagements(prev => ({
+      ...prev,
+      whatsapp: nouvelleValeur,
+      assurance: nouvelleValeur,
+      mineurs: nouvelleValeur,
+      responsabilite: nouvelleValeur,
+      absences: nouvelleValeur,
+      paiement: nouvelleValeur,
+      demission: nouvelleValeur,
+      reglement: nouvelleValeur,
+    }));
+  };
 
   const eleveCourant = eleves[eleveActif] || null;
   const ageCourant = eleveCourant ? getAge(eleveCourant.dateNaissance) : null;
   const { details: elevesAvecTotal, totalGeneral } =
     etape === "recap" || etape === "confirmation"
-      ? calculerTotal(eleves, paiementType, eleves.length)
+      ? calculerTotal(eleves, paiementType, eleves.length, tarifs.cotisationAnnuelle)
       : { details: [], totalGeneral: 0 };
 
   return (
@@ -434,25 +497,12 @@ export default function InscriptionForm() {
               ))}
             </div>
 
-            <div className="paiement-selector">
-              <h3>Mode de paiement</h3>
-              <div className="paiement-btns">
-                <button
-                  className={`paiement-btn ${paiementType === "annuel" ? "active" : ""}`}
-                  onClick={() => setPaiementType("annuel")}
-                >
-                  💳 Annuel
-                  <span>Tarif plein à l'année</span>
-                </button>
-                <button
-                  className={`paiement-btn ${paiementType === "trimestre" ? "active" : ""}`}
-                  onClick={() => setPaiementType("trimestre")}
-                >
-                  📅 Par trimestre
-                  <span>Paiement par trimestre</span>
-                </button>
-              </div>
+            <div style={{background:"#fef3c7", borderLeft:"4px solid #f59e0b", borderRadius:"0 8px 8px 0", padding:"1rem", marginBottom:"1rem"}}>
+              <p style={{margin:0, fontSize:"0.875rem", color:"#92400e"}}>
+                <strong>⚠️ Engagement annuel :</strong> Toute inscription implique un engagement annuel non remboursable en cas d'abandon. Tout trimestre entamé est dû dans sa totalité.
+              </p>
             </div>
+            
             <div style={{ display: "flex", gap: "1rem" }}>
               <button className="inscr-btn-prev" onClick={() => setEtape("accueil")}>← Retour</button>
               <button className="inscr-btn-next" onClick={initEleves}>Continuer →</button>
@@ -540,7 +590,36 @@ export default function InscriptionForm() {
                     <>
                       <div className="field">
                         <label>Niveau scolaire</label>
-                        <input value={eleveCourant.niveauScolaire} onChange={(e) => updateEleve(eleveActif, "niveauScolaire", e.target.value)} placeholder="CM2, 3ème…" />
+                        <select value={eleveCourant.niveauScolaire} onChange={(e) => updateEleve(eleveActif, "niveauScolaire", e.target.value)}>
+                          <option value="">-- Choisir --</option>
+                          <optgroup label="Maternelle">
+                            <option value="PS">PS</option>
+                            <option value="MS">MS</option>
+                            <option value="GS">GS</option>
+                          </optgroup>
+                          <optgroup label="Primaire">
+                            <option value="CP">CP</option>
+                            <option value="CE1">CE1</option>
+                            <option value="CE2">CE2</option>
+                            <option value="CM1">CM1</option>
+                            <option value="CM2">CM2</option>
+                          </optgroup>
+                          <optgroup label="Collège">
+                            <option value="6ème">6ème</option>
+                            <option value="5ème">5ème</option>
+                            <option value="4ème">4ème</option>
+                            <option value="3ème">3ème</option>
+                          </optgroup>
+                          <optgroup label="Lycée">
+                            <option value="2nde">2nde</option>
+                            <option value="1ère">1ère</option>
+                            <option value="Terminale">Terminale</option>
+                          </optgroup>
+                          <optgroup label="Autres">
+                            <option value="Étudiant">Étudiant</option>
+                            <option value="Autre">Autre</option>
+                          </optgroup>
+                        </select>
                       </div>
                       <div className="field">
                         <label>Établissement scolaire</label>
@@ -569,9 +648,21 @@ export default function InscriptionForm() {
                         <input value={eleveCourant.representantPrenom} onChange={(e) => updateEleve(eleveActif, "representantPrenom", e.target.value)} />
                       </div>
                       <div className="field">
-                        <label>Parenté</label>
-                        <input value={eleveCourant.parenté} onChange={(e) => updateEleve(eleveActif, "parenté", e.target.value)} placeholder="Mère, Père, Tuteur…" />
+                        <label>Lien de parenté *</label>
+                        <select value={eleveCourant.parenté} onChange={(e) => updateEleve(eleveActif, "parenté", e.target.value)}>
+                          <option value="">-- Choisir --</option>
+                          <option value="Mère">Mère</option>
+                          <option value="Père">Père</option>
+                          <option value="Tuteur légal">Tuteur légal</option>
+                          <option value="Autre">Autre</option>
+                        </select>
                       </div>
+                      {eleveCourant.parenté === "Autre" && (
+                        <div className="field">
+                          <label>Préciser le lien</label>
+                          <input value={eleveCourant.parentéAutre || ""} onChange={(e) => updateEleve(eleveActif, "parentéAutre", e.target.value)} placeholder="Ex: grand-parent, oncle…" />
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -619,7 +710,11 @@ export default function InscriptionForm() {
                   <button className="inscr-btn-next" onClick={() => setEleveActif(eleveActif + 1)}>Élève suivant →</button>
                 ) : (
                   <button className="inscr-btn-next" onClick={() => setEtape("recap")}
-                    disabled={eleves.some((e) => !e.nom || !e.prenom || !e.dateNaissance || !e.email || !e.telPerso)}>
+                    disabled={eleves.some((e) => {
+                      const age = getAge(e.dateNaissance);
+                      const mineurSansRepr = age !== null && age < 18 && (!e.representantNom || !e.representantPrenom || !e.parenté);
+                      return !e.nom || !e.prenom || !e.dateNaissance || !e.email || !e.telPerso || mineurSansRepr;
+                    })}>
                     Récapitulatif →
                   </button>
                 )}
@@ -650,19 +745,26 @@ export default function InscriptionForm() {
                     {eleve.coursDetails.map((c, i) => {
                       const instr = c.instrumentId ? tarifs.instruments.find((ins) => ins.id === c.instrumentId) : null;
                       return (
-                        <tr key={i}>
-                          <td>{instr && <span>{instr.emoji} </span>}{instr ? `${instr.label} — ` : ""}{c.coursData.label}{c.coursData.supplementMateriel && <span className="sup-tag"> +{c.coursData.supplementMateriel}€ mat.</span>}</td>
-                          <td>{typeof c.prixBase === "number" ? c.prixBase.toFixed(2) : c.prixBase} €</td>
-                          <td>{c.reductionAppliquee || "—"}</td>
-                          <td className="prix-final">
-                            {typeof c.prixFinal === "number"
-                              ? (c.prixFinal + (c.coursData.supplementMateriel || 0)).toFixed(2)
-                              : c.prixFinal} €
-                          </td>
-                        </tr>
+                        <React.Fragment key={i}>
+                          <tr>
+                            <td>{instr && <span>{instr.emoji} </span>}{instr ? `${instr.label} — ` : ""}{c.coursData.label}</td>
+                            <td>{c.prixBase} €</td>
+                            <td className="prix-final">{c.prixFinal} €</td>
+                            {/* <td>{c.reductionAppliquee || "—"}</td> // OOOps
+                            <td className="prix-final">{typeof c.prixFinal === "number" ? c.prixFinal : c.prixFinal} €</td> */}
+                          </tr>
+                          {c.coursData.supplementMateriel > 0 && (
+                            <tr>
+                              <td style={{paddingLeft:"1.5rem", color:"#6b7280", fontStyle:"italic"}}>↳ Matériel — {c.coursData.label}</td>
+                              <td>{c.coursData.supplementMateriel} €</td>
+                              <td>—</td>
+                              <td className="prix-final">{c.coursData.supplementMateriel} €</td>
+                            </tr>
+                          )}
+                        </React.Fragment>
                       );
                     })}
-                    <tr className="recap-cotisation"><td colSpan="3">Cotisation annuelle</td><td className="prix-final">25 €</td></tr>
+                    <tr className="recap-cotisation"><td colSpan="3">Cotisation annuelle</td><td className="prix-final">{tarifs.cotisationAnnuelle} €</td></tr>
                     <tr className="recap-sous-total"><td colSpan="3"><strong>Sous-total {eleve.prenom}</strong></td><td className="prix-final"><strong>{eleve.totalEleve} €</strong></td></tr>
                   </tbody>
                 </table>
@@ -670,10 +772,55 @@ export default function InscriptionForm() {
             ))}
 
             <div className="recap-total">
-              <span>Total {paiementType === "annuel" ? "annuel" : "par trimestre"}</span>
+              <span>Total annuel</span>
               <span className="total-montant">{totalGeneral} €</span>
             </div>
 
+            {/* Mode de paiement */}
+            <section className="engagements-section" style={{marginBottom:"1rem"}}>
+              <h3>Mode de règlement</h3>
+              <p style={{fontSize:"0.875rem", color:"#6b7280", marginBottom:"1rem"}}>
+                Le règlement s'effectue au bureau de l'école. Maximum 8 fois (1 fois/mois), soldé avant fin avril.
+              </p>
+              <div style={{display:"flex", gap:"0.75rem", flexWrap:"wrap", marginBottom:"1rem"}}>
+                {[
+                  { id: "cheque", label: "🏦 Chèque(s)", info: "À l'ordre de l'EAM Haut-Bugey" },
+                  { id: "especes", label: "💶 Espèces", info: "" },
+                  { id: "virement", label: "💳 Virement", info: "RIB fourni sur demande au bureau" },
+                ].map((m) => (
+                  <button key={m.id}
+                    className={`paiement-btn ${modePaiement.type === m.id ? "active" : ""}`}
+                    onClick={() => setModePaiement({ ...modePaiement, type: m.id })}>
+                    {m.label}
+                    {m.info && <span>{m.info}</span>}
+                  </button>
+                ))}
+              </div>
+              {modePaiement.type && (
+                <div style={{display:"flex", alignItems:"center", gap:"1rem", flexWrap:"wrap"}}>
+                  <label style={{fontSize:"0.875rem", fontWeight:600}}>Nombre de versements :</label>
+                  <select
+                    className="ia-select"
+                    value={modePaiement.nbFois}
+                    onChange={(e) => setModePaiement({ ...modePaiement, nbFois: Number(e.target.value) })}>
+                    {Array.from({length:8},(_,i)=>i+1).map(n => (
+                      <option key={n} value={n}>{n} fois{n===1?" (paiement unique)":""}</option>
+                    ))}
+                  </select>
+                  {modePaiement.nbFois > 1 && (
+                    <span style={{fontSize:"0.8rem", color:"#6b7280"}}>
+                      soit environ {arrondir(totalGeneral / modePaiement.nbFois)} €/versement
+                    </span>
+                  )}
+                </div>
+              )}
+              {modePaiement.type === "virement" && (
+                <div style={{background:"#e0f2fe", borderRadius:8, padding:"0.75rem", marginTop:"0.75rem", fontSize:"0.875rem", color:"#075985"}}>
+                  ℹ️ Le RIB vous sera communiqué par email ou au bureau de l'école.
+                </div>
+              )}
+            </section>
+            
             {/* Engagements */}
             <section className="engagements-section">
               {/* 1. Le Header avec Titre + Bouton Bascule */}
@@ -713,6 +860,7 @@ export default function InscriptionForm() {
                 { key: "absences", label: "Je m'engage à prévenir l'enseignant à l'avance de toute absence." },
                 { key: "paiement", label: "Je m'engage à régler la totalité de la facture selon les modalités choisies." },
                 { key: "reglement", label: "J'atteste avoir pris connaissance du règlement intérieur et j'accepte que l'inscription constitue un engagement annuel non remboursable, sauf cas de force majeure." },
+                { key: "demission", label: "Je prends note que toute démission doit être formulée par écrit (lettre recommandée ou email). Des remboursements exceptionnels peuvent être accordés uniquement en cas de force majeure : déménagement lié à une mobilité professionnelle, perte d'emploi, ou problème de santé justifié par un certificat médical." },
               ].map(({ key, label }) => (
                 <label key={key} className="engagement-item">
                   <input
@@ -727,7 +875,7 @@ export default function InscriptionForm() {
             <div className="recap-nav">
               <button className="inscr-btn-prev" onClick={() => setEtape("eleves")}>← Modifier</button>
               <button className="inscr-btn-submit" onClick={soumettre}
-                disabled={!Object.entries(engagements).every(([k, v]) => k === "droitImage" ? v !== null : v === true)}>
+                disabled={!modePaiement.type || !Object.entries(engagements).every(([k, v]) => k === "droitImage" ? v !== null : v === true)}>
                 Envoyer l'inscription ✓
               </button>
             </div>

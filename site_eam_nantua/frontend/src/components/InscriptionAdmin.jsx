@@ -99,6 +99,8 @@ export default function InscriptionAdmin() {
     save({ ...tarifs, pratiquesCollectives: tarifs.pratiquesCollectives.filter((_, i) => i !== idx) });
   };
 
+  
+
   if (!tarifs) return <div className="ia-loading">Chargement…</div>;
 
   return (
@@ -402,8 +404,10 @@ function ListeInscrits({ showMsg }) {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [anneeFilter, setAnneeFilter] = useState("toutes");
+  const [statutFilter, setStatutFilter] = useState("toutes");
   const [annees, setAnnees] = useState([]);
   const [expanded, setExpanded] = useState(null);
+  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
     Promise.all([
@@ -416,12 +420,15 @@ function ListeInscrits({ showMsg }) {
     const q = search.toLowerCase();
     const matchSearch = ins.eleves?.some((e) => (e.nom + " " + e.prenom + " " + (e.email || "")).toLowerCase().includes(q));
     const matchAnnee = anneeFilter === "toutes" || ins.annee === anneeFilter;
-    return matchSearch && matchAnnee;
+    const matchStatut = statutFilter === "toutes" || 
+      (statutFilter === "valide" && ins.statut === "valide") || 
+      (statutFilter === "attente" && ins.statut !== "valide");
+    return matchSearch && matchAnnee && matchStatut;
   });
 
   const exportCSV = () => {
     const headers = [
-      "Date inscription","Année scolaire","N° dossier","Nb membres foyer","Type paiement","Total foyer (€)",
+      "Date inscription","Date validation","Année scolaire","N° dossier","Nb membres foyer","Type paiement","Total foyer (€)",
       "Nom","Prénom","Date naissance","Âge","Sexe","Statut",
       "Adresse","Code postal","Localité","Tél 1","Tél 2","Email",
       "Niveau scolaire","Établissement","Profession",
@@ -443,7 +450,9 @@ function ListeInscrits({ showMsg }) {
         const supMat = cours.reduce((s, c) => s + (c.coursData?.supplementMateriel || 0), 0);
         const autresMembres = (ins.eleves || []).filter((_, i) => i !== ei).map((e) => `${e.prenom} ${e.nom}`).join(" | ");
         const row = [
-          dateIns, ins.annee || "", ins.id || "", ins.foyer?.nbMembres || 1,
+          dateIns, 
+          ins.dateValidation ? new Date(ins.dateValidation).toLocaleDateString("fr-FR") : "",
+          ins.annee || "", ins.id || "", ins.foyer?.nbMembres || 1,
           ins.foyer?.paiementType || "", ins.totalGeneral || "",
           eleve.nom || "", eleve.prenom || "", eleve.dateNaissance || "",
           age ?? "", eleve.sexe || "", age != null ? (age >= 18 ? "Majeur" : "Mineur") : "",
@@ -488,6 +497,11 @@ function ListeInscrits({ showMsg }) {
           <option value="toutes">Toutes les années</option>
           {annees.map((a) => <option key={a} value={a}>{a}</option>)}
         </select>
+        <select className="ia-select" value={statutFilter} onChange={(e) => setStatutFilter(e.target.value)}>
+          <option value="toutes">Tous les statuts</option>
+          <option value="attente">⏳ En attente</option>
+          <option value="valide">✅ Validées</option>
+        </select>
       </div>
       {loading && <p>Chargement…</p>}
       {!loading && filtered.length === 0 && <p className="ia-hint">Aucune inscription trouvée.</p>}
@@ -498,12 +512,25 @@ function ListeInscrits({ showMsg }) {
               <strong>{ins.eleves?.map((e) => `${e.prenom} ${e.nom}`).join(" · ")}</strong>
               <span className="ia-date"> — {new Date(ins.dateInscription).toLocaleDateString("fr-FR")}</span>
               {ins.annee && <span className="ia-tag blue" style={{ marginLeft: "0.5rem" }}>{ins.annee}</span>}
+              {ins.statut === "valide" && ins.dateValidation && (
+                <span style={{fontSize:"0.75rem", color:"#059669", marginLeft:"0.5rem"}}>
+                  validée le {new Date(ins.dateValidation).toLocaleDateString("fr-FR")}
+                </span>
+              )}
               {ins.statut === "valide"
                 ? <span className="ia-tag green" style={{ marginLeft: "0.5rem" }}>✅ Validée</span>
                 : <span className="ia-tag amber" style={{ marginLeft: "0.5rem" }}>⏳ En attente</span>}
             </div>
             <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
               <span className="total-badge">{ins.totalGeneral} €</span>
+              <button className="ia-btn-sm" style={{background:"#e0f2fe", color:"#075985", borderColor:"#7dd3fc"}}
+                onClick={() => {
+                  // Ouvrir dans un nouvel onglet ou une modal — on redirige vers la page inscription avec les données pré-remplies
+                  const dataStr = encodeURIComponent(JSON.stringify(ins));
+                  window.open(`/#/inscription?edit=${ins.id}&code=${ins.code}`, '_blank');
+                }}>
+                ✏️ Modifier
+              </button>
               {ins.statut !== "valide" && (
                 <button className="ia-btn-valider" onClick={async () => {
                   if (!confirm(`Valider l'inscription de ${ins.eleves?.map((e) => e.prenom).join(", ")} ? L'inscrit ne pourra plus la modifier en ligne.`)) return;

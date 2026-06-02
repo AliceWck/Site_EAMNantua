@@ -707,8 +707,10 @@
   font-weight: 700;
   letter-spacing: 0.15em;
   text-align: center;
-  color: white;
+  color: #1f2937 !important;
+  background-color: #f3f4f6 !important;
   text-transform: uppercase;
+  -webkit-text-fill-color: #1f2937 !important;
 }
 .code-input:focus { outline: none; border-color: var(--inscr-primary); }
 .inscr-error { color: var(--inscr-danger); font-size: 0.875rem; margin: 0.5rem 0; }

@@ -1326,7 +1326,8 @@ app.put("/api/inscriptions/:id", (req, res) => {
     const existing = inscriptions[idx];
 
     // Si l'inscription est déjà validée, bloquer la modification côté serveur
-    if (existing.statut === "valide") {
+    const isAdminEdit = req.headers['x-admin-edit'] === 'true';
+    if (existing.statut === "valide" && !isAdminEdit) {
       return res.status(403).json({ message: "Cette inscription a été validée par le bureau et ne peut plus être modifiée en ligne." });
     }
 
