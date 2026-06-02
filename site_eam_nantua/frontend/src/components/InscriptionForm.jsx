@@ -54,7 +54,13 @@ function calculerTarif(cours, age, paiementType) {
   return paiementType === "annuel" ? t.annuel : t.trimestre;
 }
 
-function calculerTotal(eleves, paiementType, nbFoyerTotal, cotisation = 25) {
+function calculerTotal(eleves, paiementType, nbFoyerTotal, cotisation) {
+  // Pour chaque élève, calculer la somme des cours
+  // Règles de réduction :
+  // - 10% par activité si membre d'un même foyer (nbFoyerTotal >= 2)
+  // - 33% sur chaque discipline à partir de la 2e, sauf yoga et chorale
+  // - Non-cumul : seule la réduction la plus avantageuse
+  
   let totalGeneral = 0;
   const details = eleves.map((eleve) => {
     const age = getAge(eleve.dateNaissance);
@@ -63,53 +69,59 @@ function calculerTotal(eleves, paiementType, nbFoyerTotal, cotisation = 25) {
       .sort((a, b) => b.prix - a.prix);
 
     let totalEleve = 0;
-    let disciplineEligibleCount = 0; // compte disciplines éligibles aux réductions (hors yoga/chorale)
+    let disciplineCount = 0; // compte les disciplines éligibles 33%
 
     const coursDetails = coursAvecPrix.map((c) => {
       const prixBase = c.prix;
       let prixFinal = prixBase;
       let reductionAppliquee = null;
 
-      const estYogaChorale = !!c.coursData.yogaChorale;
-
-      if (!estYogaChorale) {
-        // Discipline éligible aux réductions multi-activités
-        disciplineEligibleCount++;
-        
-        if (disciplineEligibleCount >= 2) {
-          // À partir de la 2e discipline : 33% OU 10% foyer, le plus avantageux, non cumulé
-          const reduc33 = prixBase * 0.33;
-          const reduc10 = nbFoyerTotal >= 2 ? prixBase * 0.10 : 0;
-          if (reduc33 >= reduc10) {
+      const eligible33 = !c.coursData.yogaChorale;
+      
+      if (eligible33) {
+        disciplineCount++;
+        if (disciplineCount >= 2) {
+          // 33% de réduction
+          const reduc33 = (prixBase * 0.33);
+          // 10% foyer
+          const reduc10 = nbFoyerTotal >= 2 ?  (prixBase * 0.10) : 0;
+          // On applique la plus avantageuse
+          if (reduc33 >= reduc10) { 
             prixFinal = arrondir(prixBase - reduc33);
-            reductionAppliquee = "−33%";
-          } else {
-            prixFinal = arrondir(prixBase - reduc10);
-            reductionAppliquee = "−10% foyer";
+            reductionAppliquee = "−33%"; 
+          } else { 
+            prixFinal = arrondir(prixBase - reduc10); 
+            reductionAppliquee = "−10% foyer"; 
           }
         } else if (nbFoyerTotal >= 2) {
-          // 1ère discipline éligible : seulement 10% foyer
-          prixFinal = arrondir(prixBase - prixBase * 0.10);
+          // 10% foyer sur la 1ère discipline aussi
+          const reduc10 = (prixBase * 0.10);
+          prixFinal = arrondir(prixBase - reduc10);
           reductionAppliquee = "−10% foyer";
         }
-        // sinon pas de réduction (foyer = 1 personne, 1ère discipline)
+      } else if (nbFoyerTotal >= 2) {
+        // Yoga/Chorale : seulement 10% foyer si applicable
+        const reduc10 = (prixBase * 0.10);
+        prixFinal = arrondir(prixBase - reduc10);
+        reductionAppliquee = "−10% foyer";
       }
-      // Yoga/Chorale : jamais de réduction (reducDisponible: false)
 
       totalEleve += prixFinal;
       return { ...c, prixBase, prixFinal, reductionAppliquee };
     });
 
-    // Suppléments matériel séparés (jamais réduits)
+    // Supplément matériel séparé et jamais réduit
     let totalSupMateriel = 0;
     coursDetails.forEach(c => {
-      if (c.coursData.supplementMateriel) totalSupMateriel += c.coursData.supplementMateriel;
+      if (c.coursData.supplementMateriel) {
+        totalSupMateriel += c.coursData.supplementMateriel;
+      }
     });
-    totalEleve += totalSupMateriel;
-    totalEleve += cotisation;
+
+    totalEleve += cotisation; // cotisation annuelle // TODO : changer pour mettre dynamique
     totalGeneral += totalEleve;
 
-    return { ...eleve, coursDetails, totalEleve };
+    return { ...eleve, coursDetails, totalEleve, cotisation};
   });
 
   return { details, totalGeneral };
