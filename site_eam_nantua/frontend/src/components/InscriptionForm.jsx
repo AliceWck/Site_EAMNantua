@@ -761,9 +761,8 @@ export default function InscriptionForm() {
                           <tr>
                             <td>{instr && <span>{instr.emoji} </span>}{instr ? `${instr.label} — ` : ""}{c.coursData.label}</td>
                             <td>{c.prixBase} €</td>
+                            <td>{c.reductionAppliquee || "—"}</td>
                             <td className="prix-final">{c.prixFinal} €</td>
-                            {/* <td>{c.reductionAppliquee || "—"}</td> // OOOps
-                            <td className="prix-final">{typeof c.prixFinal === "number" ? c.prixFinal : c.prixFinal} €</td> */}
                           </tr>
                           {c.coursData.supplementMateriel > 0 && (
                             <tr>
@@ -826,9 +825,22 @@ export default function InscriptionForm() {
                   )}
                 </div>
               )}
+              *{modePaiement.type === "cheque" && (
+                <div style={{background:"#f0fdf4", borderRadius:8, padding:"0.75rem", marginTop:"0.75rem", fontSize:"0.875rem", color:"#166534", borderLeft:"3px solid #86efac"}}>
+                  🏦 <strong>Chèque(s) à l'ordre de :</strong> EAMHB<br/>
+                  À remettre au bureau de l'école.
+                </div>
+              )}
               {modePaiement.type === "virement" && (
-                <div style={{background:"#e0f2fe", borderRadius:8, padding:"0.75rem", marginTop:"0.75rem", fontSize:"0.875rem", color:"#075985"}}>
-                  ℹ️ Le RIB vous sera communiqué par email ou au bureau de l'école.
+                <div style={{background:"#e0f2fe", borderRadius:8, padding:"0.75rem", marginTop:"0.75rem", fontSize:"0.875rem", color:"#075985", borderLeft:"3px solid #7dd3fc"}}>
+                  💳 <strong>Virement bancaire :</strong><br/>
+                  IBAN : <strong>FR76 1009 6181 8400 0138 4350 118</strong><br/>
+                  BIC : <strong>CMCIFRPP</strong>
+                </div>
+              )}
+              {modePaiement.type === "especes" && (
+                <div style={{background:"#fefce8", borderRadius:8, padding:"0.75rem", marginTop:"0.75rem", fontSize:"0.875rem", color:"#854d0e", borderLeft:"3px solid #fde047"}}>
+                  💶 Règlement en espèces directement au bureau de l'école.
                 </div>
               )}
             </section>
