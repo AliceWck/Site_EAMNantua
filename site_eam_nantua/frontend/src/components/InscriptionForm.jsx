@@ -68,40 +68,45 @@ function calculerTotal(eleves, paiementType, nbFoyerTotal, cotisation) {
       .map((c) => ({ ...c, prix: calculerTarif(c.coursData, age, paiementType) || 0 }))
       .sort((a, b) => b.prix - a.prix); // tri décroissant : réduction sur les moins chers
 
+    // Identifier l'activité éligible la moins chère (pour la réduction 1/3)
+    const coursEligibles = coursAvecPrix
+      .filter(c => !c.coursData.yogaChorale)
+      .sort((a, b) => a.prix - b.prix); // tri croissant : la moins chère en premier
+
+
+    // L'index (dans coursAvecPrix) du cours le moins cher éligible, seulement s'il y en a >= 2
+    const idCoursReduit = coursEligibles.length >= 2 ? coursEligibles[0].id : null;
     let totalEleve = 0;
-    let disciplineCount = 0; // compte les disciplines éligibles 33%
+    // let disciplineCount = 0; // compte les disciplines éligibles 33%
+    
 
     const coursDetails = coursAvecPrix.map((c) => {
       const prixBase = c.prix;
       let prixFinal = prixBase;
       let reductionAppliquee = null;
 
-      const eligible33 = !c.coursData.yogaChorale;
+      // const eligible33 = !c.coursData.yogaChorale;
+      const est1erEligible = !c.coursData.yogaChorale;
       
-      if (eligible33) {
-        disciplineCount++;
-        if (disciplineCount >= 2) {
-          // 33% de réduction
-          const reduc33 = (prixBase * 0.33);
-          // 10% foyer
-          const reduc10 = nbFoyerTotal >= 2 ?  (prixBase * 0.10) : 0;
-          // On applique la plus avantageuse
-          if (reduc33 >= reduc10) { 
-            prixFinal = arrondir(prixBase - reduc33);
-            reductionAppliquee = "−1/3"; 
-          } else { 
-            prixFinal = arrondir(prixBase - reduc10); 
-            reductionAppliquee = "−10% foyer"; 
-          }
-        } else if (nbFoyerTotal >= 2) {
-          // 10% foyer sur la 1ère discipline aussi
-          const reduc10 = (prixBase * 0.10);
+      if (c.id === idCoursReduit) {
+        // Réduction 1/3 sur la moins chère éligible
+        const reduc33 = prixBase / 3;
+        const reduc10 = nbFoyerTotal >= 2 ? prixBase * 0.10 : 0;
+        if (reduc33 >= reduc10) {
+          prixFinal = arrondir(prixBase - reduc33);
+          reductionAppliquee = "−1/3";
+        } else {
           prixFinal = arrondir(prixBase - reduc10);
           reductionAppliquee = "−10% foyer";
         }
-      } else if (nbFoyerTotal >= 2) {
-        // Yoga/Chorale : seulement 10% foyer si applicable
-        const reduc10 = (prixBase * 0.10);
+      } else if (nbFoyerTotal >= 2 && est1erEligible) {
+        // 10% foyer sur les autres activités éligibles
+        const reduc10 = prixBase * 0.10;
+        prixFinal = arrondir(prixBase - reduc10);
+        reductionAppliquee = "−10% foyer";
+      } else if (nbFoyerTotal >= 2 && c.coursData.yogaChorale) {
+        // Yoga/Chorale : seulement 10% foyer
+        const reduc10 = prixBase * 0.10;
         prixFinal = arrondir(prixBase - reduc10);
         reductionAppliquee = "−10% foyer";
       }
