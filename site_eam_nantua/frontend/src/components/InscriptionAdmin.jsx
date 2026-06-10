@@ -428,7 +428,7 @@ function ListeInscrits({ showMsg }) {
 
   const exportCSV = () => {
     const headers = [
-      "Date inscription","Date validation","Année scolaire","N° dossier","Nb membres foyer","Type paiement","Total foyer (€)",
+      "Date inscription","Date validation","Année scolaire","N° dossier","Nb membres foyer","Mode règlement","Nb échéances","Montant/échéance (€)","Total foyer (€)",
       "Nom","Prénom","Date naissance","Âge","Sexe","Statut",
       "Adresse","Code postal","Localité","Tél 1","Tél 2","Email",
       "Niveau scolaire","Établissement","Profession",
@@ -454,6 +454,11 @@ function ListeInscrits({ showMsg }) {
           ins.dateValidation ? new Date(ins.dateValidation).toLocaleDateString("fr-FR") : "",
           ins.annee || "", ins.id || "", ins.foyer?.nbMembres || 1,
           ins.foyer?.paiementType || "", ins.totalGeneral || "",
+          ins.modePaiement?.nbFois || 1,
+          ins.modePaiement?.nbFois > 1 && ins.totalGeneral
+            ? Math.round(ins.totalGeneral / ins.modePaiement.nbFois)
+            : ins.totalGeneral || "",
+          ins.totalGeneral || "",
           eleve.nom || "", eleve.prenom || "", eleve.dateNaissance || "",
           age ?? "", eleve.sexe || "", age != null ? (age >= 18 ? "Majeur" : "Mineur") : "",
           eleve.adresse || "", eleve.codePostal || "", eleve.localite || "",
