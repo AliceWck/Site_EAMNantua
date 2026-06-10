@@ -6,6 +6,7 @@ export default function AdminLogin({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
 
   const handleSubmit = async (e) => {
@@ -44,12 +45,27 @@ export default function AdminLogin({ onLogin }) {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
-          <input
-            type="password"
-            placeholder="Mot de passe"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div style={{position:"relative"}}>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Mot de passe"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{width:"100%", paddingRight:"2.5rem"}}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(v => !v)}
+              style={{
+                position:"absolute", right:"0.5rem", top:"50%", transform:"translateY(-50%)",
+                background:"none", border:"none", cursor:"pointer", padding:"0.25rem",
+                color:"#666", fontSize:"1.1rem", minWidth:"auto"
+              }}
+              tabIndex={-1}
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </button>
+          </div>
           <button type="submit">Se connecter</button>
         </form>
 

@@ -1451,6 +1451,23 @@ app.post("/api/annees", (req, res) => {
   }
 });
 
+// DELETE une année scolaire
+app.delete("/api/annees/:annee", (req, res) => {
+  try {
+    const annee = decodeURIComponent(req.params.annee);
+    const data = loadAnnees();
+    if (!data.liste.includes(annee)) return res.status(404).json({ message: "Année non trouvée" });
+    data.liste = data.liste.filter(a => a !== annee);
+    if (data.courante === annee) data.courante = data.liste[data.liste.length - 1] || null;
+    saveAnnees(data);
+    res.json({ success: true, annees: data.liste });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur suppression année" });
+  }
+});
+
+
 // ─── Helper : génération de code unique ───────────────────────────────────────
 function genCode() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";

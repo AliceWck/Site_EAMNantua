@@ -37,7 +37,7 @@ export default function Contact() {
 
         <p><br />Ou nous écrire directement ici :</p>
         {/* <form className="contact-form" onSubmit={(e) => e.preventDefault()}> */}
-        <form className="contact-form" action="https://formsubmit.co/alice.invernizzi@outlook.fr" method="POST">
+        <form className="contact-form" action={`https://formsubmit.co/${contact.email}`} method="POST">
           <label>
             Nom :
             <input type="text" name="name" placeholder="Votre nom" required />

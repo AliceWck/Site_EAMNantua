@@ -66,7 +66,7 @@ function calculerTotal(eleves, paiementType, nbFoyerTotal, cotisation) {
     const age = getAge(eleve.dateNaissance);
     const coursAvecPrix = (eleve.coursChoisis || [])
       .map((c) => ({ ...c, prix: calculerTarif(c.coursData, age, paiementType) || 0 }))
-      .sort((a, b) => b.prix - a.prix);
+      .sort((a, b) => b.prix - a.prix); // tri décroissant : réduction sur les moins chers
 
     let totalEleve = 0;
     let disciplineCount = 0; // compte les disciplines éligibles 33%
@@ -88,7 +88,7 @@ function calculerTotal(eleves, paiementType, nbFoyerTotal, cotisation) {
           // On applique la plus avantageuse
           if (reduc33 >= reduc10) { 
             prixFinal = arrondir(prixBase - reduc33);
-            reductionAppliquee = "−33%"; 
+            reductionAppliquee = "−1/3"; 
           } else { 
             prixFinal = arrondir(prixBase - reduc10); 
             reductionAppliquee = "−10% foyer"; 
@@ -118,6 +118,7 @@ function calculerTotal(eleves, paiementType, nbFoyerTotal, cotisation) {
       }
     });
 
+    totalEleve += totalSupMateriel;
     totalEleve += cotisation; // cotisation annuelle // TODO : changer pour mettre dynamique
     totalGeneral += totalEleve;
 
@@ -299,7 +300,7 @@ export default function InscriptionForm() {
   };
 
   const soumettre = async () => {
-    const { details, totalGeneral } = calculerTotal(eleves, paiementType, eleves.length);
+    const { details, totalGeneral } = calculerTotal(eleves, paiementType, eleves.length, tarifs.cotisationAnnuelle);
 
     // Si on modifie une inscription existante → PUT, sinon POST avec nouveau code
     const isModification = !!inscriptionId;
@@ -426,6 +427,15 @@ export default function InscriptionForm() {
         {/* -- Étape 0 : Accueil : nouvelle ou reprise */}
         {etape === "accueil" && (
           <div className="inscr-step animate-in">
+            <div style={{textAlign:"center", marginBottom:"1.5rem"}}>
+              <button
+                className="inscr-btn-prev"
+                style={{borderColor:"var(--inscr-primary)", color:"var(--inscr-primary)", fontWeight:700, fontSize:"0.95rem"}}
+                onClick={() => setEtape("tarifs")}
+              >
+                📋 Consulter les cours et tarifs 2025–2026
+              </button>
+            </div>
             <div className="accueil-choix">
               <div className="accueil-choix-card" onClick={() => setEtape("foyer")}>
                 <div className="acc-icon">📝</div>
@@ -438,6 +448,91 @@ export default function InscriptionForm() {
                 <p>Modifier ou consulter une inscription existante avec mon code</p>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ── Grille tarifaire ── */}
+        {etape === "tarifs" && tarifs && (
+          <div className="inscr-step animate-in">
+            <h2>📋 Cours & tarifs 2025–2026</h2>
+            <p className="inscr-hint">Cotisation annuelle : <strong>{tarifs.cotisationAnnuelle} €</strong> par élève (non comprise dans les tarifs ci-dessous).</p>
+            <p className="inscr-hint">Réductions : <strong>10%</strong> par activité pour les membres d'un même foyer · <strong>1/3</strong> sur chaque discipline à partir de la 2ème (sauf Yoga et Chorale). Non-cumul : la plus avantageuse s'applique.</p>
+            
+            <h3 style={{marginTop:"1.5rem", color:"var(--inscr-primary)", borderBottom:"2px solid #f3e8ff", paddingBottom:"0.4rem"}}>🎵 Cours particuliers d'instruments</h3>
+            <div style={{overflowX:"auto"}}>
+              <table className="recap-table" style={{marginBottom:"1.5rem"}}>
+                <thead>
+                  <tr>
+                    <th>Formule</th>
+                    <th>Mineur — Trimestre</th>
+                    <th>Mineur — Annuel</th>
+                    <th>Majeur — Trimestre</th>
+                    <th>Majeur — Annuel</th>
+                    <th>Options</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tarifs.coursParticuliers.map(cp => (
+                    <tr key={cp.id}>
+                      <td><strong>{cp.label}</strong></td>
+                      <td>{cp.tarifs?.mineur?.trimestre} €</td>
+                      <td>{cp.tarifs?.mineur?.annuel} €</td>
+                      <td>{cp.tarifs?.majeur?.trimestre} €</td>
+                      <td>{cp.tarifs?.majeur?.annuel} €</td>
+                      <td style={{fontSize:"0.75rem"}}>
+                        {cp.duo && <span className="tag-duo">DUO</span>} {cp.inclusFM && <span className="tag-fm">+FM</span>}
+                        {cp.noteParEleve && <span style={{color:"#6b7280"}}> /élève</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <h3 style={{marginTop:"1.5rem", color:"var(--inscr-primary)", borderBottom:"2px solid #f3e8ff", paddingBottom:"0.4rem"}}>🎭 Pratiques collectives</h3>
+            <div style={{overflowX:"auto"}}>
+              <table className="recap-table" style={{marginBottom:"1.5rem"}}>
+                <thead>
+                  <tr>
+                    <th>Activité</th>
+                    <th>Durée</th>
+                    <th>Mineur — Trimestre</th>
+                    <th>Mineur — Annuel</th>
+                    <th>Majeur — Trimestre</th>
+                    <th>Majeur — Annuel</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tarifs.pratiquesCollectives.map(pc => (
+                    <tr key={pc.id}>
+                      <td><strong>{pc.label}</strong></td>
+                      <td>{pc.duree} min</td>
+                      <td>{pc.tarifs?.mineur?.trimestre} €</td>
+                      <td>{pc.tarifs?.mineur?.annuel} €</td>
+                      <td>{pc.tarifs?.majeur ? `${pc.tarifs.majeur.trimestre} €` : "—"}</td>
+                      <td>{pc.tarifs?.majeur ? `${pc.tarifs.majeur.annuel} €` : "—"}</td>
+                      <td style={{fontSize:"0.75rem"}}>
+                        {pc.supplementMateriel > 0 && <span className="tag-mat">+{pc.supplementMateriel}€ mat.</span>}
+                        {pc.yogaChorale && <span className="tag-yoga">Pas de réduction multi</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {tarifs.pdfUrl && (
+              <p style={{textAlign:"center", marginBottom:"1rem"}}>
+                <a href={tarifs.pdfUrl.startsWith("http") ? tarifs.pdfUrl : `${API}${tarifs.pdfUrl}`}
+                   target="_blank" rel="noopener noreferrer"
+                   style={{color:"var(--inscr-primary)", fontWeight:700}}>
+                  📄 Télécharger la grille tarifaire PDF
+                </a>
+              </p>
+            )}
+
+            <button className="inscr-btn-prev" style={{marginTop:"1rem"}} onClick={() => setEtape("accueil")}>← Retour</button>
           </div>
         )}
 
@@ -795,9 +890,9 @@ export default function InscriptionForm() {
               </p>
               <div style={{display:"flex", gap:"0.75rem", flexWrap:"wrap", marginBottom:"1rem"}}>
                 {[
-                  { id: "cheque", label: "🏦 Chèque(s)", info: "À l'ordre de l'EAM Haut-Bugey" },
-                  { id: "especes", label: "💶 Espèces", info: "" },
-                  { id: "virement", label: "💳 Virement", info: "RIB fourni sur demande au bureau" },
+                  { id: "cheque", label: "🏦 Chèque(s)", info: "À l'ordre de l'EAM Haut-Bugey. - La totalité de schèques  doit être remis à l'école lors de la confirmation de l'inscription." },
+                  { id: "especes", label: "💶 Espèces", info: "Le paiement en espèce doit être fait pour la totalité de la facture." },
+                  { id: "virement", label: "💳 Virement", info: "RIB fourni sur demande au bureau. - Le virement doit être fait pour la totalité de la facture." },
                 ].map((m) => (
                   <button key={m.id}
                     className={`paiement-btn ${modePaiement.type === m.id ? "active" : ""}`}
@@ -828,7 +923,8 @@ export default function InscriptionForm() {
               *{modePaiement.type === "cheque" && (
                 <div style={{background:"#f0fdf4", borderRadius:8, padding:"0.75rem", marginTop:"0.75rem", fontSize:"0.875rem", color:"#166534", borderLeft:"3px solid #86efac"}}>
                   🏦 <strong>Chèque(s) à l'ordre de :</strong> EAMHB<br/>
-                  À remettre au bureau de l'école.
+                  À remettre au bureau de l'école. <br/>
+                  <span style={{color:"#dc2626", fontWeight:700}}>⚠️ La totalité des chèques doit être remise à l'école lors de la confirmation de l'inscription.</span>
                 </div>
               )}
               {modePaiement.type === "virement" && (
@@ -836,11 +932,13 @@ export default function InscriptionForm() {
                   💳 <strong>Virement bancaire :</strong><br/>
                   IBAN : <strong>FR76 1009 6181 8400 0138 4350 118</strong><br/>
                   BIC : <strong>CMCIFRPP</strong>
+                  <span style={{color:"#dc2626", fontWeight:700}}>⚠️ Le virement doit couvrir la totalité de la facture.</span>
                 </div>
               )}
               {modePaiement.type === "especes" && (
                 <div style={{background:"#fefce8", borderRadius:8, padding:"0.75rem", marginTop:"0.75rem", fontSize:"0.875rem", color:"#854d0e", borderLeft:"3px solid #fde047"}}>
-                  💶 Règlement en espèces directement au bureau de l'école.
+                  💶 Règlement en espèces directement au bureau de l'école. <br/>
+                  <span style={{color:"#dc2626", fontWeight:700}}>⚠️ La totalité de la somme doit être réglée en une seule fois.</span>
                 </div>
               )}
             </section>

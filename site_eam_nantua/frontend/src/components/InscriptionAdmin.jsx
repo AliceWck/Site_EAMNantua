@@ -467,7 +467,9 @@ function ListeInscrits({ showMsg }) {
           if (c) row.push(c.coursData?.label || "", c.instrumentId || "", c.prixBase || "", c.reductionAppliquee || "—", c.prixFinal || "");
           else row.push("", "", "", "", "");
         }
-        row.push(25, supMat || 0, eleve.totalEleve || "");
+        // Récupérer la cotisation depuis les données de l'inscription en dynamique
+        const cotisationVal = eleve.cotisation ?? ins.cotisationAnnuelle ?? 25;
+        row.push(cotisationVal, supMat || 0, eleve.totalEleve || "");
         row.push(ins.engagements?.droitImage || "", ins.engagements?.whatsapp ? "Oui" : "Non", ins.engagements?.assurance ? "Oui" : "Non", ins.engagements?.reglement ? "Oui" : "Non");
         rows.push(row);
       });
@@ -522,7 +524,7 @@ function ListeInscrits({ showMsg }) {
                 : <span className="ia-tag amber" style={{ marginLeft: "0.5rem" }}>⏳ En attente</span>}
             </div>
             <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
-              <span className="total-badge">{ins.totalGeneral} €</span>
+              <span className="total-badge">{ins.totalGeneral != null ? `${ins.totalGeneral} €` : "—"}</span>
               <button className="ia-btn-sm" style={{background:"#e0f2fe", color:"#075985", borderColor:"#7dd3fc"}}
                 onClick={() => {
                   // Ouvrir dans un nouvel onglet ou une modal — on redirige vers la page inscription avec les données pré-remplies
@@ -603,6 +605,17 @@ function GestionAnnees({ showMsg }) {
     if (res.ok) { setAnneeCourante(a); showMsg(`✅ Année courante : ${a}`); }
   };
 
+  const supprimer = async (a) => {
+    if (!confirm(`Supprimer définitivement l'année ${a} ? Les inscriptions liées seront conservées mais plus filtrables par cette année.`)) return;
+    const res = await fetch(`${API}/api/annees/${encodeURIComponent(a)}`, { method: "DELETE" });
+    if (res.ok) {
+      const d = await res.json();
+      setAnnees(d.annees);
+      if (anneeCourante === a) setAnneeCourante(null);
+      showMsg(`✅ Année ${a} supprimée.`);
+    } else showMsg("❌ Erreur suppression.");
+  };
+
   const archiver = async () => {
     if (!anneeCourante) return alert("Aucune année courante.");
     if (!confirm(`Archiver les inscriptions de ${anneeCourante} ?`)) return;
@@ -635,6 +648,7 @@ function GestionAnnees({ showMsg }) {
           <div className="ia-card-actions">
             {a !== anneeCourante && <button className="ia-btn-sm" onClick={() => activer(a)}>▶ Activer</button>}
             {a === anneeCourante && <button className="ia-btn-sm danger" onClick={archiver}>📦 Archiver les inscrits</button>}
+            <button className="ia-btn-sm danger" onClick={() => supprimer(a)}>🗑️ Supprimer</button>
           </div>
         </div>
       ))}
