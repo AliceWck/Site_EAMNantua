@@ -94,7 +94,7 @@ function calculerTotal(eleves, paiementType, nbFoyerTotal, cotisation) {
         const reduc10 = nbFoyerTotal >= 2 ? prixBase * 0.10 : 0;
         if (reduc33 >= reduc10) {
           prixFinal = arrondir(prixBase - reduc33);
-          reductionAppliquee = "−1/3";
+          reductionAppliquee = "−33% discipline";
         } else {
           prixFinal = arrondir(prixBase - reduc10);
           reductionAppliquee = "−10% foyer";
