@@ -5,7 +5,8 @@ const API = import.meta.env.VITE_API_URL;
 
 // Tags canoniques — synchronisés avec InscriptionForm.jsx
 const TAGS_DEF = [
-  { id: "eveil_3_5",    label: "Éveil 3–5 ans",    desc: "3 à 5 ans" },
+  { id: "eveil_3",     label: "Éveil 3 ans",     ageMin: 3,  ageMax: 4  },
+  { id: "eveil_4_5",     label: "Éveil 4–5 ans", ageMin: 4,  ageMax: 5  },
   { id: "enfant_6_10",  label: "Enfant 6–10 ans",  desc: "6 à 10 ans" },
   { id: "enfant_7_10",  label: "Enfant 7–10 ans",  desc: "7 à 10 ans" },
   { id: "enfant_11_15", label: "Enfant 11–15 ans", desc: "11 à 15 ans" },
