@@ -51,20 +51,21 @@ export default function Photos() {
 
         <h2 className="section-title"><br />Galerie Photos</h2>
         <div className="photos-grid">
-          {galleries.map((gallery, i) => (
-            <Link to={`/evenements/${gallery.id}`} key={i} className="photo-item">
-              <img
-                // src={
-                //   gallery.images?.[0]?.url ||
-                //   gallery.images?.[0] ||
-                //   `${API}/uploads/placeholder.jpg`
-                // }
-                src={getFullPhotoUrl(gallery.images?.[0]?.url || gallery.images?.[0])}
-                alt={gallery.title}
-              />
-              <div className="photo-caption">{gallery.title}</div>
-            </Link>
-          ))}
+          {galleries.length === 0 ? (
+            <div className="archives-empty">
+              <p>En construction</p>
+            </div>
+          ) : (
+            galleries.map((gallery, i) => (
+              <Link to={`/evenements/${gallery.id}`} key={i} className="photo-item">
+                <img
+                  src={getFullPhotoUrl(gallery.images?.[0]?.url || gallery.images?.[0])}
+                  alt={gallery.title}
+                />
+                <div className="photo-caption">{gallery.title}</div>
+              </Link>
+            ))
+          )}
         </div>
 
         {notes.length > 0 && (

@@ -3,6 +3,8 @@ import Header from "./Header";
 import Footer from "./Footer";
 import "./Equipe.css";
 
+// Todo : faire un "en construction" si équipe vide, ou si fetch échoue
+
 export default function Equipe() {
   const [equipe, setEquipe] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,48 +57,50 @@ export default function Equipe() {
           <section className="equipe-section">
             <h2>Conseil d’administration</h2>
             <div className="equipe-grid">
-              {equipe.filter(p => p.type === "CA").map(personne => (
-                <div className="equipe-card" key={personne.id}>
-                  <div className="equipe-photo-wrapper">
-                    <img
-                      // src={
-                      //   personne.photo
-                      //     ? `${import.meta.env.VITE_API_URL}/uploads/${personne.photo}`
-                      //     : `${import.meta.env.VITE_API_URL}/uploads/equipe/avatardefaut.png`
-                      // }
-                      src={getFullPhotoUrl(personne.photo)}
-                      alt={personne.nom}
-                      className="equipe-photo"
-                    />
-                  </div>
-                  <h3 className="equipe-nom">{personne.nom}</h3>
-                  <p className="equipe-poste">{personne.poste}</p>
+              {equipe.filter(p => p.type === "CA").length === 0 ? (
+                <div className="equipe-empty">
+                  <p>En construction</p>
                 </div>
-              ))}
+              ) : (
+                equipe.filter(p => p.type === "CA").map(personne => (
+                  <div className="equipe-card" key={personne.id}>
+                    <div className="equipe-photo-wrapper">
+                      <img
+                        src={getFullPhotoUrl(personne.photo)}
+                        alt={personne.nom}
+                        className="equipe-photo"
+                      />
+                    </div>
+                    <h3 className="equipe-nom">{personne.nom}</h3>
+                    <p className="equipe-poste">{personne.poste}</p>
+                  </div>
+                ))
+              )}
             </div>
           </section>
 
           <section className="equipe-section">
             <h2>Professeurs</h2>
             <div className="equipe-grid">
-              {equipe.filter(p => p.type === "prof").map(personne => (
-                <div className="equipe-card" key={personne.id}>
-                  <div className="equipe-photo-wrapper">
-                    <img
-                      // src={
-                      //   personne.photo
-                      //     ? `${import.meta.env.VITE_API_URL}/uploads/${personne.photo}`
-                      //     : `${import.meta.env.VITE_API_URL}/uploads/equipe/avatardefaut.png`
-                      // }
-                      src={getFullPhotoUrl(personne.photo)}
-                      alt={personne.nom}
-                      className="equipe-photo"
-                    />
-                  </div>
-                  <h3 className="equipe-nom">{personne.nom}</h3>
-                  <p className="equipe-poste">{personne.poste}</p>
+              {equipe.filter(p => p.type === "prof").length === 0 ? (
+                <div className="equipe-empty">
+                  <p>En construction</p>
                 </div>
-              ))}
+              ) : (
+                equipe.filter(p => p.type === "prof").map(personne => (
+                  <div className="equipe-card" key={personne.id}>
+                    <div className="equipe-photo-wrapper">
+                      <img
+                        src={getFullPhotoUrl(personne.photo)}
+                        alt={personne.nom}
+                        className="equipe-photo"
+                      />
+                    </div>
+                    <h3 className="equipe-nom">{personne.nom}</h3>
+                    <p className="equipe-poste">{personne.poste}</p>
+                  </div>
+                ))
+              )}
             </div>
           </section>
         </>

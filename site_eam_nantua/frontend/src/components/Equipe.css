@@ -104,6 +104,26 @@
   padding-bottom: 0.3rem;
 }
 
+.equipe-empty {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  background: linear-gradient(135deg, rgba(78, 123, 119, 0.08), rgba(166, 182, 180, 0.12));
+  border: 1px dashed #8fa2a0;
+  border-radius: 16px;
+  padding: 1.5rem 1rem;
+  color: #4e7b77;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.equipe-empty p {
+  margin: 0;
+}
 
 @media (max-width: 768px) {
   .hero-section-equipe {

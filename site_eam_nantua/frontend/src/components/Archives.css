@@ -46,6 +46,27 @@ h4 {
   margin-top: 2rem;
 }
 
+.archives-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 180px;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(78, 123, 119, 0.08), rgba(166, 182, 180, 0.12));
+  border: 1px dashed #8fa2a0;
+  border-radius: 16px;
+  color: #4e7b77;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.archives-empty p {
+  margin: 0;
+}
+
 .photo-item {
   width: 200px;
   border: 2px solid #ccc;
