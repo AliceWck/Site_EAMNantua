@@ -351,6 +351,7 @@ export default function InscriptionForm() {
         setInscriptionCode(code);
         setInscriptionId(isModification ? inscriptionId : data.id);
         setEtape("confirmation");
+        setShowFiche(true);
       } else {
         alert("Erreur lors de l'envoi. Veuillez réessayer.");
       }
@@ -1073,6 +1074,11 @@ export default function InscriptionForm() {
               <p className="confirm-contact">
                 Des questions ? <strong>04 74 75 00 81</strong> · <a href="mailto:ecole@artsmusique-hb.fr">ecole@artsmusique-hb.fr</a>
               </p>
+              <div className="confirm-actions">
+                <button className="inscr-btn-submit" type="button" onClick={() => setShowFiche(true)}>
+                  Générer la fiche d'inscription
+                </button>
+              </div>
             </div>
           </>
         )}
