@@ -89,6 +89,9 @@ const S = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-end",
+
+    pageBreakAfter: "avoid",
+    breakAfter: "avoid",
   },
   headerTitle: {
     fontFamily: "'Arial Black', Arial, sans-serif",
@@ -113,6 +116,8 @@ const S = {
   },
   body: {
     padding: "0 24px",
+    pageBreakBefore: "avoid",
+    breakBefore: "avoid",
   },
   sectionTitle: {
     background: "transparent",
@@ -299,10 +304,11 @@ const S = {
   payGridItem: {
     display: "flex",
     alignItems: "center",
-    gap: 6,
-    fontSize: 11,
+    gap: 4,
+    fontSize: 10,
     borderBottom: "1px dashed #ccc",
     padding: "2px 0",
+    minWidth: 0,
   },
   totalBox: {
     background: "#f5f0ff",
@@ -684,8 +690,8 @@ export default function FicheInscription({
             body { font-family: Arial, sans-serif; color: #111; background: #fff; }
             .no-print { display: none !important; }
             input { border: none !important; border-bottom: 1px solid #999 !important; background: transparent !important; color: #111 !important; }
-            .fiche-page { page-break-after: auto; page-break-inside: avoid; break-inside: avoid; }
-            .fiche-page * { page-break-inside: avoid; }
+            .fiche-page { page-break-after: auto;}
+            .fiche-page * { page-break-inside: auto; }
             @page { margin: 1.5cm; size: A4; }
         </style>
     </head>
@@ -1013,11 +1019,11 @@ export default function FicheInscription({
             {Array.from({ length: 9 }, (_, i) => (
               <div key={i} style={S.payGridItem}>
                 <span style={{ color: "#e8272a", fontWeight: 700, minWidth: 14 }}>{i + 1}.</span>
-                <input style={{ ...S.payInput, width: 70 }} placeholder="Montant €" />
+                <input style={{ ...S.payInput, width: 55 }} placeholder="Montant €" />
                 <span style={{ fontSize: 10 }}>le</span>
-                <input style={{ ...S.payInput, width: 90 }} placeholder="Date" />
-                <span style={{ fontSize: 10, color: "#aaa" }}>{i < 5 ? "Réf." : "N°"}</span>
-                <input style={{ ...S.payInput, width: 70 }} placeholder="" />
+                <input style={{ ...S.payInput, width: 75 }} placeholder="Date" />
+                <span style={{ fontSize: 10, color: "#aaa", minWidth: 22 }}>"Réf."</span>
+                <input style={{ ...S.payInput, width: 55 }} placeholder="" />
               </div>
             ))}
           </div>
