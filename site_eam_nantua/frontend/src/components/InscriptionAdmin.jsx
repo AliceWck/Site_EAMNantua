@@ -24,7 +24,7 @@ const API = import.meta.env.VITE_API_URL;
 const TAGS_DEF = [
   { id: "eveil_3",      label: "Éveil 3 ans",       desc: "3 ans" },
   { id: "eveil_4_5",    label: "Éveil 4–5 ans",     desc: "4 à 5 ans" },
-  { id: "enfant_5",     label: "Enfant 5 ans",      desc: "5 ans" },
+  { id: "eveil_5",     label: "Éveil 5 ans",       desc: "5 ans" },
   { id: "enfant_6_10",  label: "Enfant 6–10 ans",   desc: "6 à 10 ans" },
   { id: "enfant_11_15", label: "Enfant 11–15 ans",  desc: "11 à 15 ans" },
   { id: "ado_16plus",   label: "Ado 16–17 ans",     desc: "16 à 17 ans" },
