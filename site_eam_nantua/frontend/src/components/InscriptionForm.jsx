@@ -22,8 +22,6 @@ const TAGS_DEF = [
   { id: "adulte",        label: "Adulte 18+ ans",     ageMin: 18, ageMax: null },
 ];
 
-const [showFiche, setShowFiche] = useState(false);
-
 function getTagsForAge(age) {
   if (age === null) return [];
   return TAGS_DEF.filter((t) => age >= t.ageMin && (t.ageMax === null || age <= t.ageMax)).map((t) => t.id);
@@ -180,6 +178,7 @@ function genId(eleves = []) {
 export default function InscriptionForm() {
   const [tarifs, setTarifs] = useState(null);
   const [etape, setEtape] = useState("accueil"); // accueil | foyer | eleves | recap | confirmation
+  const [showFiche, setShowFiche] = useState(false);
   
   // Foyer
   const [nbMembres, setNbMembres] = useState(1);
