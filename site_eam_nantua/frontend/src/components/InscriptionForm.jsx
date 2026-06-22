@@ -235,7 +235,7 @@ export default function InscriptionForm() {
             setPaiementType(ins.foyer?.paiementType || "annuel");
             setEleves(ins.eleves || []);
             setEngagements(ins.engagements || { whatsapp:false, assurance:false, mineurs:false, responsabilite:false, absences:false, paiement:false, reglement:false, droitImage:null });
-            setModePaiement(ins.modePaiement || { type:"", nbFois:1 });
+            setModePaiement(ins.modePaiement || { type:"", nbFois:1, rib:"" });
             setInscriptionId(ins.id);
             setInscriptionCode(ins.code);
             setEleveActif(0);
@@ -274,8 +274,9 @@ export default function InscriptionForm() {
   };
 
   const [modePaiement, setModePaiement] = useState({
-    type: "", // cheque | especes | virement
+    type: "", // cheque | especes | virement | mandat_sepa
     nbFois: 1,
+    rib: "", // pour mandat SEPA
   })
 
   const updateEleve = (idx, field, value) =>
@@ -306,7 +307,8 @@ export default function InscriptionForm() {
   };
 
   const soumettre = async () => {
-    const { details, totalGeneral } = calculerTotal(eleves, paiementType, eleves.length, tarifs.cotisationAnnuelle);
+    const { details, totalGeneral: totalBase } = calculerTotal(eleves, paiementType, eleves.length, tarifs.cotisationAnnuelle);
+    const totalAvecFrais = totalBase + (modePaiement.type === "mandat_sepa" ? 10 : 0);
 
     // Si on modifie une inscription existante → PUT, sinon POST avec nouveau code
     const isModification = !!inscriptionId;
@@ -318,7 +320,7 @@ export default function InscriptionForm() {
       modePaiement,
       eleves: details,
       engagements,
-      totalGeneral,
+      totalGeneral: totalAvecFrais,
       statut: "en_attente",
       dateInscription: new Date().toISOString(),
     };
@@ -381,7 +383,7 @@ export default function InscriptionForm() {
     setEleveActif(0);
     setEtape("eleves");
     setInscriptionTrouvee(null);
-    setModePaiement(ins.modePaiement || { type: "", nbFois: 1 });
+    setModePaiement(ins.modePaiement || { type: "", nbFois: 1, rib: "" });
   };
 
   if (!tarifs) return (
@@ -414,10 +416,14 @@ export default function InscriptionForm() {
 
   const eleveCourant = eleves[eleveActif] || null;
   const ageCourant = eleveCourant ? getAge(eleveCourant.dateNaissance) : null;
-  const { details: elevesAvecTotal, totalGeneral } =
+  const { details: elevesAvecTotal, totalGeneral: totalBase } =
     etape === "recap" || etape === "confirmation"
       ? calculerTotal(eleves, paiementType, eleves.length, tarifs.cotisationAnnuelle)
       : { details: [], totalGeneral: 0 };
+  
+  // Ajouter 10€ de frais si mandat SEPA
+  const fraisSepa = modePaiement.type === "mandat_sepa" ? 10 : 0;
+  const totalGeneral = totalBase + fraisSepa;
 
   return (
     <div className="inscr-layout">
@@ -892,23 +898,24 @@ export default function InscriptionForm() {
             <section className="engagements-section" style={{marginBottom:"1rem"}}>
               <h3>Mode de règlement</h3>
               <p style={{fontSize:"0.875rem", color:"#6b7280", marginBottom:"1rem"}}>
-                Le règlement s'effectue au bureau de l'école. Maximum 8 fois (1 fois/mois), soldé avant fin avril.
+                Le règlement s'effectue au bureau de l'école.
               </p>
               <div style={{display:"flex", gap:"0.75rem", flexWrap:"wrap", marginBottom:"1rem"}}>
                 {[
-                  { id: "cheque", label: "🏦 Chèque(s)", info: "À l'ordre de l'EAM Haut-Bugey. - La totalité de schèques  doit être remis à l'école lors de la confirmation de l'inscription." },
-                  { id: "especes", label: "💶 Espèces", info: "Le paiement en espèce doit être fait pour la totalité de la facture." },
-                  { id: "virement", label: "💳 Virement", info: "RIB fourni sur demande au bureau. - Le virement doit être fait pour la totalité de la facture." },
+                  { id: "cheque", label: "🏦 Chèque(s)", info: "À l'ordre de l'EAM Haut-Bugey. Max 8 versements (1/mois), soldé avant fin avril." },
+                  { id: "especes", label: "💶 Espèces", info: "Paiement intégral au bureau. Pas de versements." },
+                  { id: "virement", label: "💳 Virement", info: "Paiement intégral. RIB fourni sur demande." },
+                  { id: "mandat_sepa", label: "📋 Mandat SEPA", info: "Prélèvement automatique. +10€ de frais annuels. Max 8 versements." },
                 ].map((m) => (
                   <button key={m.id}
                     className={`paiement-btn ${modePaiement.type === m.id ? "active" : ""}`}
-                    onClick={() => setModePaiement({ ...modePaiement, type: m.id })}>
+                    onClick={() => setModePaiement({ ...modePaiement, type: m.id, nbFois: 1, rib: "" })}>
                     {m.label}
                     {m.info && <span>{m.info}</span>}
                   </button>
                 ))}
               </div>
-              {modePaiement.type && (
+              {modePaiement.type && (modePaiement.type === "cheque" || modePaiement.type === "mandat_sepa") && (
                 <div style={{display:"flex", alignItems:"center", gap:"1rem", flexWrap:"wrap"}}>
                   <label style={{fontSize:"0.875rem", fontWeight:600}}>Nombre de versements :</label>
                   <select
@@ -921,30 +928,48 @@ export default function InscriptionForm() {
                   </select>
                   {modePaiement.nbFois > 1 && (
                     <span style={{fontSize:"0.8rem", color:"#6b7280"}}>
-                      soit environ {arrondir(totalGeneral / modePaiement.nbFois)} €/versement
+                      soit {(totalGeneral / modePaiement.nbFois).toFixed(2)} €/versement
                     </span>
                   )}
                 </div>
               )}
-              *{modePaiement.type === "cheque" && (
+              {modePaiement.type === "cheque" && (
                 <div style={{background:"#f0fdf4", borderRadius:8, padding:"0.75rem", marginTop:"0.75rem", fontSize:"0.875rem", color:"#166534", borderLeft:"3px solid #86efac"}}>
                   🏦 <strong>Chèque(s) à l'ordre de :</strong> EAMHB<br/>
                   À remettre au bureau de l'école. <br/>
                   <span style={{color:"#dc2626", fontWeight:700}}>⚠️ La totalité des chèques doit être remise à l'école lors de la confirmation de l'inscription.</span>
                 </div>
               )}
-              {modePaiement.type === "virement" && (
-                <div style={{background:"#e0f2fe", borderRadius:8, padding:"0.75rem", marginTop:"0.75rem", fontSize:"0.875rem", color:"#075985", borderLeft:"3px solid #7dd3fc"}}>
-                  💳 <strong>Virement bancaire :</strong><br/>
-                  IBAN : <strong>FR76 1009 6181 8400 0138 4350 118</strong><br/>
-                  BIC : <strong>CMCIFRPP</strong>
-                  <span style={{color:"#dc2626", fontWeight:700}}>⚠️ Le virement doit couvrir la totalité de la facture.</span>
-                </div>
-              )}
               {modePaiement.type === "especes" && (
                 <div style={{background:"#fefce8", borderRadius:8, padding:"0.75rem", marginTop:"0.75rem", fontSize:"0.875rem", color:"#854d0e", borderLeft:"3px solid #fde047"}}>
                   💶 Règlement en espèces directement au bureau de l'école. <br/>
                   <span style={{color:"#dc2626", fontWeight:700}}>⚠️ La totalité de la somme doit être réglée en une seule fois.</span>
+                </div>
+              )}
+              {modePaiement.type === "virement" && (
+                <div style={{background:"#e0f2fe", borderRadius:8, padding:"0.75rem", marginTop:"0.75rem", fontSize:"0.875rem", color:"#075985", borderLeft:"3px solid #7dd3fc"}}>
+                  💳 <strong>Virement bancaire :</strong><br/>
+                  IBAN : <strong>FR76 1009 6181 8400 0138 4350 118</strong><br/>
+                  BIC : <strong>CMCIFRPP</strong><br/>
+                  <span style={{color:"#dc2626", fontWeight:700}}>⚠️ Le virement doit couvrir la totalité de la facture.</span>
+                </div>
+              )}
+              {modePaiement.type === "mandat_sepa" && (
+                <div style={{background:"#f5f3ff", borderRadius:8, padding:"0.75rem", marginTop:"0.75rem", fontSize:"0.875rem", color:"#6b21a8", borderLeft:"3px solid #d8b4fe"}}>
+                  <strong>📋 Mandat SEPA :</strong><br/>
+                  L'école prélèvera automatiquement les versements sur votre compte bancaire.<br/>
+                  <span style={{fontWeight:600}}>Frais annuels : +10 €</span><br/>
+                  <label style={{display:"flex", flexDirection:"column", gap:"0.5rem", marginTop:"0.75rem"}}>
+                    <span style={{fontWeight:600}}>Votre RIB (obligatoire) :</span>
+                    <input
+                      type="text"
+                      placeholder="Ex: FR76 1009 6181 8400 0138 4350 118"
+                      value={modePaiement.rib}
+                      onChange={(e) => setModePaiement({ ...modePaiement, rib: e.target.value })}
+                      style={{padding:"0.5rem", borderRadius:4, border:"1px solid #d8b4fe", fontFamily:"monospace", fontSize:"0.85rem"}}
+                    />
+                  </label>
+                  <span style={{color:"#dc2626", fontWeight:700}}>⚠️ Vous devrez vous présenter au bureau pour signer l'autorisation de prélèvement.</span>
                 </div>
               )}
             </section>
@@ -1003,7 +1028,7 @@ export default function InscriptionForm() {
             <div className="recap-nav">
               <button className="inscr-btn-prev" onClick={() => setEtape("eleves")}>← Modifier</button>
               <button className="inscr-btn-submit" onClick={soumettre}
-                disabled={!modePaiement.type || !Object.entries(engagements).every(([k, v]) => k === "droitImage" ? v !== null : v === true)}>
+                disabled={!modePaiement.type || (modePaiement.type === "mandat_sepa" && !modePaiement.rib.trim()) || !Object.entries(engagements).every(([k, v]) => k === "droitImage" ? v !== null : v === true)}>
                 Envoyer l'inscription ✓
               </button>
             </div>
@@ -1034,6 +1059,7 @@ export default function InscriptionForm() {
               <h3>📍 Prochaine étape : passez au bureau</h3>
               <p>
                 Présentez-vous à l'école muni de ce code afin de finaliser votre inscription et régler le montant de <strong>{totalGeneral} €</strong>.
+                {modePaiement.type === "mandat_sepa" && <><br/>💡 N'oubliez pas de signer l'<strong>autorisation de prélèvement SEPA</strong> au bureau.</>}
               </p>
               <p className="confirm-modif-note">
                 Votre dossier reste <strong>modifiable en ligne</strong> jusqu'à sa prise en charge par l'équipe. Une fois validé, toute modification ultérieure devra se faire directement au bureau de l'école.
