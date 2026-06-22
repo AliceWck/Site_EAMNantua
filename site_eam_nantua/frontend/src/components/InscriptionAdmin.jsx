@@ -4,6 +4,22 @@ import "./InscriptionAdmin.css";
 const API = import.meta.env.VITE_API_URL;
 
 // Tags canoniques — synchronisés avec InscriptionForm.jsx
+// Check le format description + categories màj avec Admin/utilisateur
+// const TAGS_DEF = [
+//   { id: "eveil_3",     label: "Éveil 3 ans",     ageMin: 3,  ageMax: 4  },
+//   { id: "eveil_4_5",     label: "Éveil 4–5 ans", ageMin: 4,  ageMax: 5  },
+//   { id: "enfant_6_10",  label: "Enfant 6–10 ans",  ageMin: 6,  ageMax: 10 },
+//   { id: "enfant_11_15", label: "Enfant 11–15 ans", ageMin: 11, ageMax: 15 },
+//   { id: "ado_16plus",   label: "Ado 16–17 ans",    ageMin: 16, ageMax: 17 },
+//   { id: "adulte",       label: "Adulte 18+",        ageMin: 18, ageMax: null },
+// ];
+
+//Todo : Cette inscription a été validée par le bureau. Toute modification doit se faire directement à l'école. Check ça lors de la modif par le bureau
+// Todo accueil et menu admin : "en construction" si fetch échoue ou équipe vide, ou si fetch échoue pour les tarifs
+// Todo générer pdf construit en automatique
+// Todo check le helloasso
+// Todo check les tarifs enfants, et la gestion des tags
+
 const TAGS_DEF = [
   { id: "eveil_3",     label: "Éveil 3 ans",     ageMin: 3,  ageMax: 4  },
   { id: "eveil_4_5",     label: "Éveil 4–5 ans", ageMin: 4,  ageMax: 5  },
@@ -429,7 +445,7 @@ function ListeInscrits({ showMsg }) {
 
   const exportCSV = () => {
     const headers = [
-      "Date inscription","Date validation","Année scolaire","N° dossier","Nb membres foyer","Mode règlement","Nb échéances","Montant/échéance (€)","Total foyer (€)",
+      "Date inscription","Date validation","Année scolaire","N° dossier","Nb membres foyer", "Mode règlement","Mode règlement (type)","Nb échéances","Montant/échéance (€)","Frais SEPA (€)","Total foyer (€)",
       "Nom","Prénom","Date naissance","Âge","Sexe","Statut",
       "Adresse","Code postal","Localité","Tél 1","Tél 2","Email",
       "Niveau scolaire","Établissement","Profession",
@@ -450,16 +466,19 @@ function ListeInscrits({ showMsg }) {
         const cours = eleve.coursDetails || [];
         const supMat = cours.reduce((s, c) => s + (c.coursData?.supplementMateriel || 0), 0);
         const autresMembres = (ins.eleves || []).filter((_, i) => i !== ei).map((e) => `${e.prenom} ${e.nom}`).join(" | ");
+
+        const modeType = ins.modePaiement?.type || "";
+        // Ne pas exposer de RIB dans l'export CSV (masquage côté client)
+        const nbFois = ins.modePaiement?.nbFois || 1;
+        const total = ins.totalGeneral || 0;
+        const perEcheance = nbFois > 1 ? Math.round(total / nbFois) : total;
+        const fraisSepaVal = modeType === "mandat_sepa" ? 10 : 0;
+
         const row = [
           dateIns, 
           ins.dateValidation ? new Date(ins.dateValidation).toLocaleDateString("fr-FR") : "",
           ins.annee || "", ins.id || "", ins.foyer?.nbMembres || 1,
-          ins.foyer?.paiementType || "", ins.totalGeneral || "",
-          ins.modePaiement?.nbFois || 1,
-          ins.modePaiement?.nbFois > 1 && ins.totalGeneral
-            ? Math.round(ins.totalGeneral / ins.modePaiement.nbFois)
-            : ins.totalGeneral || "",
-          ins.totalGeneral || "",
+          ins.foyer?.paiementType || "", modeType, nbFois, perEcheance || "", fraisSepaVal || 0, total || "",
           eleve.nom || "", eleve.prenom || "", eleve.dateNaissance || "",
           age ?? "", eleve.sexe || "", age != null ? (age >= 18 ? "Majeur" : "Mineur") : "",
           eleve.adresse || "", eleve.codePostal || "", eleve.localite || "",

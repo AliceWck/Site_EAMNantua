@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import "./InscriptionForm.css";
+import { FicheInscriptionModal } from "./FicheInscription";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -20,6 +21,8 @@ const TAGS_DEF = [
   { id: "ado_16plus",    label: "Ado 16+ ans",        ageMin: 16, ageMax: 17 },
   { id: "adulte",        label: "Adulte 18+ ans",     ageMin: 18, ageMax: null },
 ];
+
+const [showFiche, setShowFiche] = useState(false);
 
 function getTagsForAge(age) {
   if (age === null) return [];
@@ -235,7 +238,8 @@ export default function InscriptionForm() {
             setPaiementType(ins.foyer?.paiementType || "annuel");
             setEleves(ins.eleves || []);
             setEngagements(ins.engagements || { whatsapp:false, assurance:false, mineurs:false, responsabilite:false, absences:false, paiement:false, reglement:false, droitImage:null });
-            setModePaiement(ins.modePaiement || { type:"", nbFois:1, rib:"" });
+            // Ne pas pré-remplir ni créer de champ `rib` côté client
+            setModePaiement(ins.modePaiement || { type:"", nbFois:1 });
             setInscriptionId(ins.id);
             setInscriptionCode(ins.code);
             setEleveActif(0);
@@ -276,7 +280,7 @@ export default function InscriptionForm() {
   const [modePaiement, setModePaiement] = useState({
     type: "", // cheque | especes | virement | mandat_sepa
     nbFois: 1,
-    rib: "", // pour mandat SEPA
+    // rib: "", // pour mandat SEPA (désactivé)
   })
 
   const updateEleve = (idx, field, value) =>
@@ -383,7 +387,8 @@ export default function InscriptionForm() {
     setEleveActif(0);
     setEtape("eleves");
     setInscriptionTrouvee(null);
-    setModePaiement(ins.modePaiement || { type: "", nbFois: 1, rib: "" });
+    // Ne pas pré-remplir ni créer de champ `rib` côté client
+    setModePaiement(ins.modePaiement || { type: "", nbFois: 1 });
   };
 
   if (!tarifs) return (
@@ -909,7 +914,7 @@ export default function InscriptionForm() {
                 ].map((m) => (
                   <button key={m.id}
                     className={`paiement-btn ${modePaiement.type === m.id ? "active" : ""}`}
-                    onClick={() => setModePaiement({ ...modePaiement, type: m.id, nbFois: 1, rib: "" })}>
+                    onClick={() => setModePaiement({ ...modePaiement, type: m.id, nbFois: 1 })}>
                     {m.label}
                     {m.info && <span>{m.info}</span>}
                   </button>
@@ -958,18 +963,9 @@ export default function InscriptionForm() {
                 <div style={{background:"#f5f3ff", borderRadius:8, padding:"0.75rem", marginTop:"0.75rem", fontSize:"0.875rem", color:"#6b21a8", borderLeft:"3px solid #d8b4fe"}}>
                   <strong>📋 Mandat SEPA :</strong><br/>
                   L'école prélèvera automatiquement les versements sur votre compte bancaire.<br/>
-                  <span style={{fontWeight:600}}>Frais annuels : +10 €</span><br/>
-                  <label style={{display:"flex", flexDirection:"column", gap:"0.5rem", marginTop:"0.75rem"}}>
-                    <span style={{fontWeight:600}}>Votre RIB (obligatoire) :</span>
-                    <input
-                      type="text"
-                      placeholder="Ex: FR76 1009 6181 8400 0138 4350 118"
-                      value={modePaiement.rib}
-                      onChange={(e) => setModePaiement({ ...modePaiement, rib: e.target.value })}
-                      style={{padding:"0.5rem", borderRadius:4, border:"1px solid #d8b4fe", fontFamily:"monospace", fontSize:"0.85rem"}}
-                    />
-                  </label>
-                  <span style={{color:"#dc2626", fontWeight:700}}>⚠️ Vous devrez vous présenter au bureau pour signer l'autorisation de prélèvement.</span>
+                  <span style={{fontWeight:600}}>Frais annuels : +10 €</span>
+                  <div style={{marginTop:"0.75rem", fontSize:"0.9rem"}}>Votre RIB vous sera demandé au bureau de l'école pour signature de l'autorisation de prélèvement.</div>
+                  <span style={{color:"#dc2626", fontWeight:700, display:"block", marginTop:"0.5rem"}}>⚠️ Vous devrez vous présenter au bureau pour signer l'autorisation de prélèvement.</span>
                 </div>
               )}
             </section>
@@ -1028,7 +1024,7 @@ export default function InscriptionForm() {
             <div className="recap-nav">
               <button className="inscr-btn-prev" onClick={() => setEtape("eleves")}>← Modifier</button>
               <button className="inscr-btn-submit" onClick={soumettre}
-                disabled={!modePaiement.type || (modePaiement.type === "mandat_sepa" && !modePaiement.rib.trim()) || !Object.entries(engagements).every(([k, v]) => k === "droitImage" ? v !== null : v === true)}>
+                disabled={!modePaiement.type || !Object.entries(engagements).every(([k, v]) => k === "droitImage" ? v !== null : v === true)}>
                 Envoyer l'inscription ✓
               </button>
             </div>
@@ -1037,39 +1033,49 @@ export default function InscriptionForm() {
 
         {/* -- Étape 4 : Confirmation -- */}
         {etape === "confirmation" && (
-          <div className="inscr-step inscr-step-confirm animate-in">
-            <div className="confirm-icon">✓</div>
-            <h2>{inscriptionId && inscriptionCode ? "Inscription mise à jour !" : "Inscription envoyée !"}</h2>
-            <p>
-              {inscriptionId && inscriptionCode
-                ? "Vos modifications ont bien été enregistrées."
-                : "Votre dossier a bien été reçu. L'école vous recontactera pour finaliser les horaires avec les professeurs."
-              }
-            </p>
-
-            <div className="confirm-code-box">
-              <p className="confirm-code-label">Votre code de dossier</p>
-              <div className="confirm-code">{inscriptionCode}</div>
-              <p className="confirm-code-hint">
-                Conservez ce code — il vous permet de retrouver et modifier votre dossier en ligne, tant qu'il n'a pas été traité par le bureau.
-              </p>
-            </div>
-
-            <div className="confirm-bureau-box">
-              <h3>📍 Prochaine étape : passez au bureau</h3>
+          <>
+            {showFiche && (
+              <FicheInscriptionModal
+                inscription={{ code: inscriptionCode, foyer: { nbMembres, paiementType }, modePaiement, eleves: elevesAvecTotal }}
+                apiUrl={API}
+                onClose={() => setShowFiche(false)}
+              />
+            )}
+          
+            <div className="inscr-step inscr-step-confirm animate-in">
+              <div className="confirm-icon">✓</div>
+              <h2>{inscriptionId && inscriptionCode ? "Inscription mise à jour !" : "Inscription envoyée !"}</h2>
               <p>
-                Présentez-vous à l'école muni de ce code afin de finaliser votre inscription et régler le montant de <strong>{totalGeneral} €</strong>.
-                {modePaiement.type === "mandat_sepa" && <><br/>💡 N'oubliez pas de signer l'<strong>autorisation de prélèvement SEPA</strong> au bureau.</>}
+                {inscriptionId && inscriptionCode
+                  ? "Vos modifications ont bien été enregistrées."
+                  : "Votre dossier a bien été reçu. L'école vous recontactera pour finaliser les horaires avec les professeurs."
+                }
               </p>
-              <p className="confirm-modif-note">
-                Votre dossier reste <strong>modifiable en ligne</strong> jusqu'à sa prise en charge par l'équipe. Une fois validé, toute modification ultérieure devra se faire directement au bureau de l'école.
+
+              <div className="confirm-code-box">
+                <p className="confirm-code-label">Votre code de dossier</p>
+                <div className="confirm-code">{inscriptionCode}</div>
+                <p className="confirm-code-hint">
+                  Conservez ce code — il vous permet de retrouver et modifier votre dossier en ligne, tant qu'il n'a pas été traité par le bureau.
+                </p>
+              </div>
+
+              <div className="confirm-bureau-box">
+                <h3>📍 Prochaine étape : passez au bureau</h3>
+                <p>
+                  Présentez-vous à l'école muni de ce code afin de finaliser votre inscription et régler le montant de <strong>{totalGeneral} €</strong>.
+                  {modePaiement.type === "mandat_sepa" && <><br/>💡 N'oubliez pas de signer l'<strong>autorisation de prélèvement SEPA</strong> au bureau.</>}
+                </p>
+                <p className="confirm-modif-note">
+                  Votre dossier reste <strong>modifiable en ligne</strong> jusqu'à sa prise en charge par l'équipe. Une fois validé, toute modification ultérieure devra se faire directement au bureau de l'école.
+                </p>
+              </div>
+
+              <p className="confirm-contact">
+                Des questions ? <strong>04 74 75 00 81</strong> · <a href="mailto:ecole@artsmusique-hb.fr">ecole@artsmusique-hb.fr</a>
               </p>
             </div>
-
-            <p className="confirm-contact">
-              Des questions ? <strong>04 74 75 00 81</strong> · <a href="mailto:ecole@artsmusique-hb.fr">ecole@artsmusique-hb.fr</a>
-            </p>
-          </div>
+          </>
         )}
       </main>
 

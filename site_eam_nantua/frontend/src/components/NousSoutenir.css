@@ -55,6 +55,7 @@
 .helloasso-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 14px 30px rgba(78, 123, 119, 0.18);
+  color: black;
 }
 
 .soutien-disabled {

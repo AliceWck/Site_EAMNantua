@@ -651,13 +651,14 @@ export default function AdminPanel({ onLogout }) {
                 <label>
                     Texte de présentation :
                     <textarea
-                        name="message"
-                        value={dons.message}
-                        onChange={handleDonsChange}
-                        rows={5}
-                        className="form-input"
-                        placeholder="Vous pouvez soutenir l'association en faisant un don via HelloAsso..."
-                    />
+                            name="message"
+                            value={dons.message}
+                            onChange={handleDonsChange}
+                            rows={5}
+                            className="form-input"
+                            placeholder="Vous pouvez soutenir l'association en faisant un don via HelloAsso..."
+                            style={{ width: '100%', boxSizing: 'border-box', minHeight: '140px', resize: 'vertical' }}
+                        />
                 </label>
 
                 <label>
@@ -668,18 +669,38 @@ export default function AdminPanel({ onLogout }) {
                         value={dons.helloassoUrl}
                         onChange={handleDonsChange}
                         className="form-input"
-                        placeholder="https://www.helloasso.com/association/..."
+                        placeholder="https://www.helloasso.com/association..."
+                        style={{ width: '100%', boxSizing: 'border-box' }}
                     />
                 </label>
 
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '1rem' }}>
+                <label style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '1rem', 
+                    marginTop: '2rem',
+                    padding: '1.25rem',
+                    backgroundColor: dons.enabled ? '#f0fdf4' : '#f9f9fc',
+                    border: `2px solid ${dons.enabled ? '#86efac' : '#e5e7eb'}`,
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                }}>
                     <input
                         type="checkbox"
                         name="enabled"
                         checked={dons.enabled}
                         onChange={handleDonsChange}
+                        style={{
+                            width: '24px',
+                            height: '24px',
+                            cursor: 'pointer',
+                            accentColor: '#4e7b77'
+                        }}
                     />
-                    Activer la page de dons
+                    <span style={{ fontSize: '1.05rem', fontWeight: '600', color: dons.enabled ? '#166534' : '#374151' }}>
+                        {dons.enabled ? '✓ Page de dons activée' : '○ Activer la page de dons'}
+                    </span>
                 </label>
 
                 <div className="form-actions">
