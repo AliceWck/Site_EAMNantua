@@ -21,16 +21,21 @@ function arrondir(val) {
   return Math.round(val);
 }
 
-function calculerPrixFinal(prixBase, disciplineIndex, nbFoyer, yogaChorale) {
+function calculerPrixFinal(prixBase, apply33pct, nbFoyer, yogaChorale) {
   let prixFinal = prixBase;
   let reduction = null;
-  const eligible33 = !yogaChorale;
-  if (eligible33 && disciplineIndex >= 2) {
+  const hasFoyer = nbFoyer >= 2;
+  if (apply33pct && !yogaChorale) {
     const r33 = prixBase * 0.33;
-    const r10 = nbFoyer >= 2 ? prixBase * 0.10 : 0;
-    if (r33 >= r10) { prixFinal = arrondir(prixBase - r33); reduction = "−33%"; }
-    else { prixFinal = arrondir(prixBase - r10); reduction = "−10%"; }
-  } else if (nbFoyer >= 2) {
+    const r10 = hasFoyer ? prixBase * 0.10 : 0;
+    if (r33 > r10) {
+      prixFinal = arrondir(prixBase - r33);
+      reduction = "−33%";
+    } else if (r10 > 0) {
+      prixFinal = arrondir(prixBase - r10);
+      reduction = "−10%";
+    }
+  } else if (hasFoyer) {
     prixFinal = arrondir(prixBase - prixBase * 0.10);
     reduction = "−10%";
   }
@@ -45,7 +50,7 @@ const S = {
     margin: "0 auto",
     padding: "0 0 40px",
     background: "#fff",
-    color: "#222",
+    color: "#111",
     fontSize: 13,
   },
   noPrint: {
@@ -498,6 +503,7 @@ export default function FicheInscription({
   onClose = null,
 }) {
   const [tarifsData, setTarifsData] = useState(tarifs);
+  const [contactInfo, setContactInfo] = useState({ phone: "04 74 75 00 81", email: "ecole@artsmusique-hb.fr" });
   const [eleve, setEleve] = useState(null);
   const [engagements, setEngagements] = useState({
     whatsapp: false, assurance: false, mineurs: false,
@@ -518,6 +524,14 @@ export default function FicheInscription({
         .then(setTarifsData)
         .catch(console.error);
     }
+  }, [apiUrl]);
+
+  useEffect(() => {
+    if (!apiUrl) return;
+    fetch(`${apiUrl}/api/contact`)
+      .then((r) => r.json())
+      .then((data) => setContactInfo((prev) => ({ ...prev, ...data })))
+      .catch(() => {});
   }, [apiUrl]);
 
   // Initialiser depuis l'inscription
@@ -541,9 +555,23 @@ export default function FicheInscription({
     const nbFoyer = inscription?.foyer?.nbMembres || inscription?.eleves?.length || 1;
     const paiementType = inscription?.foyer?.paiementType || "annuel";
 
-    let disciplineCount = 0;
+    const prixBaseByIndex = coursChoisis.map((c) => {
+      const coursData = c.coursData;
+      const tarif = estMajeur ? coursData?.tarifs?.majeur : coursData?.tarifs?.mineur;
+      return tarif ? (paiementType === "annuel" ? tarif.annuel : tarif.trimestre) : 0;
+    });
 
-    const newLignes = coursChoisis.map((c) => {
+    const eligibleIndices = coursChoisis
+      .map((c, idx) => (!c.coursData?.yogaChorale ? idx : null))
+      .filter((idx) => idx !== null);
+
+    const discountLineIndex = eligibleIndices.length >= 2
+      ? eligibleIndices.reduce((best, idx) => {
+          return prixBaseByIndex[idx] < prixBaseByIndex[best] ? idx : best;
+        }, eligibleIndices[0])
+      : -1;
+
+    const newLignes = coursChoisis.map((c, idx) => {
       const coursData = c.coursData;
       if (!coursData) return null;
       const tarif = estMajeur ? coursData.tarifs?.majeur : coursData.tarifs?.mineur;
@@ -552,10 +580,9 @@ export default function FicheInscription({
         : 0;
 
       const eligible = !coursData.yogaChorale;
-      if (eligible) disciplineCount++;
       const { prixFinal, reduction } = calculerPrixFinal(
         prixBase,
-        eligible ? disciplineCount : 0,
+        eligible && idx === discountLineIndex,
         nbFoyer,
         coursData.yogaChorale
       );
@@ -617,6 +644,7 @@ export default function FicheInscription({
   const estMajeur = age !== null && age >= 18;
   const cotisation = tarifsData?.cotisationAnnuelle || 25;
   const paiementType = inscription?.foyer?.paiementType || "annuel";
+  const anneeLabel = inscription?.annee || `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`;
 
   return (
     <div style={S.page} ref={printRef}>
@@ -636,12 +664,12 @@ export default function FicheInscription({
           <span style={S.headerTitle}>
             Fiche d'inscription
           </span>
-          <span style={S.headerYear}> 2025-2026</span>
+          <span style={S.headerYear}>{anneeLabel}</span>
         </div>
         <div style={S.headerSchool}>
           <strong>École Arts &amp; Musique du Haut-Bugey</strong><br />
           31 r. du Dr. Mercier 01130 Nantua<br />
-          T. 04 74 75 00 81 — ecole@artsmusique-hb.fr
+          T. {contactInfo.phone} — <a href={`mailto:${contactInfo.email}`} style={{ color: "#fff", textDecoration: "underline" }}>{contactInfo.email}</a>
         </div>
       </div>
 
@@ -1060,7 +1088,7 @@ export default function FicheInscription({
 
       {/* ── Footer */}
       <div style={S.footer}>
-        <strong>Ecole Arts &amp; Musique du Haut-Bugey</strong> : 31 r. du Dr. Mercier 01130 Nantua — T. 04 74 75 00 81 — ecole@artsmusique-hb.fr<br />
+        <strong>Ecole Arts &amp; Musique du Haut-Bugey</strong> : 31 r. du Dr. Mercier 01130 Nantua — T. {contactInfo.phone} — <a href={`mailto:${contactInfo.email}`} style={{ color: "#fff", textDecoration: "underline" }}>{contactInfo.email}</a><br />
         Paiement à l'Ordre de <strong>EAMHB</strong> — Virement IBAN : <strong>FR76 1009 6181 8400 0138 4350 118</strong> — BIC : <strong>CMCIFRPP</strong>
       </div>
 
@@ -1101,16 +1129,18 @@ export function FicheInscriptionModal({ inscription, apiUrl, onClose }) {
       zIndex: 9999,
       overflowY: "auto",
       display: "flex",
-      flexDirection: "column",
+      justifyContent: "center",
+      padding: "20px 0",
     }}>
       <div style={{
         background: "#fff",
         maxWidth: 900,
         width: "100%",
-        margin: "20px auto",
+        margin: "0 20px",
         borderRadius: 8,
         overflow: "hidden",
         boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+        maxHeight: "calc(100vh - 40px)",
       }}>
         {/* Sélecteur d'élève si foyer multiple */}
         {eleves.length > 1 && (

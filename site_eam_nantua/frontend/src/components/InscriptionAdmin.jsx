@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./InscriptionAdmin.css";
+import { FicheInscriptionModal } from "./FicheInscription";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -425,6 +426,7 @@ function ListeInscrits({ showMsg }) {
   const [annees, setAnnees] = useState([]);
   const [expanded, setExpanded] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const [ficheInscription, setFicheInscription] = useState(null);
 
   useEffect(() => {
     Promise.all([
@@ -550,9 +552,12 @@ function ListeInscrits({ showMsg }) {
             </div>
             <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
               <span className="total-badge">{ins.totalGeneral != null ? `${ins.totalGeneral} €` : "—"}</span>
+              <button className="ia-btn-sm" style={{background:"#fde68a", color:"#92400e", borderColor:"#fcd34d"}}
+                onClick={() => setFicheInscription(ins)}>
+                📄 Fiche
+              </button>
               <button className="ia-btn-sm" style={{background:"#e0f2fe", color:"#075985", borderColor:"#7dd3fc"}}
                 onClick={() => {
-                  // Ouvrir dans un nouvel onglet ou une modal — on redirige vers la page inscription avec les données pré-remplies
                   const dataStr = encodeURIComponent(JSON.stringify(ins));
                   window.open(`/#/inscription?edit=${ins.id}&code=${ins.code}`, '_blank');
                 }}>
@@ -600,6 +605,13 @@ function ListeInscrits({ showMsg }) {
           )}
         </div>
       ))}
+      {ficheInscription && (
+        <FicheInscriptionModal
+          inscription={ficheInscription}
+          apiUrl={API}
+          onClose={() => setFicheInscription(null)}
+        />
+      )}
     </div>
   );
 }
