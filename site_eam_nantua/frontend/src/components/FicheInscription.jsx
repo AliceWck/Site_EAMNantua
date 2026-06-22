@@ -667,7 +667,8 @@ export default function FicheInscription({
   const handlePrint = () => {
     try {
       const contentEl = printRef.current || document.querySelector('.fiche-page');
-      const content = contentEl ? contentEl.outerHTML : document.body.outerHTML;
+      const inner = contentEl ? contentEl.innerHTML : document.body.innerHTML;
+      const content = `<div class="fiche-page" style="background:#fff;color:#111">${inner}</div>`;
       const w = window.open('', '_blank', 'noopener,noreferrer');
       if (!w) return window.print();
       w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Fiche d'inscription</title>`);
@@ -682,7 +683,9 @@ export default function FicheInscription({
       w.document.write('</body></html>');
       w.document.close();
       w.focus();
-      setTimeout(() => { w.print(); w.close(); }, 200);
+      // Wait for fonts and rendering, but keep short to avoid long delays
+      const doPrint = () => { w.print(); w.close(); };
+      if (w.document.fonts && w.document.fonts.ready) w.document.fonts.ready.then(doPrint).catch(() => setTimeout(doPrint, 80)); else setTimeout(doPrint, 80);
     } catch (e) {
       window.print();
     }
@@ -908,15 +911,15 @@ export default function FicheInscription({
                 <td style={{ ...S.actTd, textAlign: "right" }}>
                   <input
                     style={S.tarifInput}
-                    value={ligne._manualPrix !== null ? ligne._manualPrix : (ligne.prixBase ? `${ligne.prixBase} €` : "")}
-                    onChange={(e) => updateLignePrix(idx, e.target.value)}
+                    value={ligne.prixBase ? `${ligne.prixBase} €` : ""}
+                    readOnly
                   />
                 </td>
                 <td style={{ ...S.actTd, textAlign: "center", color: "#059669", fontWeight: 700, fontSize: 11 }}>
                   {ligne.reduction || "—"}
                 </td>
                 <td style={S.tarifTotal}>
-                  {(ligne._manualPrix !== null ? ligne._manualPrix : `${ligne.prixFinal} €`)}
+                  {`${ligne.prixFinal} €`}
                 </td>
               </tr>
             ))}
@@ -946,7 +949,7 @@ export default function FicheInscription({
               <td style={S.actTd}>—</td>
               <td style={{ ...S.tarifTotal, color: "#166534" }}>{cotisation} €</td>
             </tr>
-            {modePaiement.type === "mandat_sepa" && (
+            {(modePaiement.type === "mandat_sepa" || modePaiement.type === "cepa") && (
               <tr style={{ background: "#eef2ff" }}>
                 <td style={S.actTd} />
                 <td style={{ ...S.actTd, fontStyle: "italic", color: "#1d4ed8", fontSize: 11 }}>
