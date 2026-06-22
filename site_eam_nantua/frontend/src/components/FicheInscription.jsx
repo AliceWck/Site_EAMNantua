@@ -672,29 +672,22 @@ export default function FicheInscription({
     const w = window.open('', '_blank', 'width=900,height=700');
     if (!w) return;
 
-    // Récupérer les styles inline du document courant
-    const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
-        .map(el => el.outerHTML)
-        .join('\n');
-
-    const content = printRef.current?.innerHTML || '';
+    const content = printRef.current?.outerHTML || '';
 
     w.document.write(`<!doctype html>
     <html>
     <head>
         <meta charset="utf-8">
         <title>Fiche d'inscription</title>
-        ${styles}
         <style>
-            body { font-family: Arial, sans-serif; color: #111; background: #fff; margin: 0; }
+            html, body { height: auto !important; min-height: auto !important; overflow: visible !important; margin: 0; padding: 0; }
+            body { font-family: Arial, sans-serif; color: #111; background: #fff; }
             .no-print { display: none !important; }
-            input { border: none !important; border-bottom: 1px solid #999 !important; background: transparent !important; }
-            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            input { border: none !important; border-bottom: 1px solid #999 !important; background: transparent !important; color: #111 !important; }
+            .fiche-page { page-break-after: auto; page-break-inside: avoid; break-inside: avoid; }
+            .fiche-page * { page-break-inside: avoid; }
             @page { margin: 1.5cm; size: A4; }
         </style>
-        <span style={{ fontSize: 11, color: "#6b7280" }}>
-        💡 Pour les couleurs, activez « Graphiques d'arrière-plan » dans les options d'impression
-        </span>
     </head>
     <body>${content}</body>
     </html>`);
