@@ -669,30 +669,42 @@ export default function FicheInscription({
   };
 
   const handlePrint = () => {
-    try {
-      const contentEl = printRef.current || document.querySelector('.fiche-page');
-      const inner = contentEl ? contentEl.innerHTML : document.body.innerHTML;
-      const content = `<div class="fiche-page" style="background:#fff;color:#111">${inner}</div>`;
-      const w = window.open('', '_blank', 'noopener,noreferrer');
-      if (!w) return window.print();
-      w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Fiche d'inscription</title>`);
-      w.document.write(`<style>
-        body{font-family: Arial, sans-serif; color:#111; background:#fff;}
-        .no-print{display:none !important}
-        input{border:none; border-bottom:1px solid #999}
-        @page{margin:1.5cm; size:A4}
-      </style>`);
-      w.document.write('</head><body>');
-      w.document.write(content);
-      w.document.write('</body></html>');
-      w.document.close();
-      w.focus();
-      // Wait for fonts and rendering, but keep short to avoid long delays
-      const doPrint = () => { w.print(); w.close(); };
-      if (w.document.fonts && w.document.fonts.ready) w.document.fonts.ready.then(doPrint).catch(() => setTimeout(doPrint, 80)); else setTimeout(doPrint, 80);
-    } catch (e) {
-      window.print();
-    }
+    const w = window.open('', '_blank', 'width=900,height=700');
+    if (!w) return;
+
+    // Récupérer les styles inline du document courant
+    const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+        .map(el => el.outerHTML)
+        .join('\n');
+
+    const content = printRef.current?.innerHTML || '';
+
+    w.document.write(`<!doctype html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <title>Fiche d'inscription</title>
+        ${styles}
+        <style>
+            body { font-family: Arial, sans-serif; color: #111; background: #fff; margin: 0; }
+            .no-print { display: none !important; }
+            input { border: none !important; border-bottom: 1px solid #999 !important; background: transparent !important; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            @page { margin: 1.5cm; size: A4; }
+        </style>
+        <span style={{ fontSize: 11, color: "#6b7280" }}>
+        💡 Pour les couleurs, activez « Graphiques d'arrière-plan » dans les options d'impression
+        </span>
+    </head>
+    <body>${content}</body>
+    </html>`);
+
+    w.document.close();
+    w.focus();
+    setTimeout(() => {
+        w.print();
+        w.close();
+    }, 300);
   };
 
   if (!eleve) {
