@@ -231,7 +231,7 @@ const S = {
     outline: "none",
     fontSize: 11,
     padding: "1px 3px",
-    background: "#fff",
+    // background: "#fff",
     color: "#111",
     textAlign: "right",
   },
@@ -263,6 +263,8 @@ const S = {
     textTransform: "uppercase",
     color: "#e8272a",
     letterSpacing: 1,
+    textAlign: "center",
+    width: "100%",
   },
   payRow: {
     display: "flex",
@@ -336,6 +338,8 @@ const S = {
     color: "#e8272a",
     letterSpacing: 1,
     marginBottom: 6,
+    textAlign: "center",
+    width: "100%",
   },
   engItem: {
     display: "flex",
@@ -577,8 +581,8 @@ export default function FicheInscription({
     const e = inscription.eleves?.[eleveIndex];
     if (e) {
       setEleve({ ...e });
-      if (inscription.engagements) setEngagements({ ...inscription.engagements });
-      if (inscription.engagements?.droitImage) setDroitImage(inscription.engagements.droitImage);
+      if (inscription.engagements) setEngagements((prev) => ({ ...prev, ...inscription.engagements }));
+      if (inscription.engagements) setDroitImage(inscription.engagements.droitImage ?? null);
       if (inscription.modePaiement) setModePaiement(inscription.modePaiement);
     }
   }, [inscription, eleveIndex]);
