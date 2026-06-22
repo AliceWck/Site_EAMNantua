@@ -115,8 +115,8 @@ const S = {
     padding: "0 24px",
   },
   sectionTitle: {
-    background: "#e8272a",
-    color: "#fff",
+    background: "transparent",
+    color: "#e8272a",
     fontWeight: 900,
     fontSize: 13,
     padding: "3px 8px",
@@ -124,7 +124,9 @@ const S = {
     marginBottom: 4,
     letterSpacing: 1,
     textTransform: "uppercase",
-    display: "inline-block",
+    display: "block",
+    width: "100%",
+    textAlign: "center",
   },
   grid2: {
     display: "grid",
@@ -282,6 +284,7 @@ const S = {
     fontSize: 11,
     padding: "1px 4px",
     background: "transparent",
+    color: "#111",
     width: 80,
     textAlign: "right",
   },
@@ -644,7 +647,7 @@ export default function FicheInscription({
     setLignes(newLignes);
 
     const cotisation = tarifsData.cotisationAnnuelle || 25;
-    const sepaFrais = modePaiement.type === "mandat_sepa" ? 10 : 0;
+    const sepaFrais = (modePaiement.type === "mandat_sepa" || modePaiement.type === "cepa") ? 10 : 0;
     const total = newLignes.reduce((s, l) => s + (l.prixFinal || 0) + (l.supplementMateriel || 0), 0) + cotisation + sepaFrais;
     setTotalCalcule(total);
   }, [eleve, tarifsData, inscription, modePaiement.type]);
@@ -662,7 +665,27 @@ export default function FicheInscription({
   };
 
   const handlePrint = () => {
-    window.print();
+    try {
+      const contentEl = printRef.current || document.querySelector('.fiche-page');
+      const content = contentEl ? contentEl.outerHTML : document.body.outerHTML;
+      const w = window.open('', '_blank', 'noopener,noreferrer');
+      if (!w) return window.print();
+      w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Fiche d'inscription</title>`);
+      w.document.write(`<style>
+        body{font-family: Arial, sans-serif; color:#111; background:#fff;}
+        .no-print{display:none !important}
+        input{border:none; border-bottom:1px solid #999}
+        @page{margin:1.5cm; size:A4}
+      </style>`);
+      w.document.write('</head><body>');
+      w.document.write(content);
+      w.document.write('</body></html>');
+      w.document.close();
+      w.focus();
+      setTimeout(() => { w.print(); w.close(); }, 200);
+    } catch (e) {
+      window.print();
+    }
   };
 
   if (!eleve) {
