@@ -26,18 +26,19 @@ function calculerPrixFinal(prixBase, apply33pct, nbFoyer, yogaChorale) {
   let reduction = null;
   const hasFoyer = nbFoyer >= 2;
   if (apply33pct && !yogaChorale) {
-    const r33 = prixBase * 0.33;
+    const r33 = prixBase / 3;
     const r10 = hasFoyer ? prixBase * 0.10 : 0;
     if (r33 > r10) {
       prixFinal = arrondir(prixBase - r33);
-      reduction = "−33%";
+      reduction = `-${arrondir(r33)} € (-33,33%)`;
     } else if (r10 > 0) {
       prixFinal = arrondir(prixBase - r10);
-      reduction = "−10%";
+      reduction = `-${arrondir(r10)} € (-10%)`;
     }
   } else if (hasFoyer) {
-    prixFinal = arrondir(prixBase - prixBase * 0.10);
-    reduction = "−10%";
+    const remise10 = prixBase * 0.10;
+    prixFinal = arrondir(prixBase - remise10);
+    reduction = `-${arrondir(remise10)} € (-10%)`;
   }
   return { prixFinal, reduction };
 }
@@ -228,7 +229,19 @@ const S = {
     outline: "none",
     fontSize: 11,
     padding: "1px 3px",
-    background: "transparent",
+    background: "#fff",
+    color: "#111",
+    textAlign: "right",
+  },
+  payInput: {
+    border: "none",
+    borderBottom: "1.5px solid #aaa",
+    outline: "none",
+    fontSize: 11,
+    padding: "1px 4px",
+    background: "#fff",
+    color: "#111",
+    width: 80,
     textAlign: "right",
   },
   tarifTotal: {
@@ -631,9 +644,10 @@ export default function FicheInscription({
     setLignes(newLignes);
 
     const cotisation = tarifsData.cotisationAnnuelle || 25;
-    const total = newLignes.reduce((s, l) => s + (l.prixFinal || 0) + (l.supplementMateriel || 0), 0) + cotisation;
+    const sepaFrais = modePaiement.type === "mandat_sepa" ? 10 : 0;
+    const total = newLignes.reduce((s, l) => s + (l.prixFinal || 0) + (l.supplementMateriel || 0), 0) + cotisation + sepaFrais;
     setTotalCalcule(total);
-  }, [eleve, tarifsData, inscription]);
+  }, [eleve, tarifsData, inscription, modePaiement.type]);
 
   const updateLignePrix = (idx, val) => {
     setLignes((prev) => {
@@ -697,7 +711,7 @@ export default function FicheInscription({
       <div style={S.body}>
 
         {/* ── Identité élève */}
-        <div style={{ ...S.sectionTitle, marginTop: 10 }}>NOM DE L'ÉLÈVE</div>
+        <div style={{ ...S.sectionTitle, marginTop: 10 }}>ÉLÈVE</div>
         <div style={S.grid2}>
           <div style={S.fieldRow}>
             <span style={S.fieldLabel}>Nom</span>
@@ -909,6 +923,19 @@ export default function FicheInscription({
               <td style={S.actTd}>—</td>
               <td style={{ ...S.tarifTotal, color: "#166534" }}>{cotisation} €</td>
             </tr>
+            {modePaiement.type === "mandat_sepa" && (
+              <tr style={{ background: "#eef2ff" }}>
+                <td style={S.actTd} />
+                <td style={{ ...S.actTd, fontStyle: "italic", color: "#1d4ed8", fontSize: 11 }}>
+                  Frais de mandat SEPA
+                </td>
+                <td style={{ ...S.actTd, textAlign: "right", fontStyle: "italic", fontSize: 11 }}>
+                  10 €
+                </td>
+                <td style={S.actTd}>—</td>
+                <td style={{ ...S.tarifTotal, color: "#1d4ed8" }}>10 €</td>
+              </tr>
+            )}
           </tbody>
         </table>
 
@@ -968,6 +995,7 @@ export default function FicheInscription({
                 { id: "cheque", label: "🏦 Chèque(s) à l'ordre de EAMHB" },
                 { id: "especes", label: "💶 Espèces" },
                 { id: "virement", label: "💳 Virement" },
+              { id: "cepa", label: "📄 CEPA" },
               ].map((m) => (
                 <label key={m.id} style={{ display: "flex", alignItems: "center", gap: 4, cursor: "pointer", fontSize: 11 }}>
                   <input
@@ -983,6 +1011,11 @@ export default function FicheInscription({
             {modePaiement.type === "virement" && (
               <div style={{ fontSize: 10, color: "#075985", marginTop: 4, background: "#e0f2fe", padding: "3px 8px", borderRadius: 3 }}>
                 IBAN : <strong>FR76 1009 6181 8400 0138 4350 118</strong> — BIC : <strong>CMCIFRPP</strong>
+              </div>
+            )}
+            {modePaiement.type === "cepa" && (
+              <div style={{ fontSize: 10, color: "#075985", marginTop: 4, background: "#e0f2fe", padding: "3px 8px", borderRadius: 3 }}>
+                CEPA sélectionné. Merci de présenter le dossier au bureau pour validation.
               </div>
             )}
           </div>
