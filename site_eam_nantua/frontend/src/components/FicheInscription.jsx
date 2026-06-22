@@ -231,7 +231,7 @@ const S = {
     outline: "none",
     fontSize: 11,
     padding: "1px 3px",
-    // background: "#fff",
+    background: "transparent",
     color: "#111",
     textAlign: "right",
   },

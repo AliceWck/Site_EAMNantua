@@ -351,7 +351,7 @@ export default function InscriptionForm() {
         setInscriptionCode(code);
         setInscriptionId(isModification ? inscriptionId : data.id);
         setEtape("confirmation");
-        setFicheInscription({ code, foyer: { nbMembres, paiementType }, modePaiement, eleves: elevesAvecTotal });
+        setFicheInscription({ code, foyer: { nbMembres, paiementType }, modePaiement, engagements, eleves: elevesAvecTotal });
       } else {
         alert("Erreur lors de l'envoi. Veuillez réessayer.");
       }
