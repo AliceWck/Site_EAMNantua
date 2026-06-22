@@ -30,16 +30,6 @@ function coursDisponibleParTags(cours, age) {
   if (age === null) return true;
   if (!cours.tags || cours.tags.length === 0) return true; // pas de tag = dispo pour tous
   const ageTags = getTagsForAge(age);
-
-  console.log(
-    tarifs.pratiquesCollectives
-      .filter(c => c.label.toLowerCase().includes("éveil"))
-      .map(c => ({
-        label: c.label,
-        tags: c.tags
-      }))
-  );
-
   return cours.tags.some((t) => ageTags.includes(t));
 }
 
