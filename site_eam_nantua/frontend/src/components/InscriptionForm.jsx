@@ -12,14 +12,13 @@ function arrondir(val) {
 
 // -------- Définition des tags avec leurs tranches d'âge 
 const TAGS_DEF = [
-  { id: "eveil_3",     label: "Éveil 3 ans",     ageMin: 3,  ageMax: 4  },
+  { id: "eveil_3",       label: "Éveil 3 ans",       ageMin: 3,  ageMax: 3  },
   { id: "eveil_4_5",     label: "Éveil 4–5 ans",     ageMin: 4,  ageMax: 5  },
+  { id: "eveil_5",       label: "Éveil 5 ans",       ageMin: 5,  ageMax: 5  },
   { id: "enfant_6_10",   label: "Enfant 6–10 ans",   ageMin: 6,  ageMax: 10 },
-  { id: "enfant_7_10",   label: "Enfant 7–10 ans",   ageMin: 7,  ageMax: 10 },
   { id: "enfant_11_15",  label: "Enfant 11–15 ans",  ageMin: 11, ageMax: 15 },
-  { id: "enfant_12_15",  label: "Enfant 12–15 ans",  ageMin: 12, ageMax: 15 },
-  { id: "ado_16plus",    label: "Ado 16+ ans",        ageMin: 16, ageMax: 17 },
-  { id: "adulte",        label: "Adulte 18+ ans",     ageMin: 18, ageMax: null },
+  { id: "ado_16plus",    label: "Ado 16+ ans",       ageMin: 16, ageMax: 17 },
+  { id: "adulte",        label: "Adulte 18+ ans",    ageMin: 18, ageMax: null },
 ];
 
 function getTagsForAge(age) {

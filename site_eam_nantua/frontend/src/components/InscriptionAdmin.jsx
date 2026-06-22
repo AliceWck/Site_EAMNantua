@@ -22,13 +22,12 @@ const API = import.meta.env.VITE_API_URL;
 // Todo check les tarifs enfants, et la gestion des tags
 
 const TAGS_DEF = [
-  { id: "eveil_3",     label: "Éveil 3 ans",     ageMin: 3,  ageMax: 4  },
-  { id: "eveil_4_5",     label: "Éveil 4–5 ans", ageMin: 4,  ageMax: 5  },
-  { id: "enfant_6_10",  label: "Enfant 6–10 ans",  desc: "6 à 10 ans" },
-  { id: "enfant_7_10",  label: "Enfant 7–10 ans",  desc: "7 à 10 ans" },
-  { id: "enfant_11_15", label: "Enfant 11–15 ans", desc: "11 à 15 ans" },
-  { id: "enfant_12_15", label: "Enfant 12–15 ans", desc: "12 à 15 ans" },
-  { id: "ado_16plus",   label: "Ado 16–17 ans",    desc: "16 à 17 ans" },
+  { id: "eveil_3",      label: "Éveil 3 ans",       desc: "3 ans" },
+  { id: "eveil_4_5",    label: "Éveil 4–5 ans",     desc: "4 à 5 ans" },
+  { id: "enfant_5",     label: "Enfant 5 ans",      desc: "5 ans" },
+  { id: "enfant_6_10",  label: "Enfant 6–10 ans",   desc: "6 à 10 ans" },
+  { id: "enfant_11_15", label: "Enfant 11–15 ans",  desc: "11 à 15 ans" },
+  { id: "ado_16plus",   label: "Ado 16–17 ans",     desc: "16 à 17 ans" },
   { id: "adulte",       label: "Adulte 18+",        desc: "18 ans et plus" },
 ];
 
