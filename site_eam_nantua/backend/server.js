@@ -302,12 +302,20 @@ app.get("/", (req, res) => {
 
 /////////// CONTACT
 const contactFilePath = path.join(dataDir, "contact.json");
+const donationsFilePath = path.join(dataDir, "donations.json");
 
 // Au démarrage, si le fichier n'existe pas, on initialise avec les 4 champs
 if (!fs.existsSync(contactFilePath)) {
   fs.writeFileSync(
     contactFilePath,
     JSON.stringify({ email: "", phone: "", facebook: "", instagram: "" }, null, 2)
+  );
+}
+
+if (!fs.existsSync(donationsFilePath)) {
+  fs.writeFileSync(
+    donationsFilePath,
+    JSON.stringify({ enabled: false, message: "", helloassoUrl: "" }, null, 2)
   );
 }
 
@@ -319,6 +327,15 @@ function loadContact() {
 
 function saveContact(data) {
   fs.writeFileSync(contactFilePath, JSON.stringify(data, null, 2), "utf-8");
+}
+
+function loadDons() {
+  const raw = fs.readFileSync(donationsFilePath, "utf-8");
+  return JSON.parse(raw);
+}
+
+function saveDons(data) {
+  fs.writeFileSync(donationsFilePath, JSON.stringify(data, null, 2), "utf-8");
 }
 
 // GET : lire les infos de contact depuis contact.json
@@ -334,14 +351,14 @@ app.get("/api/contact", (req, res) => {
 
 // PUT : mettre à jour les infos de contact dans contact.json
 app.put("/api/contact", (req, res) => {
-  const { email, phone, facebook, instagram } = req.body;
+  const { email, phone, facebook, instagram, helloassoUrl } = req.body;
 
   if (!email || !phone) {
     return res.status(400).json({ message: "Email et téléphone requis" });
   }
 
   try {
-    const updated = { email, phone, facebook: facebook || "", instagram: instagram || "" };
+    const updated = { email, phone, facebook: facebook || "", instagram: instagram || "", helloassoUrl: helloassoUrl || "", };
     saveContact(updated);
     res.status(200).json({ message: "Contact mis à jour" });
   } catch (err) {
@@ -352,6 +369,33 @@ app.put("/api/contact", (req, res) => {
 
 
 
+
+app.get("/api/dons", (req, res) => {
+  try {
+    const dons = loadDons();
+    res.json(dons);
+  } catch (err) {
+    console.error("Erreur lecture dons :", err);
+    res.status(500).json({ message: "Erreur lecture configuration des dons" });
+  }
+});
+
+app.put("/api/dons", (req, res) => {
+  const { enabled, message, helloassoUrl } = req.body;
+
+  try {
+    const updated = {
+      enabled: !!enabled,
+      message: message || "",
+      helloassoUrl: helloassoUrl || "",
+    };
+    saveDons(updated);
+    res.status(200).json({ message: "Configuration dons mise à jour" });
+  } catch (err) {
+    console.error("Erreur sauvegarde dons :", err);
+    res.status(500).json({ message: "Erreur lors de l'enregistrement des dons" });
+  }
+});
 
 //////////// NOTES
 // GET /api/notes événement
@@ -1459,6 +1503,24 @@ app.delete("/api/annees/:annee", (req, res) => {
     if (!data.liste.includes(annee)) return res.status(404).json({ message: "Année non trouvée" });
     data.liste = data.liste.filter(a => a !== annee);
     if (data.courante === annee) data.courante = data.liste[data.liste.length - 1] || null;
+    saveAnnees(data);
+    res.json({ success: true, annees: data.liste });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur suppression année" });
+  }
+});
+
+
+// ─── DELETE année scolaire ────────────────────────────────────────────────────
+app.delete("/api/annees/:annee", (req, res) => {
+  try {
+    const annee = decodeURIComponent(req.params.annee);
+    const data = loadAnnees();
+    data.liste = data.liste.filter(a => a !== annee);
+    if (data.courante === annee) {
+      data.courante = data.liste[data.liste.length - 1] || null;
+    }
     saveAnnees(data);
     res.json({ success: true, annees: data.liste });
   } catch (err) {

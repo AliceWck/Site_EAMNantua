@@ -12,6 +12,7 @@ import EvenementPage from "./components/EvenementPage";
 import Equipe from "./components/Equipe";
 import Mentions from "./components/Mentions";
 import Partenaires from "./components/Partenaires";
+import NousSoutenir from "./components/NousSoutenir";
 import InscriptionForm from "./components/InscriptionForm";
 
 
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/admin" element={<Admin />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/presentation" element={<Presentation />} />
+          <Route path="/nous-soutenir" element={<NousSoutenir />} />
           <Route path="/archives" element={<Archives />} />
           <Route path="/evenements/:slug" element={<EvenementPage />} />
           <Route path="/equipe" element={<Equipe />} />

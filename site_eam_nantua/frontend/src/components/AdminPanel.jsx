@@ -13,6 +13,7 @@ export default function AdminPanel({ onLogout }) {
 
     const [message, setMessage] = useState("");
     const [contact, setContact] = useState({ phone: "", email: "", facebook: "", instagram: "" });
+    const [dons, setDons] = useState({ enabled: false, message: "", helloassoUrl: "" });
 
     const [eventNotes, setEventNotes] = useState([]);
     const [newNote, setNewNote] = useState({ title: "", content: "", date: "" });
@@ -42,6 +43,10 @@ export default function AdminPanel({ onLogout }) {
         fetch(`${API}/api/contact`)
             .then((res) => res.json())
             .then((data) => setContact(data));
+
+        fetch(`${API}/api/dons`)
+            .then((res) => res.json())
+            .then((data) => setDons(data));
 
         // fetch("http://localhost:5000/api/notes")
         //     .then((res) => res.json())
@@ -97,6 +102,27 @@ export default function AdminPanel({ onLogout }) {
     if (res.ok) {
         setMessage("✅ Informations de contact mises à jour !");
     }
+    };
+
+    const handleDonsChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setDons((prev) => ({
+            ...prev,
+            [name]: type === "checkbox" ? checked : value,
+        }));
+    };
+
+    const handleSaveDons = async () => {
+        const res = await fetch(`${API}/api/dons`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dons),
+        });
+        if (res.ok) {
+            setMessage("✅ Configuration des dons mise à jour !");
+        } else {
+            setMessage("❌ Échec de la sauvegarde des dons.");
+        }
     };
 
 
@@ -371,6 +397,7 @@ export default function AdminPanel({ onLogout }) {
             <button onClick={() => setActiveTab("presentation")}>🎨 Présentation</button>
             <button onClick={() => setActiveTab("equipe")}>👥 Équipe</button>
             <button onClick={() => setActiveTab("contact")}>📬 Contact</button>
+            <button onClick={() => setActiveTab("dons")}>💖 Dons</button>
             <button onClick={() => setActiveTab("partenaires")}>🤝 Partenaires</button>
 
         </div>
@@ -599,9 +626,9 @@ export default function AdminPanel({ onLogout }) {
                         onChange={handleContactChange}
                         placeholder="https://www.facebook.com/..."
                     />
-                    </label>
+                </label>
 
-                    <label>
+                <label>
                     Lien Instagram :
                     <input
                         type="url"
@@ -612,11 +639,54 @@ export default function AdminPanel({ onLogout }) {
                     />
                 </label>
 
-
                 <button onClick={handleSaveContact} >💾 Enregistrer</button>
             </div>
             )}
 
+        {activeTab === "dons" && (
+            <div className="contact-admin-container">
+                <h2>💖 Page Dons</h2>
+                <p>Rédigez le texte de présentation et indiquez le lien HelloAsso pour activer la page.</p>
+
+                <label>
+                    Texte de présentation :
+                    <textarea
+                        name="message"
+                        value={dons.message}
+                        onChange={handleDonsChange}
+                        rows={5}
+                        className="form-input"
+                        placeholder="Vous pouvez soutenir l'association en faisant un don via HelloAsso..."
+                    />
+                </label>
+
+                <label>
+                    Lien HelloAsso :
+                    <input
+                        type="url"
+                        name="helloassoUrl"
+                        value={dons.helloassoUrl}
+                        onChange={handleDonsChange}
+                        className="form-input"
+                        placeholder="https://www.helloasso.com/association/..."
+                    />
+                </label>
+
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '1rem' }}>
+                    <input
+                        type="checkbox"
+                        name="enabled"
+                        checked={dons.enabled}
+                        onChange={handleDonsChange}
+                    />
+                    Activer la page de dons
+                </label>
+
+                <div className="form-actions">
+                    <button onClick={handleSaveDons}>💾 Enregistrer</button>
+                </div>
+            </div>
+        )}
 
         {activeTab === "partenaires" && (
             <div className="tab-tab">

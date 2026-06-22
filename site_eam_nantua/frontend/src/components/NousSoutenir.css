@@ -1,0 +1,79 @@
+.nous-soutenir-page {
+  background-color: #f9f9fc;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.nous-soutenir-main {
+  flex: 1;
+  padding: 3rem 1rem 4rem;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.soutien-hero {
+  display: flex;
+  justify-content: center;
+}
+
+.soutien-card {
+  width: 100%;
+  max-width: 760px;
+  background: white;
+  border-radius: 24px;
+  border: 1px solid rgba(78, 123, 119, 0.15);
+  box-shadow: 0 18px 45px rgba(78, 123, 119, 0.08);
+  padding: 3rem;
+  text-align: center;
+}
+
+.soutien-card h1 {
+  font-size: 2.4rem;
+  margin-bottom: 1rem;
+  color: #2b2e42;
+}
+
+.soutien-card p {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: #4a5d58;
+  margin-bottom: 2rem;
+}
+
+.helloasso-button {
+  display: inline-block;
+  padding: 1rem 1.8rem;
+  border-radius: 999px;
+  background: linear-gradient(120deg, #4e7b77, #7ea99a);
+  color: white;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.helloasso-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(78, 123, 119, 0.18);
+}
+
+.soutien-disabled {
+  color: #8fa2a0;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .nous-soutenir-main {
+    padding: 2rem 0.75rem 3rem;
+  }
+
+  .soutien-card {
+    padding: 2rem;
+    border-radius: 20px;
+  }
+
+  .soutien-card h1 {
+    font-size: 2rem;
+  }
+}
