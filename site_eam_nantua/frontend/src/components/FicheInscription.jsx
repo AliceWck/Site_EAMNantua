@@ -404,6 +404,27 @@ const S = {
     textAlign: "center",
     lineHeight: 1.6,
   },
+  modalOverlay: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,0.6)",
+    zIndex: 9999,
+    overflowY: "auto",
+    display: "flex",
+    justifyContent: "center",
+    padding: "20px 0",
+  },
+  modalContent: {
+    background: "#fff",
+    maxWidth: 900,
+    width: "100%",
+    margin: "0 20px",
+    borderRadius: 8,
+    overflow: "auto",
+    boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+    maxHeight: "calc(100vh - 40px)",
+    minHeight: 0,
+  },
   divider: {
     borderTop: "2px solid #3a5a78",
     margin: "10px 0 6px",
@@ -647,7 +668,7 @@ export default function FicheInscription({
   const anneeLabel = inscription?.annee || `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`;
 
   return (
-    <div style={S.page} ref={printRef}>
+    <div className="fiche-page" style={S.page} ref={printRef}>
       {/* ── Barre d'actions (non imprimée) */}
       <div style={S.noPrint} className="no-print">
         <span style={{ fontWeight: 700, color: "#6b21a8", fontSize: 14 }}>
@@ -1123,25 +1144,16 @@ export function FicheInscriptionModal({ inscription, apiUrl, onClose }) {
   const eleves = inscription?.eleves || [];
 
   return (
-    <div style={{
-      position: "fixed", inset: 0,
-      background: "rgba(0,0,0,0.6)",
-      zIndex: 9999,
-      overflowY: "auto",
-      display: "flex",
-      justifyContent: "center",
-      padding: "20px 0",
-    }}>
-      <div style={{
-        background: "#fff",
-        maxWidth: 900,
-        width: "100%",
-        margin: "0 20px",
-        borderRadius: 8,
-        overflow: "hidden",
-        boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
-        maxHeight: "calc(100vh - 40px)",
-      }}>
+    <div className="fiche-modal-overlay" style={S.modalOverlay}>
+      <style>{`
+        @media print {
+          .fiche-modal-overlay { position: static !important; overflow: visible !important; background: transparent !important; }
+          .fiche-modal-content { max-height: none !important; overflow: visible !important; box-shadow: none !important; margin: 0 !important; border-radius: 0 !important; width: auto !important; }
+          .no-print { display: none !important; }
+          .fiche-page { page-break-after: auto; page-break-inside: avoid; break-inside: avoid; }
+        }
+      `}</style>
+      <div className="fiche-modal-content" style={S.modalContent}>
         {/* Sélecteur d'élève si foyer multiple */}
         {eleves.length > 1 && (
           <div style={{

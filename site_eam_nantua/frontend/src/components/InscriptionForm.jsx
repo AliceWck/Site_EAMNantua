@@ -178,7 +178,7 @@ function genId(eleves = []) {
 export default function InscriptionForm() {
   const [tarifs, setTarifs] = useState(null);
   const [etape, setEtape] = useState("accueil"); // accueil | foyer | eleves | recap | confirmation
-  const [showFiche, setShowFiche] = useState(false);
+  const [ficheInscription, setFicheInscription] = useState(null);
   
   // Foyer
   const [nbMembres, setNbMembres] = useState(1);
@@ -351,7 +351,7 @@ export default function InscriptionForm() {
         setInscriptionCode(code);
         setInscriptionId(isModification ? inscriptionId : data.id);
         setEtape("confirmation");
-        setShowFiche(true);
+        setFicheInscription({ code, foyer: { nbMembres, paiementType }, modePaiement, eleves: elevesAvecTotal });
       } else {
         alert("Erreur lors de l'envoi. Veuillez réessayer.");
       }
@@ -582,6 +582,11 @@ export default function InscriptionForm() {
                     <p>Votre dossier a été traité. Pour toute modification, merci de vous présenter directement au bureau de l'école.</p>
                     <p><strong>Montant à régler :</strong> {inscriptionTrouvee.totalGeneral} €</p>
                     <p className="ins-contact">📞 04 74 75 00 81 · <a href="mailto:ecole@artsmusique-hb.fr">ecole@artsmusique-hb.fr</a></p>
+                    <div className="ins-trouvee-btns" style={{ marginTop: "1rem" }}>
+                      <button className="inscr-btn-next" onClick={() => setFicheInscription(inscriptionTrouvee)}>
+                        📄 PDF fiche inscription
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <div>
@@ -591,6 +596,9 @@ export default function InscriptionForm() {
                     <p className="inscr-hint">Cette inscription est encore modifiable.</p>
                     <div className="ins-trouvee-btns">
                       <button className="inscr-btn-next" onClick={() => reprendreInscription(inscriptionTrouvee)}>✏️ Modifier l'inscription</button>
+                      <button className="inscr-btn-next" style={{ marginLeft: 12 }} onClick={() => setFicheInscription(inscriptionTrouvee)}>
+                        📄 PDF fiche inscription
+                      </button>
                     </div>
                   </div>
                 )}
@@ -1034,14 +1042,6 @@ export default function InscriptionForm() {
         {/* -- Étape 4 : Confirmation -- */}
         {etape === "confirmation" && (
           <>
-            {showFiche && (
-              <FicheInscriptionModal
-                inscription={{ code: inscriptionCode, foyer: { nbMembres, paiementType }, modePaiement, eleves: elevesAvecTotal }}
-                apiUrl={API}
-                onClose={() => setShowFiche(false)}
-              />
-            )}
-          
             <div className="inscr-step inscr-step-confirm animate-in">
               <div className="confirm-icon">✓</div>
               <h2>{inscriptionId && inscriptionCode ? "Inscription mise à jour !" : "Inscription envoyée !"}</h2>
@@ -1075,7 +1075,7 @@ export default function InscriptionForm() {
                 Des questions ? <strong>04 74 75 00 81</strong> · <a href="mailto:ecole@artsmusique-hb.fr">ecole@artsmusique-hb.fr</a>
               </p>
               <div className="confirm-actions">
-                <button className="inscr-btn-submit" type="button" onClick={() => setShowFiche(true)}>
+                <button className="inscr-btn-submit" type="button" onClick={() => setFicheInscription({ code: inscriptionCode, foyer: { nbMembres, paiementType }, modePaiement, eleves: elevesAvecTotal })}>
                   Générer la fiche d'inscription
                 </button>
               </div>
@@ -1083,6 +1083,13 @@ export default function InscriptionForm() {
           </>
         )}
       </main>
+      {ficheInscription && (
+        <FicheInscriptionModal
+          inscription={ficheInscription}
+          apiUrl={API}
+          onClose={() => setFicheInscription(null)}
+        />
+      )}
 
       {/* -- Panneau de sélection de cours -- */}
       {panneauOuvert && (
