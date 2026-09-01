@@ -310,19 +310,35 @@ export default function InscriptionAdmin() {
       {/* ── Réductions ── */}
       {activeSection === "reduc" && (
         <div className="ia-section">
-          <h3>Réductions &amp; Cotisation</h3>
-          <div className="ia-grid">
-            <F label="Cotisation annuelle par élève (€)" type="number" value={tarifs.cotisationAnnuelle} onChange={(v) => setTarifs({ ...tarifs, cotisationAnnuelle: Number(v) })} />
-            <F label="Réduction foyer (%)" type="number" value={tarifs.reductions.foyer10pct * 100} onChange={(v) => setTarifs({ ...tarifs, reductions: { ...tarifs.reductions, foyer10pct: Number(v) / 100 } })} />
-            <F label="Réduction multi-activités (%) — à partir de la 2e discipline" type="number" value={tarifs.reductions.deuxiemeDiscipline33pct * 100} onChange={(v) => setTarifs({ ...tarifs, reductions: { ...tarifs.reductions, deuxiemeDiscipline33pct: Number(v) / 100 } })} />
+          <h3>Frais &amp; Réductions</h3>
+          
+          {/* ─── CATÉGORIE FRAIS ─── */}
+          <div style={{ marginBottom: "2rem" }}>
+            <h4 style={{ color: "#e8272a", marginBottom: "1rem" }}>💳 Frais</h4>
+            <div className="ia-grid">
+              <F label="Cotisation annuelle par élève (€)" type="number" value={tarifs.cotisationAnnuelle} onChange={(v) => setTarifs({ ...tarifs, cotisationAnnuelle: Number(v) })} />
+              <F label="Montant des arrhes à la signature (€)" type="number" value={tarifs.frais?.montantArrhes || 100} onChange={(v) => setTarifs({ ...tarifs, frais: { ...tarifs.frais, montantArrhes: Number(v) } })} />
+              <F label="Frais SEPA annuels (€)" type="number" value={tarifs.frais?.fraisSEPA || 10} onChange={(v) => setTarifs({ ...tarifs, frais: { ...tarifs.frais, fraisSEPA: Number(v) } })} />
+              <F label="Location mensuelle MAO (€)" type="number" value={tarifs.frais?.locationMAO || 0} onChange={(v) => setTarifs({ ...tarifs, frais: { ...tarifs.frais, locationMAO: Number(v) } })} />
+            </div>
           </div>
-          <div className="ia-checkboxes" style={{ marginTop: "1rem" }}>
-            <C label="Exclure Yoga et Chorale des réductions multi-activités" checked={tarifs.reductions.exclureYogaChorale} onChange={(v) => setTarifs({ ...tarifs, reductions: { ...tarifs.reductions, exclureYogaChorale: v } })} />
+
+          {/* ─── CATÉGORIE RÉDUCTIONS ─── */}
+          <div>
+            <h4 style={{ color: "#16a34a", marginBottom: "1rem" }}>📉 Réductions</h4>
+            <div className="ia-grid">
+              <F label="Réduction foyer (%)" type="number" value={tarifs.reductions.foyer10pct * 100} onChange={(v) => setTarifs({ ...tarifs, reductions: { ...tarifs.reductions, foyer10pct: Number(v) / 100 } })} />
+              <F label="Réduction multi-activités (%) — à partir de la 2e discipline" type="number" value={tarifs.reductions.deuxiemeDiscipline33pct * 100} onChange={(v) => setTarifs({ ...tarifs, reductions: { ...tarifs.reductions, deuxiemeDiscipline33pct: Number(v) / 100 } })} />
+            </div>
+            <div className="ia-checkboxes" style={{ marginTop: "1rem" }}>
+              <C label="Exclure Yoga et Chorale des réductions multi-activités" checked={tarifs.reductions.exclureYogaChorale} onChange={(v) => setTarifs({ ...tarifs, reductions: { ...tarifs.reductions, exclureYogaChorale: v } })} />
+            </div>
+            <div className="ia-rules-box">
+              <h4>⚠️ Non-cumul</h4>
+              <p>Seule la réduction la plus avantageuse est appliquée par activité.</p>
+            </div>
           </div>
-          <div className="ia-rules-box">
-            <h4>⚠️ Non-cumul</h4>
-            <p>Seule la réduction la plus avantageuse est appliquée par activité. 33% (2e+ discipline) vs 10% foyer → la plus forte s'applique.</p>
-          </div>
+
           <button className="ia-btn-save" onClick={() => save(tarifs)}>💾 Enregistrer</button>
         </div>
       )}

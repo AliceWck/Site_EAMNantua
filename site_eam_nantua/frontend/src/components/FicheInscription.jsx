@@ -659,7 +659,7 @@ export default function FicheInscription({
     setLignes(newLignes);
 
     const cotisation = tarifsData.cotisationAnnuelle || 33;
-    const sepaFrais = (modePaiement.type === "mandat_sepa" || modePaiement.type === "cepa") ? 10 : 0;
+    const sepaFrais = (modePaiement.type === "mandat_sepa" || modePaiement.type === "cepa") ? (tarifsData?.frais?.fraisSEPA || 10) : 0;
     const total = newLignes.reduce((s, l) => s + (l.prixFinal || 0) + (l.supplementMateriel || 0), 0) + cotisation + sepaFrais;
     setTotalCalcule(total);
   }, [eleve, tarifsData, inscription, modePaiement.type]);
@@ -999,7 +999,7 @@ export default function FicheInscription({
             <span style={{ fontSize: 11, fontWeight: 700 }}>Préinscription :</span>
             <label style={{ ...S.engItem, marginBottom: 0, fontSize: 11 }}>
               <input type="checkbox" style={S.payCheckbox} />
-              un versement de <strong style={{ margin: "0 4px" }}>100 €</strong> d'arrhes est requis.
+              un versement de <strong style={{ margin: "0 4px" }}>{tarifsData?.frais?.montantArrhes || 100} €</strong> d'arrhes est requis.
             </label>
           </div>
           <div style={S.payRow}>

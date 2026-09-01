@@ -919,7 +919,7 @@ export default function InscriptionForm() {
                   { id: "cheque", label: "🏦 Chèque(s)", info: "À l'ordre de l'EAM Haut-Bugey. Max 10 versements (1/mois), soldé avant fin avril." },
                   { id: "especes", label: "💶 Espèces", info: "Paiement intégral au bureau. Pas de versements." },
                   { id: "virement", label: "💳 Virement", info: "Paiement intégral. RIB fourni sur demande." },
-                  { id: "mandat_sepa", label: "📋 Mandat SEPA", info: "Prélèvement automatique. +10€ de frais annuels. Max 10 versements." },
+                  { id: "mandat_sepa", label: "📋 Mandat SEPA", info: `Prélèvement automatique. +${tarifs?.frais?.fraisSEPA || 10}€ de frais annuels. Max 10 versements.` },
                 ].map((m) => (
                   <button key={m.id}
                     className={`paiement-btn ${modePaiement.type === m.id ? "active" : ""}`}
@@ -972,7 +972,7 @@ export default function InscriptionForm() {
                 <div style={{background:"#f5f3ff", borderRadius:8, padding:"0.75rem", marginTop:"0.75rem", fontSize:"0.875rem", color:"#6b21a8", borderLeft:"3px solid #d8b4fe"}}>
                   <strong>📋 Mandat SEPA :</strong><br/>
                   L'école prélèvera automatiquement les versements sur votre compte bancaire.<br/>
-                  <span style={{fontWeight:600}}>Frais annuels : +10 €</span>
+                  <span style={{fontWeight:600}}>Frais annuels : +{tarifs?.frais?.fraisSEPA || 10} €</span>
                   <div style={{marginTop:"0.75rem", fontSize:"0.9rem"}}>Votre RIB vous sera demandé au bureau de l'école pour signature de l'autorisation de prélèvement.</div>
                   <span style={{color:"#dc2626", fontWeight:700, display:"block", marginTop:"0.5rem"}}>⚠️ Vous devrez vous présenter au bureau pour signer l'autorisation de prélèvement.</span>
                 </div>
