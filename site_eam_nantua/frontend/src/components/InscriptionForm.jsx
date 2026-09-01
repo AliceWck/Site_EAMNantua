@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import "./InscriptionForm.css";
@@ -177,7 +178,9 @@ function genId(eleves = []) {
 // --- Composant principal ------------------------------------------------
 
 export default function InscriptionForm() {
+  const location = useLocation();
   const [tarifs, setTarifs] = useState(null);
+  const [anneeActive, setAnneeActive] = useState(null);
   const [etape, setEtape] = useState("accueil"); // accueil | foyer | eleves | recap | confirmation
   const [ficheInscription, setFicheInscription] = useState(null);
   
@@ -221,7 +224,50 @@ export default function InscriptionForm() {
     .then((r) => r.json())
     .then(setTarifs)
     .catch(() => console.error("Impossible de charger les tarifs"));
+    
+    fetch(`${API}/api/annee-courante`)
+    .then((r) => r.json())
+    .then((data) => setAnneeActive(data.annee))
+    .catch(() => console.error("Impossible de charger l'année courante"));
   }, []);
+
+  // Réinitialiser le formulaire quand on revient à la page Inscription (sans paramètres d'édition)
+  useEffect(() => {
+    // Vérifier si on est sur /inscription et s'il n'y a pas de paramètres d'édition
+    const hash = window.location.hash;
+    const params = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
+    const editId = params.get('edit');
+    const editCode = params.get('code');
+    
+    // Si pas de paramètres d'édition, réinitialiser à "accueil"
+    if (!editId && !editCode) {
+      setEtape("accueil");
+      setFicheInscription(null);
+      setNbMembres(1);
+      setPaiementType("annuel");
+      setEleves([]);
+      setEleveActif(0);
+      setSelectionEnCours(null);
+      setPanneauOuvert(false);
+      setEngagements({
+        whatsapp: false, 
+        assurance: false, 
+        mineurs: false,
+        responsabilite: false, 
+        absences: false, 
+        paiement: false,
+        reglement: false, 
+        demission: false,
+        droitImage: null,
+      });
+      setCodeRecherche("");
+      setInscriptionTrouvee(null);
+      setRechercheErreur("");
+      setInscriptionId(null);
+      setInscriptionCode(null);
+      setModePaiement({ type: "", nbFois: 1 });
+    }
+  }, [location]);
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -436,7 +482,7 @@ export default function InscriptionForm() {
       <Header />
 
       <section className="inscr-hero">
-        <h1>Inscription 2025–2026</h1>
+        <h1>Inscription {anneeActive || "..."}</h1>
         <p>École des Arts et Musique du Haut-Bugey</p>
       </section>
 
@@ -451,14 +497,14 @@ export default function InscriptionForm() {
                 style={{borderColor:"var(--inscr-primary)", color:"var(--inscr-primary)", fontWeight:700, fontSize:"0.95rem"}}
                 onClick={() => setEtape("tarifs")}
               >
-                📋 Consulter les cours et tarifs 2025–2026
+                📋 Consulter les cours et tarifs {anneeActive || "..."}
               </button>
             </div>
             <div className="accueil-choix">
               <div className="accueil-choix-card" onClick={() => setEtape("foyer")}>
                 <div className="acc-icon">📝</div>
                 <h3>Nouvelle inscription</h3>
-                <p>Inscrire un ou plusieurs membres du foyer pour 2025–2026</p>
+                <p>Inscrire un ou plusieurs membres du foyer pour {anneeActive || "..."}</p>
               </div>
               <div className="accueil-choix-card" onClick={() => setEtape("recherche")}>
                 <div className="acc-icon">🔍</div>
@@ -472,7 +518,7 @@ export default function InscriptionForm() {
         {/* ── Grille tarifaire ── */}
         {etape === "tarifs" && tarifs && (
           <div className="inscr-step animate-in">
-            <h2>📋 Cours & tarifs 2025–2026</h2>
+            <h2>📋 Cours & tarifs {anneeActive || "..."}</h2>
             <p className="inscr-hint">Cotisation annuelle : <strong>{tarifs.cotisationAnnuelle} €</strong> par élève (non comprise dans les tarifs ci-dessous).</p>
             <p className="inscr-hint">Réductions : <strong>10%</strong> par activité pour les membres d'un même foyer · <strong>1/3</strong> sur chaque discipline à partir de la 2ème (sauf Yoga et Chorale). Non-cumul : la plus avantageuse s'applique.</p>
             
