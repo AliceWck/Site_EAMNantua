@@ -131,7 +131,7 @@ export default function InscriptionAdmin() {
           { id: "cp", label: "🎵 Cours particuliers" },
           { id: "pc", label: "🎭 Pratiques collectives" },
           { id: "instr", label: "🎸 Instruments" },
-          { id: "reduc", label: "💸 Réductions" },
+          { id: "reduc", label: "💸 Frais/Réductions" },
           { id: "inscrits", label: "📊 Inscrits" },
           { id: "annees", label: "📅 Années scolaires" },
         ].map((t) => (

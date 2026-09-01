@@ -4,6 +4,8 @@ import Footer from "./Footer";
 import "./InscriptionForm.css";
 import { FicheInscriptionModal } from "./FicheInscription";
 
+// Todo : check le code généré, qu'il soit unique, et qu'il ne soit pas déjà utilisé pour une autre inscription, et que ça fonctionne à l'année siuvante
+
 const API = import.meta.env.VITE_API_URL;
 
 function arrondir(val) {

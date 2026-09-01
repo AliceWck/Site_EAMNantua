@@ -1263,7 +1263,7 @@ if (!fs.existsSync(tarifsFilePath)) {
     coursParticuliers: [], 
     pratiquesCollectives: [], 
     instruments: [],
-    cotisationAnnuelle: 25,
+    cotisationAnnuelle: 33,
     reductions: { foyer10pct: 0.10, deuxiemeDiscipline33pct: 0.33, exclureYogaChorale: true }
   }, null, 2));
 }

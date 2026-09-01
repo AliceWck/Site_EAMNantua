@@ -507,7 +507,8 @@ function getActiviteCode(coursId, instrumentId) {
   }
   // Matching sur l'id du cours collectif
   const map = {
-    pc_education_musicale: { num: "12", color: "#666" },
+    pc_education_musicale: { num: "12", color: "#e8272a" },
+    pc_mao: { num: "13", color: "#e8272a" },
     pc_eveil_musical: { num: "14", color: "#e8272a" },
     pc_eveil_hiphop: { num: "15", color: "#1d4ed8" },
     pc_danse_contemporaine: { num: "16", color: "#1d4ed8" },
@@ -515,8 +516,8 @@ function getActiviteCode(coursId, instrumentId) {
     pc_hiphop_breakdance_75: { num: "17", color: "#1d4ed8" },
     pc_chorale: { num: "18", color: "#16a34a" },
     pc_groupe_vocal: { num: "19", color: "#16a34a" },
-    pc_theatre_60: { num: "20", color: "#ea580c" },
-    pc_theatre_90: { num: "20", color: "#ea580c" },
+    pc_theatre_60: { num: "20", color: "#ed9261" },
+    pc_theatre_90: { num: "20", color: "#ed9261" },
     pc_arts_plastiques_60: { num: "21", color: "#7c3aed" },
     pc_arts_plastiques_90: { num: "21", color: "#7c3aed" },
     pc_yoga_enfants: { num: "22", color: "#0891b2" },
@@ -656,7 +657,7 @@ export default function FicheInscription({
 
     setLignes(newLignes);
 
-    const cotisation = tarifsData.cotisationAnnuelle || 25;
+    const cotisation = tarifsData.cotisationAnnuelle || 33;
     const sepaFrais = (modePaiement.type === "mandat_sepa" || modePaiement.type === "cepa") ? 10 : 0;
     const total = newLignes.reduce((s, l) => s + (l.prixFinal || 0) + (l.supplementMateriel || 0), 0) + cotisation + sepaFrais;
     setTotalCalcule(total);
@@ -718,7 +719,7 @@ export default function FicheInscription({
 
   const age = getAge(eleve.dateNaissance);
   const estMajeur = age !== null && age >= 18;
-  const cotisation = tarifsData?.cotisationAnnuelle || 25;
+  const cotisation = tarifsData?.cotisationAnnuelle || 33;
   const paiementType = inscription?.foyer?.paiementType || "annuel";
   const anneeLabel = inscription?.annee || `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`;
 
@@ -872,9 +873,10 @@ export default function FicheInscription({
               { label: "VIOLON", num: "05", color: "#222" },
               { label: "ALTO", num: "06", color: "#222" },
               { label: "CLARINETTE", num: "07", color: "#222" },
-              { label: "FLÛTE", num: "09", color: "#666" },
-              { label: "TROMPETTE", num: "11", color: "#666" },
-              { label: "FM", num: "12", color: "#666" },
+              { label: "CORNET", num: "08", color: "#222" },
+              { label: "FLÛTE", num: "09", color: "#222" },
+              { label: "SAXOPHONE", num: "10", color: "#222" },
+              { label: "TROMPETTE", num: "11", color: "#222" },
               ...(tarifsData.pratiquesCollectives || []).map((pc) => {
                 const c = getActiviteCode(pc.id, null);
                 return { label: pc.label.toUpperCase(), num: c.num, color: c.color };
@@ -996,7 +998,7 @@ export default function FicheInscription({
             <span style={{ fontSize: 11, fontWeight: 700 }}>Préinscription :</span>
             <label style={{ ...S.engItem, marginBottom: 0, fontSize: 11 }}>
               <input type="checkbox" style={S.payCheckbox} />
-              un versement de <strong style={{ margin: "0 4px" }}>80 €</strong> d'arrhes est requis.
+              un versement de <strong style={{ margin: "0 4px" }}>100 €</strong> d'arrhes est requis.
             </label>
           </div>
           <div style={S.payRow}>

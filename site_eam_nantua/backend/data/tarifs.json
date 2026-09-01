@@ -240,7 +240,7 @@
     { "id": "clarinette", "label": "Clarinette", "emoji": "🎷" },
     { "id": "chant",      "label": "Chant",      "emoji": "🎤" }
   ],
-  "cotisationAnnuelle": 25,
+  "cotisationAnnuelle": 33,
   "reductions": {
     "foyer10pct": 0.10,
     "deuxiemeDiscipline33pct": 0.33,
