@@ -714,7 +714,7 @@ export default function InscriptionForm() {
                     <input value={eleveCourant.tel2} onChange={(e) => updateEleve(eleveActif, "tel2", e.target.value)} />
                   </div>
                   <div className="field field-full">
-                    <label>Email *</label>
+                    <label>Email</label>
                     <input type="email" value={eleveCourant.email} onChange={(e) => updateEleve(eleveActif, "email", e.target.value)} placeholder="marie.dupont@email.fr" />
                   </div>
 
@@ -846,7 +846,7 @@ export default function InscriptionForm() {
                     disabled={eleves.some((e) => {
                       const age = getAge(e.dateNaissance);
                       const mineurSansRepr = age !== null && age < 18 && (!e.representantNom || !e.representantPrenom || !e.parenté);
-                      return !e.nom || !e.prenom || !e.dateNaissance || !e.email || !e.telPerso || mineurSansRepr;
+                      return !e.nom || !e.prenom || !e.dateNaissance || !e.telPerso || mineurSansRepr;
                     })}>
                     Récapitulatif →
                   </button>
