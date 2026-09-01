@@ -916,10 +916,10 @@ export default function InscriptionForm() {
               </p>
               <div style={{display:"flex", gap:"0.75rem", flexWrap:"wrap", marginBottom:"1rem"}}>
                 {[
-                  { id: "cheque", label: "🏦 Chèque(s)", info: "À l'ordre de l'EAM Haut-Bugey. Max 8 versements (1/mois), soldé avant fin avril." },
+                  { id: "cheque", label: "🏦 Chèque(s)", info: "À l'ordre de l'EAM Haut-Bugey. Max 10 versements (1/mois), soldé avant fin avril." },
                   { id: "especes", label: "💶 Espèces", info: "Paiement intégral au bureau. Pas de versements." },
                   { id: "virement", label: "💳 Virement", info: "Paiement intégral. RIB fourni sur demande." },
-                  { id: "mandat_sepa", label: "📋 Mandat SEPA", info: "Prélèvement automatique. +10€ de frais annuels. Max 8 versements." },
+                  { id: "mandat_sepa", label: "📋 Mandat SEPA", info: "Prélèvement automatique. +10€ de frais annuels. Max 10 versements." },
                 ].map((m) => (
                   <button key={m.id}
                     className={`paiement-btn ${modePaiement.type === m.id ? "active" : ""}`}
@@ -936,7 +936,7 @@ export default function InscriptionForm() {
                     className="ia-select"
                     value={modePaiement.nbFois}
                     onChange={(e) => setModePaiement({ ...modePaiement, nbFois: Number(e.target.value) })}>
-                    {Array.from({length:8},(_,i)=>i+1).map(n => (
+                    {Array.from({length:10},(_,i)=>i+1).map(n => (
                       <option key={n} value={n}>{n} fois{n===1?" (paiement unique)":""}</option>
                     ))}
                   </select>

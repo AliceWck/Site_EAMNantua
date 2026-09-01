@@ -505,6 +505,7 @@ function getActiviteCode(coursId, instrumentId) {
     const key = instrumentId.toLowerCase();
     return ACTIVITE_CODES[key] || { num: "—", color: "#555" };
   }
+  // Todo : check pourquoi pas dans le bon ordre à l'affichage sur la fiche
   // Matching sur l'id du cours collectif
   const map = {
     pc_education_musicale: { num: "12", color: "#e8272a" },
@@ -993,7 +994,7 @@ export default function FicheInscription({
 
         {/* ── Paiement */}
         <div style={S.paySection}>
-          <div style={S.payTitle}>Paiement</div>
+          <div style={S.payTitle}>Paiements (à compléter)</div>
           <div style={{ ...S.payRow, marginTop: 6 }}>
             <span style={{ fontSize: 11, fontWeight: 700 }}>Préinscription :</span>
             <label style={{ ...S.engItem, marginBottom: 0, fontSize: 11 }}>
@@ -1018,7 +1019,7 @@ export default function FicheInscription({
 
           {/* Grille des versements */}
           <div style={S.payGrid}>
-            {Array.from({ length: 9 }, (_, i) => (
+            {Array.from({ length: 10 }, (_, i) => (
               <div key={i} style={S.payGridItem}>
                 <span style={{ color: "#e8272a", fontWeight: 700, minWidth: 14 }}>{i + 1}.</span>
                 <input style={{ ...S.payInput, width: 55 }} placeholder="Montant €" />
@@ -1038,7 +1039,7 @@ export default function FicheInscription({
                 { id: "cheque", label: "🏦 Chèque(s) à l'ordre de EAMHB" },
                 { id: "especes", label: "💶 Espèces" },
                 { id: "virement", label: "💳 Virement" },
-              { id: "cepa", label: "📄 CEPA" },
+              { id: "cepa", label: "📄 SEPA" },
               ].map((m) => (
                 <label key={m.id} style={{ display: "flex", alignItems: "center", gap: 4, cursor: "pointer", fontSize: 11 }}>
                   <input
@@ -1058,7 +1059,7 @@ export default function FicheInscription({
             )}
             {modePaiement.type === "cepa" && (
               <div style={{ fontSize: 10, color: "#075985", marginTop: 4, background: "#e0f2fe", padding: "3px 8px", borderRadius: 3 }}>
-                CEPA sélectionné. Merci de présenter le dossier au bureau pour validation.
+                SEPA sélectionné. Merci de présenter le dossier au bureau pour validation.
               </div>
             )}
           </div>
