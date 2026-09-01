@@ -984,21 +984,6 @@ export default function InscriptionForm() {
               {/* 1. Le Header avec Titre + Bouton Bascule */}
               <div className="engagements-header">
                 <h3>Déclarations et engagements</h3>
-                {(() => {
-                  const tousCoches = Object.entries(engagements)
-                    .filter(([key]) => key !== "droitImage")
-                    .every(([_, v]) => v === true);
-
-                  return (
-                    <button 
-                      type="button" 
-                      className={`inscr-btn-tout-cocher ${tousCoches ? 'active' : ''}`}
-                      onClick={basculerTout}
-                    >
-                      {tousCoches ? "❌ Tout décocher" : "✅ Tout cocher"}
-                    </button>
-                  );
-                })()}
               </div>
 
               {/* 2. Le Droit à l'image (Exclu du "Tout cocher") */}
@@ -1009,6 +994,23 @@ export default function InscriptionForm() {
                   <button className={engagements.droitImage === "non" ? "active" : ""} onClick={() => setEngagements({ ...engagements, droitImage: "non" })}>✗ Non</button>
                 </div>
               </div>
+
+              {/* 3. Bouton "Tout cocher/Tout décocher" */}
+              {(() => {
+                const tousCoches = Object.entries(engagements)
+                  .filter(([key]) => key !== "droitImage")
+                  .every(([_, v]) => v === true);
+
+                return (
+                  <button 
+                    type="button" 
+                    className={`inscr-btn-tout-cocher ${tousCoches ? 'active' : ''}`}
+                    onClick={basculerTout}
+                  >
+                    {tousCoches ? "❌ Tout décocher" : "✅ Tout cocher"}
+                  </button>
+                );
+              })()}
 
               {[
                 { key: "whatsapp", label: "J'autorise l'école à intégrer mon numéro dans un groupe WhatsApp dédié à la communication." },

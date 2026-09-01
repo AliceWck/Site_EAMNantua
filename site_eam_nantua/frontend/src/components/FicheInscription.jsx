@@ -994,7 +994,7 @@ export default function FicheInscription({
 
         {/* ── Paiement */}
         <div style={S.paySection}>
-          <div style={S.payTitle}>Paiements (à compléter)</div>
+          <div style={S.payTitle}>Paiements (lignes à compléter)</div>
           <div style={{ ...S.payRow, marginTop: 6 }}>
             <span style={{ fontSize: 11, fontWeight: 700 }}>Préinscription :</span>
             <label style={{ ...S.engItem, marginBottom: 0, fontSize: 11 }}>
@@ -1031,6 +1031,7 @@ export default function FicheInscription({
             ))}
           </div>
 
+          {/* Todo : appliquer la même logique à tous les modes, càd permettre de payer en plusieurs fois pour tous les modes de paiement, pas seulement le virement ou le SEPA. Pour l'instant, on ne gère que le virement et le SEPA. */}
           {/* Mode de paiement */}
           <div style={{ ...S.payRow, marginTop: 8, background: "#f5f5f5", padding: "6px 8px", flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
             <span style={{ fontSize: 11, fontWeight: 700 }}>Mode de règlement :</span>
