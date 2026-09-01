@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import "./InscriptionAdmin.css";
 import { FicheInscriptionModal } from "./FicheInscription";
 
+// ATTENTION variable yogaChorale correspond au str "∅réduc33%"
+
 const API = import.meta.env.VITE_API_URL;
 
 // Tags canoniques — synchronisés avec InscriptionForm.jsx
@@ -218,7 +220,7 @@ export default function InscriptionAdmin() {
               <div className="ia-card-header">
                 <strong>{pc.label}</strong>
                 <span className="ia-tag blue">{pc.duree} min</span>
-                {pc.yogaChorale && <span className="ia-tag pink">Yoga/Chorale</span>}
+                {pc.yogaChorale && <span className="ia-tag pink">∅Réduc33%</span>}
                 <div className="ia-card-actions">
                   <button className="ia-btn-sm" onClick={() => setEditingItem(editingItem === `pc-${idx}` ? null : `pc-${idx}`)}>
                     {editingItem === `pc-${idx}` ? "▲ Fermer" : "✏️ Modifier"}
@@ -406,7 +408,7 @@ function NouveauPC({ onAdd, onCancel }) {
         <F label="Mineur annuel (€)" type="number" value={f.tarifs.mineur.annuel} onChange={(v) => setF({ ...f, tarifs: { ...f.tarifs, mineur: { ...f.tarifs.mineur, annuel: Number(v) } } })} />
         <F label="Supplément matériel/an (€)" type="number" value={f.supplementMateriel} onChange={(v) => setF({ ...f, supplementMateriel: Number(v) })} />
       </div>
-      <div className="ia-checkboxes"><C label="Yoga/Chorale (pas de réduction multi-activités)" checked={f.yogaChorale} onChange={(v) => setF({ ...f, yogaChorale: v })} /></div>
+      <div className="ia-checkboxes"><C label="∅réduc33% (pas de réduction multi-activités)" checked={f.yogaChorale} onChange={(v) => setF({ ...f, yogaChorale: v })} /></div>
       <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
         <button className="ia-btn-save" onClick={() => { if (!f.label) return alert("Label requis"); onAdd(f); }}>✓ Ajouter</button>
         <button className="ia-btn-cancel" onClick={onCancel}>Annuler</button>
