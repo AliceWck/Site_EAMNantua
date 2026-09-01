@@ -314,7 +314,7 @@ export default function InscriptionAdmin() {
           
           {/* ─── CATÉGORIE FRAIS ─── */}
           <div style={{ marginBottom: "2rem" }}>
-            <h4 style={{ color: "#e8272a", marginBottom: "1rem" }}>💳 Frais</h4>
+            <h4 style={{ color: "#1b86e9", marginBottom: "1rem" }}>💳 Frais</h4>
             <div className="ia-grid">
               <F label="Cotisation annuelle par élève (€)" type="number" value={tarifs.cotisationAnnuelle} onChange={(v) => setTarifs({ ...tarifs, cotisationAnnuelle: Number(v) })} />
               <F label="Montant des arrhes à la signature (€)" type="number" value={tarifs.frais?.montantArrhes || 100} onChange={(v) => setTarifs({ ...tarifs, frais: { ...tarifs.frais, montantArrhes: Number(v) } })} />

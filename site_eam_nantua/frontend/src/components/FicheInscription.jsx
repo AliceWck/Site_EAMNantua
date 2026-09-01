@@ -974,10 +974,10 @@ export default function FicheInscription({
                   Frais de mandat SEPA
                 </td>
                 <td style={{ ...S.actTd, textAlign: "right", fontStyle: "italic", fontSize: 11 }}>
-                  10 €
+                  {tarifsData?.frais?.fraisSEPA || 10} €
                 </td>
                 <td style={S.actTd}>—</td>
-                <td style={{ ...S.tarifTotal, color: "#1d4ed8" }}>10 €</td>
+                <td style={{ ...S.tarifTotal, color: "#1d4ed8" }}>{tarifsData?.frais?.fraisSEPA || 10} €</td>
               </tr>
             )}
           </tbody>
