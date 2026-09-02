@@ -401,7 +401,11 @@ function NouveauCP({ onAdd, onCancel }) {
         <F label="Majeur trim (€)" type="number" value={f.tarifs.majeur.trimestre} onChange={(v) => setF({ ...f, tarifs: { ...f.tarifs, majeur: { ...f.tarifs.majeur, trimestre: Number(v) } } })} />
         <F label="Majeur annuel (€)" type="number" value={f.tarifs.majeur.annuel} onChange={(v) => setF({ ...f, tarifs: { ...f.tarifs, majeur: { ...f.tarifs.majeur, annuel: Number(v) } } })} />
       </div>
-      <div className="ia-checkboxes"><C label="DUO" checked={f.duo} onChange={(v) => setF({ ...f, duo: v })} /><C label="+FM/Orchestre" checked={f.inclusFM} onChange={(v) => setF({ ...f, inclusFM: v })} /><C label="Exclure de la réduction foyer" checked={f.exclureFoyer10pct} onChange={(v) => setF({ ...f, exclureFoyer10pct: v })} /></div>
+      <div className="ia-checkboxes">
+        <C label="DUO" checked={f.duo} onChange={(v) => setF({ ...f, duo: v })} />
+        <C label="+FM/Orchestre" checked={f.inclusFM} onChange={(v) => setF({ ...f, inclusFM: v })} />
+        <C label="∅réduc10% (exclure de la réduction foyer)" checked={f.exclureFoyer10pct} onChange={(v) => setF({ ...f, exclureFoyer10pct: v })} />
+      </div>
       <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
         <button className="ia-btn-save" onClick={() => { if (!f.label) return alert("Label requis"); onAdd(f); }}>✓ Ajouter</button>
         <button className="ia-btn-cancel" onClick={onCancel}>Annuler</button>
@@ -426,7 +430,10 @@ function NouveauPC({ onAdd, onCancel }) {
         <F label="Mineur annuel (€)" type="number" value={f.tarifs.mineur.annuel} onChange={(v) => setF({ ...f, tarifs: { ...f.tarifs, mineur: { ...f.tarifs.mineur, annuel: Number(v) } } })} />
         <F label="Supplément matériel/an (€)" type="number" value={f.supplementMateriel} onChange={(v) => setF({ ...f, supplementMateriel: Number(v) })} />
       </div>
-      <div className="ia-checkboxes"><C label="∅réduc33% (pas de réduction multi-activités)" checked={f.yogaChorale} onChange={(v) => setF({ ...f, yogaChorale: v })} /><C label="Exclure de la réduction foyer" checked={f.exclureFoyer10pct} onChange={(v) => setF({ ...f, exclureFoyer10pct: v })} /></div>
+      <div className="ia-checkboxes">
+        <C label="∅réduc33% (pas de réduction multi-activités)" checked={f.yogaChorale} onChange={(v) => setF({ ...f, yogaChorale: v })} />
+        <C label="∅réduc10% (exclure de la réduction foyer" checked={f.exclureFoyer10pct} onChange={(v) => setF({ ...f, exclureFoyer10pct: v })} />
+      </div>
       <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
         <button className="ia-btn-save" onClick={() => { if (!f.label) return alert("Label requis"); onAdd(f); }}>✓ Ajouter</button>
         <button className="ia-btn-cancel" onClick={onCancel}>Annuler</button>
