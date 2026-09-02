@@ -62,7 +62,10 @@ export default function InscriptionAdmin() {
   useEffect(() => {
     fetch(`${API}/api/tarifs`)
       .then((r) => r.json())
-      .then(setTarifs)
+      .then((data) => setTarifs({
+        ...data,
+        groupesActivites: data.groupesActivites || { individuelles: [], collectives: [] },
+      }))
       .catch(() => setMessage("❌ Erreur chargement tarifs"));
   }, []);
 
@@ -131,6 +134,7 @@ export default function InscriptionAdmin() {
           { id: "cp", label: "🎵 Cours particuliers" },
           { id: "pc", label: "🎭 Pratiques collectives" },
           { id: "instr", label: "🎸 Instruments" },
+          { id: "groupes", label: "🗂️ Groupes d'activités" },
           { id: "reduc", label: "💸 Frais/Réductions" },
           { id: "inscrits", label: "📊 Inscrits" },
           { id: "annees", label: "📅 Années scolaires" },
@@ -153,7 +157,7 @@ export default function InscriptionAdmin() {
             </button>
           </div>
           {showNewForm === "cp" && (
-            <NouveauCP onAdd={(n) => { save({ ...tarifs, coursParticuliers: [...tarifs.coursParticuliers, n] }); setShowNewForm(false); }} onCancel={() => setShowNewForm(false)} />
+            <NouveauCP groupes={tarifs.groupesActivites?.individuelles} onAdd={(n) => { save({ ...tarifs, coursParticuliers: [...tarifs.coursParticuliers, n] }); setShowNewForm(false); }} onCancel={() => setShowNewForm(false)} />
           )}
           {tarifs.coursParticuliers.map((cp, idx) => (
             <div key={cp.id} className="ia-card">
@@ -189,6 +193,7 @@ export default function InscriptionAdmin() {
                     <div className="ia-grid-full ia-subheading">🟢 Majeur (+18 ans)</div>
                     <F label="Tarif majeur — trimestre (€)" type="number" value={cp.tarifs?.majeur?.trimestre ?? ""} onChange={(v) => updateCP(idx, "tarifs.majeur.trimestre", v)} />
                     <F label="Tarif majeur — annuel (€)" type="number" value={cp.tarifs?.majeur?.annuel ?? ""} onChange={(v) => updateCP(idx, "tarifs.majeur.annuel", v)} />
+                    <GroupeSelect label="Groupe" type="individuelles" value={cp.groupId} groupes={tarifs.groupesActivites?.individuelles} onChange={(v) => updateCP(idx, "groupId", v)} />
                   </div>
                   <div className="ia-checkboxes">
                     <C label="Cours en DUO" checked={!!cp.duo} onChange={(v) => updateCP(idx, "duo", v)} />
@@ -215,7 +220,7 @@ export default function InscriptionAdmin() {
             </button>
           </div>
           {showNewForm === "pc" && (
-            <NouveauPC onAdd={(n) => { save({ ...tarifs, pratiquesCollectives: [...tarifs.pratiquesCollectives, n] }); setShowNewForm(false); }} onCancel={() => setShowNewForm(false)} />
+            <NouveauPC groupes={tarifs.groupesActivites?.collectives} onAdd={(n) => { save({ ...tarifs, pratiquesCollectives: [...tarifs.pratiquesCollectives, n] }); setShowNewForm(false); }} onCancel={() => setShowNewForm(false)} />
           )}
           {tarifs.pratiquesCollectives.map((pc, idx) => (
             <div key={pc.id} className="ia-card">
@@ -257,6 +262,7 @@ export default function InscriptionAdmin() {
                     <F label="Tarif majeur — annuel (€)" type="number" value={pc.tarifs?.majeur?.annuel ?? ""} onChange={(v) => updatePC(idx, "tarifs.majeur.annuel", v)} />
                     <div className="ia-grid-full ia-subheading">⚙️ Options</div>
                     <F label="Supplément matériel / an (€, 0 = aucun)" type="number" value={pc.supplementMateriel ?? 0} onChange={(v) => updatePC(idx, "supplementMateriel", v)} />
+                    <GroupeSelect label="Groupe" type="collectives" value={pc.groupId} groupes={tarifs.groupesActivites?.collectives} onChange={(v) => updatePC(idx, "groupId", v)} />
                   </div>
                   <div className="ia-checkboxes">
                     <C label="Exclure de la réduction multi-activités" checked={!!pc.yogaChorale} onChange={(v) => updatePC(idx, "yogaChorale", v)} />
@@ -311,6 +317,10 @@ export default function InscriptionAdmin() {
         </div>
       )}
 
+      {activeSection === "groupes" && (
+        <GroupesActivitesEditor tarifs={tarifs} onSave={save} />
+      )}
+
       {/* ── Réductions ── */}
       {activeSection === "reduc" && (
         <div className="ia-section">
@@ -353,6 +363,71 @@ export default function InscriptionAdmin() {
   );
 }
 
+function GroupeSelect({ label, type, value, groupes = [], onChange }) {
+  return (
+    <div className="ia-field">
+      <label>{label}</label>
+      <select value={value || ""} onChange={(e) => onChange(e.target.value)}>
+        <option value="">Aucun</option>
+        {groupes.map((g) => <option key={g.id} value={g.id}>{g.label}</option>)}
+      </select>
+    </div>
+  );
+}
+
+function GroupesActivitesEditor({ tarifs, onSave }) {
+  const [type, setType] = useState("individuelles");
+  const [label, setLabel] = useState("");
+  const [color, setColor] = useState("#9ca3af");
+  const groupes = tarifs.groupesActivites?.[type] || [];
+
+  const updateGroupes = (next) => onSave({
+    ...tarifs,
+    groupesActivites: {
+      ...tarifs.groupesActivites,
+      [type]: next,
+    },
+  });
+
+  const ajouter = () => {
+    if (!label.trim()) return;
+    updateGroupes([...groupes, { id: `groupe_${Date.now()}`, label: label.trim(), color }]);
+    setLabel("");
+    setColor("#9ca3af");
+  };
+
+  return (
+    <div className="ia-section">
+      <h3>Groupes d'activités</h3>
+      <p className="ia-hint">Créez des sous-groupes pour organiser les activités dans la fiche d'inscription.</p>
+      <div className="ia-tabs">
+        <button className={`ia-tab ${type === "individuelles" ? "active" : ""}`} onClick={() => setType("individuelles")}>🎵 Activités individuelles</button>
+        <button className={`ia-tab ${type === "collectives" ? "active" : ""}`} onClick={() => setType("collectives")}>🎭 Activités collectives</button>
+      </div>
+      <div className="ia-card">
+        <h4>Créer un groupe</h4>
+        <div className="ia-grid">
+          <F label="Nom du groupe" value={label} onChange={setLabel} />
+          <div className="ia-field">
+            <label>Couleur</label>
+            <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
+          </div>
+        </div>
+        <button className="ia-btn-save" onClick={ajouter}>➕ Ajouter le groupe</button>
+      </div>
+      {groupes.map((groupe) => (
+        <div className="ia-card groupe-admin-row" key={groupe.id}>
+          <span className="groupe-color-dot" style={{ background: groupe.color || "#9ca3af" }} />
+          <F label="Nom" value={groupe.label} onChange={(value) => updateGroupes(groupes.map((g) => g.id === groupe.id ? { ...g, label: value } : g))} />
+          <input type="color" value={groupe.color || "#9ca3af"} onChange={(e) => updateGroupes(groupes.map((g) => g.id === groupe.id ? { ...g, color: e.target.value } : g))} />
+          <button className="ia-btn-sm danger" onClick={() => updateGroupes(groupes.filter((g) => g.id !== groupe.id))}>🗑️</button>
+        </div>
+      ))}
+      {groupes.length === 0 && <p className="ia-hint">Aucun groupe créé. Les activités resteront dans « Aucun ».</p>}
+    </div>
+  );
+}
+
 // ── Tiny helpers ──────────────────────────────────────────────────────────────
 function F({ label, value, onChange, type = "text" }) {
   return (
@@ -387,7 +462,7 @@ function GroupesEditor({ groupes, onChange }) {
 }
 
 // ── Nouveau CP ──
-function NouveauCP({ onAdd, onCancel }) {
+function NouveauCP({ groupes, onAdd, onCancel }) {
   const [f, setF] = useState({ id: `cp_${Date.now()}`, label: "", ageMin: 12, ageMax: null, duo: false, inclusFM: false, noteParEleve: false, exclureFoyer10pct: false, instruments: [], tarifs: { mineur: { trimestre: 0, annuel: 0 }, majeur: { trimestre: 0, annuel: 0 } } });
   return (
     <div className="ia-card ia-new-card">
@@ -402,6 +477,7 @@ function NouveauCP({ onAdd, onCancel }) {
         <F label="Mineur annuel (€)" type="number" value={f.tarifs.mineur.annuel} onChange={(v) => setF({ ...f, tarifs: { ...f.tarifs, mineur: { ...f.tarifs.mineur, annuel: Number(v) } } })} />
         <F label="Majeur trim (€)" type="number" value={f.tarifs.majeur.trimestre} onChange={(v) => setF({ ...f, tarifs: { ...f.tarifs, majeur: { ...f.tarifs.majeur, trimestre: Number(v) } } })} />
         <F label="Majeur annuel (€)" type="number" value={f.tarifs.majeur.annuel} onChange={(v) => setF({ ...f, tarifs: { ...f.tarifs, majeur: { ...f.tarifs.majeur, annuel: Number(v) } } })} />
+        <GroupeSelect label="Groupe" type="individuelles" value={f.groupId} groupes={groupes} onChange={(v) => setF({ ...f, groupId: v })} />
       </div>
       <div className="ia-checkboxes">
         <C label="DUO" checked={f.duo} onChange={(v) => setF({ ...f, duo: v })} />
@@ -417,7 +493,7 @@ function NouveauCP({ onAdd, onCancel }) {
 }
 
 // ── Nouveau PC ──
-function NouveauPC({ onAdd, onCancel }) {
+function NouveauPC({ groupes, onAdd, onCancel }) {
   const [f, setF] = useState({ id: `pc_${Date.now()}`, label: "", duree: 60, ageMin: 0, ageMax: null, reducDisponible: true, yogaChorale: false, exclureFoyer10pct: false, supplementMateriel: 0, groupes: [], tarifs: { mineur: { trimestre: 0, annuel: 0 }, majeur: null } });
   return (
     <div className="ia-card ia-new-card">
@@ -431,6 +507,7 @@ function NouveauPC({ onAdd, onCancel }) {
         <F label="Mineur trim (€)" type="number" value={f.tarifs.mineur.trimestre} onChange={(v) => setF({ ...f, tarifs: { ...f.tarifs, mineur: { ...f.tarifs.mineur, trimestre: Number(v) } } })} />
         <F label="Mineur annuel (€)" type="number" value={f.tarifs.mineur.annuel} onChange={(v) => setF({ ...f, tarifs: { ...f.tarifs, mineur: { ...f.tarifs.mineur, annuel: Number(v) } } })} />
         <F label="Supplément matériel/an (€)" type="number" value={f.supplementMateriel} onChange={(v) => setF({ ...f, supplementMateriel: Number(v) })} />
+        <GroupeSelect label="Groupe" type="collectives" value={f.groupId} groupes={groupes} onChange={(v) => setF({ ...f, groupId: v })} />
       </div>
       <div className="ia-checkboxes">
         <C label="∅RéducMultiActivite" checked={f.yogaChorale} onChange={(v) => setF({ ...f, yogaChorale: v })} />

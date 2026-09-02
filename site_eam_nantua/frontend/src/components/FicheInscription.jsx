@@ -476,57 +476,21 @@ const S = {
 };
 
 // ─── Activités catalogue ─────────────────────────────────────────────────────
-// Numéros de référence tels que sur la fiche originale
-const ACTIVITE_CODES = {
-  batterie: { num: "01", color: "#222" },
-  chant: { num: "02", color: "#222" },
-  guitare: { num: "03", color: "#222" },
-  piano: { num: "04", color: "#222" },
-  violon: { num: "05", color: "#222" },
-  alto: { num: "06", color: "#222" },
-  clarinette: { num: "07", color: "#222" },
-  cornet: { num: "08", color: "#666" },
-  flute: { num: "09", color: "#666" },
-  saxophone: { num: "10", color: "#666" },
-  trompette: { num: "11", color: "#666" },
-  fm: { num: "12", color: "#666" },
-  mao: { num: "13", color: "#666" },
-  eveil_musical: { num: "14", color: "#e8272a" },
-  eveil_danse: { num: "15", color: "#1d4ed8" },
-  danse_contemporaine: { num: "16", color: "#1d4ed8" },
-  hiphop: { num: "17", color: "#1d4ed8" },
-  chorale: { num: "18", color: "#16a34a" },
-  groupe_vocal: { num: "19", color: "#16a34a" },
-  theatre: { num: "20", color: "#ea580c" },
-  arts_plastiques: { num: "21", color: "#7c3aed" },
-  yoga: { num: "22", color: "#0891b2" },
-};
+const GROUPE_SANS_NOM = { label: "Aucun", color: "#9ca3af" };
 
-function getActiviteCode(coursId, instrumentId) {
-  if (instrumentId) {
-    const key = instrumentId.toLowerCase();
-    return ACTIVITE_CODES[key] || { num: "—", color: "#555" };
-  }
-  // Todo : check pourquoi pas dans le bon ordre à l'affichage sur la fiche
-  // Matching sur l'id du cours collectif
-  const map = {
-    pc_education_musicale: { num: "12", color: "#e8272a" },
-    pc_mao: { num: "13", color: "#e8272a" },
-    pc_eveil_musical: { num: "14", color: "#e8272a" },
-    pc_eveil_hiphop: { num: "15", color: "#1d4ed8" },
-    pc_danse_contemporaine: { num: "16", color: "#1d4ed8" },
-    pc_hiphop_breakdance_60: { num: "17", color: "#1d4ed8" },
-    pc_hiphop_breakdance_75: { num: "17", color: "#1d4ed8" },
-    pc_chorale: { num: "18", color: "#16a34a" },
-    pc_groupe_vocal: { num: "19", color: "#16a34a" },
-    pc_theatre_60: { num: "20", color: "#ed9261" },
-    pc_theatre_90: { num: "20", color: "#ed9261" },
-    pc_arts_plastiques_60: { num: "21", color: "#7c3aed" },
-    pc_arts_plastiques_90: { num: "21", color: "#7c3aed" },
-    pc_yoga_enfants: { num: "22", color: "#0891b2" },
-    pc_yoga_adultes: { num: "22", color: "#0891b2" },
-  };
-  return map[coursId] || { num: "—", color: "#555" };
+function getGroupe(tarifsData, type, groupId) {
+  return tarifsData?.groupesActivites?.[type]?.find((g) => g.id === groupId) || GROUPE_SANS_NOM;
+}
+
+function getActiviteCode(tarifsData, coursData, instrumentId) {
+  const instruments = tarifsData?.instruments || [];
+  const collectives = tarifsData?.pratiquesCollectives || [];
+  const position = instrumentId
+    ? instruments.findIndex((instrument) => instrument.id === instrumentId) + 1
+    : instruments.length + collectives.findIndex((cours) => cours.id === coursData?.id) + 1;
+  const type = instrumentId ? "individuelles" : "collectives";
+  const groupe = getGroupe(tarifsData, type, coursData?.groupId);
+  return { num: position > 0 ? String(position).padStart(2, "0") : "—", color: groupe.color, groupLabel: groupe.label };
 }
 
 // ─── Composant champ éditable ────────────────────────────────────────────────
@@ -644,12 +608,13 @@ export default function FicheInscription({
         ? tarifsData.instruments.find((i) => i.id === c.instrumentId)
         : null;
 
-      const actCode = getActiviteCode(coursData.id, c.instrumentId);
+      const actCode = getActiviteCode(tarifsData, coursData, c.instrumentId);
 
       return {
         id: c.id || c.coursData?.id,
         num: actCode.num,
         color: actCode.color,
+        groupLabel: actCode.groupLabel,
         label: instr ? `${instr.emoji} ${instr.label} — ${coursData.label}` : coursData.label,
         prixBase,
         prixFinal,
@@ -871,32 +836,29 @@ export default function FicheInscription({
         {tarifsData && (
           <div style={{ display: "flex", flexWrap: "wrap", gap: 3, marginBottom: 6 }}>
             {[
-              { label: "BATTERIE", num: "01", color: "#222" },
-              { label: "CHANT", num: "02", color: "#222" },
-              { label: "GUITARE", num: "03", color: "#222" },
-              { label: "PIANO", num: "04", color: "#222" },
-              { label: "VIOLON", num: "05", color: "#222" },
-              { label: "ALTO", num: "06", color: "#222" },
-              { label: "CLARINETTE", num: "07", color: "#222" },
-              { label: "CORNET", num: "08", color: "#222" },
-              { label: "FLÛTE", num: "09", color: "#222" },
-              { label: "SAXOPHONE", num: "10", color: "#222" },
-              { label: "TROMPETTE", num: "11", color: "#222" },
+              ...(tarifsData.instruments || []).map((instrument, i) => {
+                const c = getActiviteCode(tarifsData, null, instrument.id);
+                const groupe = getGroupe(tarifsData, "individuelles", tarifsData.coursParticuliers?.find((cours) => cours.instruments?.includes(instrument.id))?.groupId);
+                return { label: instrument.label.toUpperCase(), num: c.num, color: c.color, groupLabel: groupe.label };
+              }),
               ...(tarifsData.pratiquesCollectives || []).map((pc) => {
-                const c = getActiviteCode(pc.id, null);
-                return { label: pc.label.toUpperCase(), num: c.num, color: c.color };
-              }).filter((x, i, arr) => arr.findIndex((a) => a.num === x.num) === i),
+                const c = getActiviteCode(tarifsData, pc, null);
+                return { label: pc.label.toUpperCase(), num: c.num, color: c.color, groupLabel: c.groupLabel };
+              }),
             ].map((act, i) => (
               <span key={i} style={{
                 display: "inline-flex", alignItems: "center", gap: 3,
                 fontSize: 10, whiteSpace: "nowrap",
                 marginRight: 6, marginBottom: 2,
+                borderLeft: `3px solid ${act.color}`,
+                paddingLeft: 3,
               }}>
                 <span style={{
                   background: act.color, color: "#fff",
                   padding: "1px 5px", fontWeight: 700, fontSize: 10, borderRadius: 2,
                 }}>{act.num}</span>
                 {act.label}
+                {act.groupLabel !== "Aucun" && <span style={{ color: act.color, fontSize: 9, fontStyle: "italic", marginLeft: 3 }}>({act.groupLabel})</span>}
               </span>
             ))}
           </div>
@@ -929,7 +891,10 @@ export default function FicheInscription({
                     padding: "1px 6px", fontWeight: 700, fontSize: 11, borderRadius: 2,
                   }}>{ligne.num}</span>
                 </td>
-                <td style={S.actTd}>{ligne.label}</td>
+                <td style={{ ...S.actTd, borderLeft: `3px solid ${ligne.color}` }}>
+                  {ligne.label}
+                  {ligne.groupLabel !== "Aucun" && <span style={{ color: ligne.color, fontSize: 9, fontStyle: "italic", marginLeft: 5 }}>({ligne.groupLabel})</span>}
+                </td>
                 <td style={{ ...S.actTd, textAlign: "right" }}>
                   <input
                     style={S.tarifInput}
