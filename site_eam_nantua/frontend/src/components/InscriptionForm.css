@@ -76,13 +76,13 @@
 }
 
 .tarifs-step .recap-table {
-  min-width: 900px;
-  white-space: nowrap;
+  table-layout: fixed;
 }
 
-.tarifs-step > div[style*="overflowX"] {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+.tarifs-step .recap-table th,
+.tarifs-step .recap-table td {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 /* Animate in */

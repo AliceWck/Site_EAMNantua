@@ -259,7 +259,7 @@ export default function InscriptionAdmin() {
                     <F label="Supplément matériel / an (€, 0 = aucun)" type="number" value={pc.supplementMateriel ?? 0} onChange={(v) => updatePC(idx, "supplementMateriel", v)} />
                   </div>
                   <div className="ia-checkboxes">
-                    <C label="∅RéducMultiActivite" checked={!!pc.yogaChorale} onChange={(v) => updatePC(idx, "yogaChorale", v)} />
+                    <C label="Exclure de la réduction multi-activités" checked={!!pc.yogaChorale} onChange={(v) => updatePC(idx, "yogaChorale", v)} />
                     <C label="Réduction 33% multi-activités applicable" checked={!!pc.reducDisponible} onChange={(v) => updatePC(idx, "reducDisponible", v)} />
                     <C label="Exclure de la réduction foyer" checked={!!pc.exclureFoyer10pct} onChange={(v) => updatePC(idx, "exclureFoyer10pct", v)} />
                   </div>
