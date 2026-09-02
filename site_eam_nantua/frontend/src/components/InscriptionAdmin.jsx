@@ -193,6 +193,7 @@ export default function InscriptionAdmin() {
                     <C label="Cours en DUO" checked={!!cp.duo} onChange={(v) => updateCP(idx, "duo", v)} />
                     <C label="Inclut FM / Orchestre" checked={!!cp.inclusFM} onChange={(v) => updateCP(idx, "inclusFM", v)} />
                     <C label='Afficher "par élève"' checked={!!cp.noteParEleve} onChange={(v) => updateCP(idx, "noteParEleve", v)} />
+                    <C label="Exclure de la réduction foyer" checked={!!cp.exclureFoyer10pct} onChange={(v) => updateCP(idx, "exclureFoyer10pct", v)} />
                   </div>
                   <TagSelector tags={cp.tags || []} onChange={(newTags) => updateCP(idx, "tags", newTags)} />
                   <button className="ia-btn-save" onClick={() => { save(tarifs); setEditingItem(null); }}>💾 Enregistrer</button>
@@ -258,6 +259,7 @@ export default function InscriptionAdmin() {
                   <div className="ia-checkboxes">
                     <C label="Exclu des réductions multi-activités (Yoga / Chorale)" checked={!!pc.yogaChorale} onChange={(v) => updatePC(idx, "yogaChorale", v)} />
                     <C label="Réduction 33% multi-activités applicable" checked={!!pc.reducDisponible} onChange={(v) => updatePC(idx, "reducDisponible", v)} />
+                    <C label="Exclure de la réduction foyer" checked={!!pc.exclureFoyer10pct} onChange={(v) => updatePC(idx, "exclureFoyer10pct", v)} />
                   </div>
                   <TagSelector tags={pc.tags || []} onChange={(newTags) => updatePC(idx, "tags", newTags)} />
                   <div className="ia-groups-section">
@@ -384,7 +386,7 @@ function GroupesEditor({ groupes, onChange }) {
 
 // ── Nouveau CP ──
 function NouveauCP({ onAdd, onCancel }) {
-  const [f, setF] = useState({ id: `cp_${Date.now()}`, label: "", ageMin: 12, ageMax: null, duo: false, inclusFM: false, noteParEleve: false, instruments: [], tarifs: { mineur: { trimestre: 0, annuel: 0 }, majeur: { trimestre: 0, annuel: 0 } } });
+  const [f, setF] = useState({ id: `cp_${Date.now()}`, label: "", ageMin: 12, ageMax: null, duo: false, inclusFM: false, noteParEleve: false, exclureFoyer10pct: false, instruments: [], tarifs: { mineur: { trimestre: 0, annuel: 0 }, majeur: { trimestre: 0, annuel: 0 } } });
   return (
     <div className="ia-card ia-new-card">
       <h4>➕ Nouveau cours particulier</h4>
@@ -399,7 +401,7 @@ function NouveauCP({ onAdd, onCancel }) {
         <F label="Majeur trim (€)" type="number" value={f.tarifs.majeur.trimestre} onChange={(v) => setF({ ...f, tarifs: { ...f.tarifs, majeur: { ...f.tarifs.majeur, trimestre: Number(v) } } })} />
         <F label="Majeur annuel (€)" type="number" value={f.tarifs.majeur.annuel} onChange={(v) => setF({ ...f, tarifs: { ...f.tarifs, majeur: { ...f.tarifs.majeur, annuel: Number(v) } } })} />
       </div>
-      <div className="ia-checkboxes"><C label="DUO" checked={f.duo} onChange={(v) => setF({ ...f, duo: v })} /><C label="+FM/Orchestre" checked={f.inclusFM} onChange={(v) => setF({ ...f, inclusFM: v })} /></div>
+      <div className="ia-checkboxes"><C label="DUO" checked={f.duo} onChange={(v) => setF({ ...f, duo: v })} /><C label="+FM/Orchestre" checked={f.inclusFM} onChange={(v) => setF({ ...f, inclusFM: v })} /><C label="Exclure de la réduction foyer" checked={f.exclureFoyer10pct} onChange={(v) => setF({ ...f, exclureFoyer10pct: v })} /></div>
       <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
         <button className="ia-btn-save" onClick={() => { if (!f.label) return alert("Label requis"); onAdd(f); }}>✓ Ajouter</button>
         <button className="ia-btn-cancel" onClick={onCancel}>Annuler</button>
@@ -410,7 +412,7 @@ function NouveauCP({ onAdd, onCancel }) {
 
 // ── Nouveau PC ──
 function NouveauPC({ onAdd, onCancel }) {
-  const [f, setF] = useState({ id: `pc_${Date.now()}`, label: "", duree: 60, ageMin: 0, ageMax: null, reducDisponible: true, yogaChorale: false, supplementMateriel: 0, groupes: [], tarifs: { mineur: { trimestre: 0, annuel: 0 }, majeur: null } });
+  const [f, setF] = useState({ id: `pc_${Date.now()}`, label: "", duree: 60, ageMin: 0, ageMax: null, reducDisponible: true, yogaChorale: false, exclureFoyer10pct: false, supplementMateriel: 0, groupes: [], tarifs: { mineur: { trimestre: 0, annuel: 0 }, majeur: null } });
   return (
     <div className="ia-card ia-new-card">
       <h4>➕ Nouvelle pratique collective</h4>
@@ -424,7 +426,7 @@ function NouveauPC({ onAdd, onCancel }) {
         <F label="Mineur annuel (€)" type="number" value={f.tarifs.mineur.annuel} onChange={(v) => setF({ ...f, tarifs: { ...f.tarifs, mineur: { ...f.tarifs.mineur, annuel: Number(v) } } })} />
         <F label="Supplément matériel/an (€)" type="number" value={f.supplementMateriel} onChange={(v) => setF({ ...f, supplementMateriel: Number(v) })} />
       </div>
-      <div className="ia-checkboxes"><C label="∅réduc33% (pas de réduction multi-activités)" checked={f.yogaChorale} onChange={(v) => setF({ ...f, yogaChorale: v })} /></div>
+      <div className="ia-checkboxes"><C label="∅réduc33% (pas de réduction multi-activités)" checked={f.yogaChorale} onChange={(v) => setF({ ...f, yogaChorale: v })} /><C label="Exclure de la réduction foyer" checked={f.exclureFoyer10pct} onChange={(v) => setF({ ...f, exclureFoyer10pct: v })} /></div>
       <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
         <button className="ia-btn-save" onClick={() => { if (!f.label) return alert("Label requis"); onAdd(f); }}>✓ Ajouter</button>
         <button className="ia-btn-cancel" onClick={onCancel}>Annuler</button>

@@ -74,13 +74,15 @@ function calculerTarif(cours, age, paiementType) {
   return paiementType === "annuel" ? t.annuel : t.trimestre;
 }
 
-function calculerTotal(eleves, paiementType, nbFoyerTotal, cotisation) {
+function calculerTotal(eleves, paiementType, nbFoyerTotal, cotisation, reductions = {}) {
   // Pour chaque élève, calculer la somme des cours
   // Règles de réduction :
   // - 10% par activité si membre d'un même foyer (nbFoyerTotal >= 2)
   // - 33% sur chaque discipline à partir de la 2e, sauf yoga et chorale
   // - Non-cumul : seule la réduction la plus avantageuse
   
+  const tauxFoyer = reductions.foyer10pct ?? 0.10;
+  const tauxMultiActivites = reductions.deuxiemeDiscipline33pct ?? (1 / 3);
   let totalGeneral = 0;
   const details = eleves.map((eleve) => {
     const age = getAge(eleve.dateNaissance);
@@ -90,7 +92,7 @@ function calculerTotal(eleves, paiementType, nbFoyerTotal, cotisation) {
 
     // Identifier l'activité éligible la moins chère (pour la réduction 1/3)
     const coursEligibles = coursAvecPrix
-      .filter(c => !c.coursData.yogaChorale)
+      .filter(c => !c.coursData.yogaChorale && c.coursData.reducDisponible !== false)
       .sort((a, b) => a.prix - b.prix); // tri croissant : la moins chère en premier
 
 
@@ -106,29 +108,25 @@ function calculerTotal(eleves, paiementType, nbFoyerTotal, cotisation) {
       let reductionAppliquee = null;
 
       // const eligible33 = !c.coursData.yogaChorale;
-      const est1erEligible = !c.coursData.yogaChorale;
+      const estEligible33 = !c.coursData.yogaChorale && c.coursData.reducDisponible !== false;
+      const estEligibleFoyer = c.coursData.exclureFoyer10pct !== true;
       
-      if (c.id === idCoursReduit) {
+      if (c.id === idCoursReduit && estEligible33) {
         // Réduction 1/3 sur la moins chère éligible
-        const reduc33 = prixBase / 3;
-        const reduc10 = nbFoyerTotal >= 2 ? prixBase * 0.10 : 0;
+        const reduc33 = prixBase * tauxMultiActivites;
+        const reduc10 = nbFoyerTotal >= 2 && estEligibleFoyer ? prixBase * tauxFoyer : 0;
         if (reduc33 >= reduc10) {
           prixFinal = arrondir(prixBase - reduc33);
-          reductionAppliquee = "−33% discipline";
+          reductionAppliquee = `−${Math.round(tauxMultiActivites * 100)}% discipline`;
         } else {
           prixFinal = arrondir(prixBase - reduc10);
-          reductionAppliquee = "−10% foyer";
+          reductionAppliquee = `−${Math.round(tauxFoyer * 100)}% foyer`;
         }
-      } else if (nbFoyerTotal >= 2 && est1erEligible) {
+      } else if (nbFoyerTotal >= 2 && estEligibleFoyer) {
         // 10% foyer sur les autres activités éligibles
-        const reduc10 = prixBase * 0.10;
+        const reduc10 = prixBase * tauxFoyer;
         prixFinal = arrondir(prixBase - reduc10);
-        reductionAppliquee = "−10% foyer";
-      } else if (nbFoyerTotal >= 2 && c.coursData.yogaChorale) {
-        // Yoga/Chorale : seulement 10% foyer
-        const reduc10 = prixBase * 0.10;
-        prixFinal = arrondir(prixBase - reduc10);
-        reductionAppliquee = "−10% foyer";
+        reductionAppliquee = `−${Math.round(tauxFoyer * 100)}% foyer`;
       }
 
       totalEleve += prixFinal;
@@ -394,7 +392,7 @@ export default function InscriptionForm() {
   };
 
   const soumettre = async () => {
-    const { details, totalGeneral: totalBase } = calculerTotal(eleves, paiementType, eleves.length, tarifs.cotisationAnnuelle);
+    const { details, totalGeneral: totalBase } = calculerTotal(eleves, paiementType, eleves.length, tarifs.cotisationAnnuelle, tarifs.reductions);
     const totalAvecFrais = totalBase + (modePaiement.type === "mandat_sepa" ? 10 : 0);
 
     // Si on modifie une inscription existante → PUT, sinon POST avec nouveau code
@@ -507,7 +505,7 @@ export default function InscriptionForm() {
   const ageCourant = eleveCourant ? getAge(eleveCourant.dateNaissance) : null;
   const { details: elevesAvecTotal, totalGeneral: totalBase } =
     etape === "recap" || etape === "confirmation"
-      ? calculerTotal(eleves, paiementType, eleves.length, tarifs.cotisationAnnuelle)
+      ? calculerTotal(eleves, paiementType, eleves.length, tarifs.cotisationAnnuelle, tarifs.reductions)
       : { details: [], totalGeneral: 0 };
   
   // Ajouter 10€ de frais si mandat SEPA

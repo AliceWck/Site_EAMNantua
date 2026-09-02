@@ -21,24 +21,26 @@ function arrondir(val) {
   return Math.round(val);
 }
 
-function calculerPrixFinal(prixBase, apply33pct, nbFoyer, yogaChorale) {
+function calculerPrixFinal(prixBase, apply33pct, nbFoyer, yogaChorale, exclureFoyer10pct, reductions = {}) {
   let prixFinal = prixBase;
   let reduction = null;
   const hasFoyer = nbFoyer >= 2;
+  const tauxFoyer = reductions.foyer10pct ?? 0.10;
+  const tauxMultiActivites = reductions.deuxiemeDiscipline33pct ?? (1 / 3);
   if (apply33pct && !yogaChorale) {
-    const r33 = prixBase / 3;
-    const r10 = hasFoyer ? prixBase * 0.10 : 0;
+    const r33 = prixBase * tauxMultiActivites;
+    const r10 = hasFoyer && !exclureFoyer10pct ? prixBase * tauxFoyer : 0;
     if (r33 > r10) {
       prixFinal = arrondir(prixBase - r33);
-      reduction = `-${arrondir(r33)} € (-33,33%)`;
+      reduction = `-${arrondir(r33)} € (-${Math.round(tauxMultiActivites * 100)}%)`;
     } else if (r10 > 0) {
       prixFinal = arrondir(prixBase - r10);
-      reduction = `-${arrondir(r10)} € (-10%)`;
+      reduction = `-${arrondir(r10)} € (-${Math.round(tauxFoyer * 100)}%)`;
     }
-  } else if (hasFoyer) {
-    const remise10 = prixBase * 0.10;
+  } else if (hasFoyer && !exclureFoyer10pct) {
+    const remise10 = prixBase * tauxFoyer;
     prixFinal = arrondir(prixBase - remise10);
-    reduction = `-${arrondir(remise10)} € (-10%)`;
+    reduction = `-${arrondir(remise10)} € (-${Math.round(tauxFoyer * 100)}%)`;
   }
   return { prixFinal, reduction };
 }
@@ -611,7 +613,7 @@ export default function FicheInscription({
     });
 
     const eligibleIndices = coursChoisis
-      .map((c, idx) => (!c.coursData?.yogaChorale ? idx : null))
+      .map((c, idx) => (!c.coursData?.yogaChorale && c.coursData?.reducDisponible !== false ? idx : null))
       .filter((idx) => idx !== null);
 
     const discountLineIndex = eligibleIndices.length >= 2
@@ -633,7 +635,9 @@ export default function FicheInscription({
         prixBase,
         eligible && idx === discountLineIndex,
         nbFoyer,
-        coursData.yogaChorale
+        coursData.yogaChorale,
+        coursData.exclureFoyer10pct === true,
+        tarifsData.reductions
       );
 
       const instr = c.instrumentId && tarifsData.instruments
