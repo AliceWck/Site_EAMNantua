@@ -33,6 +33,10 @@ const TAGS_DEF = [
   { id: "adulte",       label: "Adulte 18+",        desc: "18 ans et plus" },
 ];
 
+function couleurGroupeActivite(groupes = [], groupId) {
+  return groupes.find((groupe) => groupe.id === groupId) || { label: "Aucun", color: "#9ca3af" };
+}
+
 function TagSelector({ tags = [], onChange }) {
   const toggle = (id) =>
     onChange(tags.includes(id) ? tags.filter((t) => t !== id) : [...tags, id]);
@@ -160,9 +164,17 @@ export default function InscriptionAdmin() {
             <NouveauCP groupes={tarifs.groupesActivites?.individuelles} onAdd={(n) => { save({ ...tarifs, coursParticuliers: [...tarifs.coursParticuliers, n] }); setShowNewForm(false); }} onCancel={() => setShowNewForm(false)} />
           )}
           {tarifs.coursParticuliers.map((cp, idx) => (
-            <div key={cp.id} className="ia-card">
+            <div
+              key={cp.id}
+              className="ia-card"
+              style={{ borderColor: couleurGroupeActivite(tarifs.groupesActivites?.individuelles, cp.groupId).color }}
+            >
               <div className="ia-card-header">
                 <strong>{cp.label}</strong>
+                {cp.groupId && (() => {
+                  const groupe = couleurGroupeActivite(tarifs.groupesActivites?.individuelles, cp.groupId);
+                  return <span className="ia-tag groupe" style={{ borderColor: groupe.color, color: groupe.color }}>{groupe.label}</span>;
+                })()}
                 {cp.exclureFoyer10pct && <span className="ia-tag foyer">∅RéducFoyer</span>}
                 <div className="ia-card-actions">
                   <button className="ia-btn-sm" onClick={() => setEditingItem(editingItem === `cp-${idx}` ? null : `cp-${idx}`)}>
@@ -223,10 +235,18 @@ export default function InscriptionAdmin() {
             <NouveauPC groupes={tarifs.groupesActivites?.collectives} onAdd={(n) => { save({ ...tarifs, pratiquesCollectives: [...tarifs.pratiquesCollectives, n] }); setShowNewForm(false); }} onCancel={() => setShowNewForm(false)} />
           )}
           {tarifs.pratiquesCollectives.map((pc, idx) => (
-            <div key={pc.id} className="ia-card">
+            <div
+              key={pc.id}
+              className="ia-card"
+              style={{ borderColor: couleurGroupeActivite(tarifs.groupesActivites?.collectives, pc.groupId).color }}
+            >
               <div className="ia-card-header">
                 <strong>{pc.label}</strong>
                 <span className="ia-tag blue">{pc.duree} min</span>
+                {pc.groupId && (() => {
+                  const groupe = couleurGroupeActivite(tarifs.groupesActivites?.collectives, pc.groupId);
+                  return <span className="ia-tag groupe" style={{ borderColor: groupe.color, color: groupe.color }}>{groupe.label}</span>;
+                })()}
                 {pc.yogaChorale && <span className="ia-tag pink">∅RéducMultiActivite</span>}
                 {pc.exclureFoyer10pct && <span className="ia-tag foyer">∅RéducFoyer</span>}
                 <div className="ia-card-actions">
