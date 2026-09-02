@@ -173,6 +173,7 @@ export default function InscriptionAdmin() {
                   <span>Majeur : {cp.tarifs?.majeur?.trimestre}€/trim · {cp.tarifs?.majeur?.annuel}€/an</span>
                   {cp.duo && <span className="ia-tag">DUO</span>}
                   {cp.inclusFM && <span className="ia-tag green">+FM</span>}
+                  {cp.exclureFoyer10pct && <span className="ia-tag foyer">Pas de réduction foyer</span>}
                 </div>
               )}
               {editingItem === `cp-${idx}` && (
@@ -235,6 +236,7 @@ export default function InscriptionAdmin() {
                   <span>Mineur : {pc.tarifs?.mineur?.trimestre}€/trim · {pc.tarifs?.mineur?.annuel}€/an</span>
                   {pc.tarifs?.majeur ? <span>Majeur : {pc.tarifs.majeur.trimestre}€/trim · {pc.tarifs.majeur.annuel}€/an</span> : <span className="ia-na">Majeurs : non disponible</span>}
                   {pc.supplementMateriel > 0 && <span className="ia-tag amber">+{pc.supplementMateriel}€ mat.</span>}
+                  {pc.exclureFoyer10pct && <span className="ia-tag foyer">Pas de réduction foyer</span>}
                 </div>
               )}
               {editingItem === `pc-${idx}` && (

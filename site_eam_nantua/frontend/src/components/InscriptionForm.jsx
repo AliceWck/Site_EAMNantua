@@ -552,7 +552,7 @@ export default function InscriptionForm() {
 
         {/* ── Grille tarifaire ── */}
         {etape === "tarifs" && tarifs && (
-          <div className="inscr-step animate-in">
+          <div className="inscr-step tarifs-step animate-in">
             <h2>📋 Cours & tarifs {anneeActive || "..."}</h2>
             <p className="inscr-hint">Cotisation annuelle : <strong>{tarifs.cotisationAnnuelle} €</strong> par élève (non comprise dans les tarifs ci-dessous).</p>
             <p className="inscr-hint">Réductions : <strong>10%</strong> par activité pour les membres d'un même foyer · <strong>1/3</strong> sur chaque discipline à partir de la 2ème (sauf Yoga et Chorale). Non-cumul : la plus avantageuse s'applique.</p>
@@ -580,6 +580,7 @@ export default function InscriptionForm() {
                       <td>{cp.tarifs?.majeur?.annuel} €</td>
                       <td style={{fontSize:"0.75rem"}}>
                         {cp.duo && <span className="tag-duo">DUO</span>} {cp.inclusFM && <span className="tag-fm">+FM</span>}
+                        {cp.exclureFoyer10pct && <span className="tag-foyer">Pas de réduction foyer</span>}
                         {cp.noteParEleve && <span style={{color:"#6b7280"}}> /élève</span>}
                       </td>
                     </tr>
@@ -614,6 +615,7 @@ export default function InscriptionForm() {
                       <td style={{fontSize:"0.75rem"}}>
                         {pc.supplementMateriel > 0 && <span className="tag-mat">+{pc.supplementMateriel}€ mat.</span>}
                         {pc.yogaChorale && <span className="tag-yoga">Pas de réduction multi</span>}
+                        {pc.exclureFoyer10pct && <span className="tag-foyer">Pas de réduction foyer</span>}
                       </td>
                     </tr>
                   ))}
