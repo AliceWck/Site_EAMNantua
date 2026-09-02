@@ -9,6 +9,22 @@ import { FicheInscriptionModal } from "./FicheInscription";
 
 const API = import.meta.env.VITE_API_URL;
 
+// Liste locale des communes du Haut-Bugey proposée dans le formulaire.
+const COMMUNES_HAUT_BUGEY = [
+  "Apremont", "Aranc", "Arbent", "Béard-Géovreissiat", "Belleydoux", "Bellignat",
+  "Bolozon", "Brénod", "Brion", "Ceignes", "Champdor-Corcelles", "Charix",
+  "Chevillard", "Condamine", "Corlier", "Dortan", "Échallon", "Evosges",
+  "Géovreisset", "Groissiat", "Izenave", "Izernore", "Lantenay", "Le Poizat-Lalleyriat", "Les Neyrolles",
+  "Leyssard", "Maillat", "Martignat", "Matafelon-Granges", "Montréal-la-Cluse",
+  "Nantua", "Nurieux-Volognat", "Outriaz", "Oyonnax", "Peyriat", "Plateau d'Hauteville", "Port",
+  "Prémillieu", "Saint-Martin-du-Frêne", "Samognat", "Sonthonnax-la-Montagne", "Vieu-d'Izenave",
+];
+
+function formaterTelephone(value) {
+  const chiffres = value.replace(/\D/g, "").slice(0, 10);
+  return chiffres.replace(/(\d{2})(?=\d)/g, "$1 ");
+}
+
 function arrondir(val) {
   return Math.round(val);
 }
@@ -178,7 +194,6 @@ function genId(eleves = []) {
 // --- Composant principal ------------------------------------------------
 
 export default function InscriptionForm() {
-  const location = useLocation();
   const [tarifs, setTarifs] = useState(null);
   const [anneeActive, setAnneeActive] = useState(null);
   const [etape, setEtape] = useState("accueil"); // accueil | foyer | eleves | recap | confirmation
@@ -231,43 +246,43 @@ export default function InscriptionForm() {
     .catch(() => console.error("Impossible de charger l'année courante"));
   }, []);
 
-  // Réinitialiser le formulaire quand on revient à la page Inscription (sans paramètres d'édition)
+  // Réinitialiser le formulaire quand on clique sur l'onglet Inscription depuis un autre onglet
   useEffect(() => {
-    // Vérifier si on est sur /inscription et s'il n'y a pas de paramètres d'édition
-    const hash = window.location.hash;
-    const params = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
-    const editId = params.get('edit');
-    const editCode = params.get('code');
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash === "#/inscription") {
+        // Réinitialiser tous les états quand on revient à l'onglet inscription
+        setEtape("accueil");
+        setFicheInscription(null);
+        setNbMembres(1);
+        setPaiementType("annuel");
+        setEleves([]);
+        setEleveActif(0);
+        setSelectionEnCours(null);
+        setPanneauOuvert(false);
+        setEngagements({
+          whatsapp: false, 
+          assurance: false, 
+          mineurs: false,
+          responsabilite: false, 
+          absences: false, 
+          paiement: false,
+          reglement: false, 
+          demission: false,
+          droitImage: null,
+        });
+        setCodeRecherche("");
+        setInscriptionTrouvee(null);
+        setRechercheErreur("");
+        setInscriptionId(null);
+        setInscriptionCode(null);
+        setModePaiement({ type: "", nbFois: 1 });
+      }
+    };
     
-    // Si pas de paramètres d'édition, réinitialiser à "accueil"
-    if (!editId && !editCode) {
-      setEtape("accueil");
-      setFicheInscription(null);
-      setNbMembres(1);
-      setPaiementType("annuel");
-      setEleves([]);
-      setEleveActif(0);
-      setSelectionEnCours(null);
-      setPanneauOuvert(false);
-      setEngagements({
-        whatsapp: false, 
-        assurance: false, 
-        mineurs: false,
-        responsabilite: false, 
-        absences: false, 
-        paiement: false,
-        reglement: false, 
-        demission: false,
-        droitImage: null,
-      });
-      setCodeRecherche("");
-      setInscriptionTrouvee(null);
-      setRechercheErreur("");
-      setInscriptionId(null);
-      setInscriptionCode(null);
-      setModePaiement({ type: "", nbFois: 1 });
-    }
-  }, [location]);
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -333,6 +348,28 @@ export default function InscriptionForm() {
     setEleves((prev) => 
       prev.map((e, i) => (i === idx ? { ...e, [field]: value } : e))
 );
+
+  const reporterInformationsPremierEleve = () => {
+    const premierEleve = eleves[0];
+    if (!premierEleve || eleveActif === 0) return;
+
+    setEleves((prev) => prev.map((eleve, index) => index === eleveActif
+      ? {
+          ...eleve,
+          nom: premierEleve.nom,
+          adresse: premierEleve.adresse,
+          codePostal: premierEleve.codePostal,
+          localite: premierEleve.localite,
+          telPerso: premierEleve.telPerso,
+          email: premierEleve.email,
+          representantNom: premierEleve.representantNom,
+          representantPrenom: premierEleve.representantPrenom,
+          parenté: premierEleve.parenté,
+          parentéAutre: premierEleve.parentéAutre,
+        }
+      : eleve
+    ));
+  };
 
   const ajouterCours = (coursData, instrumentId = null) => {
     setEleves((prev) => 
@@ -712,6 +749,15 @@ export default function InscriptionForm() {
               {/* Infos personnelles */}
               <section className="eleve-section">
                 <h3>Informations de l'élève {eleves.length > 1 ? `(${eleveActif + 1}/${eleves.length})` : ""}</h3>
+                {eleves.length > 1 && eleveActif > 0 && (
+                  <button
+                    type="button"
+                    className="report-infos-btn"
+                    onClick={reporterInformationsPremierEleve}
+                  >
+                    ↳ Reporter les informations du 1er élève
+                  </button>
+                )}
                 <p className="inscr-hint">⚠️ Renseignez d'abord la date de naissance pour voir les cours disponibles s'afficher dans "Activités choisies" ci-dessous.</p>
                 <p className="inscr-hint">⚠️ Les champs marqués d'un astérisque (*) sont obligatoires.</p>
                 <div className="form-grid">
@@ -749,15 +795,23 @@ export default function InscriptionForm() {
                   </div>
                   <div className="field">
                     <label>Localité</label>
-                    <input value={eleveCourant.localite} onChange={(e) => updateEleve(eleveActif, "localite", e.target.value)} placeholder="Nantua" />
+                    <select value={eleveCourant.localite} onChange={(e) => updateEleve(eleveActif, "localite", e.target.value)}>
+                      <option value="">-- Choisir une commune --</option>
+                      {eleveCourant.localite && !COMMUNES_HAUT_BUGEY.includes(eleveCourant.localite) && (
+                        <option value={eleveCourant.localite}>{eleveCourant.localite}</option>
+                      )}
+                      {COMMUNES_HAUT_BUGEY.map((commune) => (
+                        <option key={commune} value={commune}>{commune}</option>
+                      ))}
+                    </select>
                   </div>
                   <div className="field">
                     <label>Téléphone 1 *</label>
-                    <input value={eleveCourant.telPerso} onChange={(e) => updateEleve(eleveActif, "telPerso", e.target.value)} placeholder="06 12 34 56 78" />
+                    <input type="tel" inputMode="numeric" value={eleveCourant.telPerso} onChange={(e) => updateEleve(eleveActif, "telPerso", formaterTelephone(e.target.value))} placeholder="06 12 34 56 78" />
                   </div>
                   <div className="field">
                     <label>Téléphone 2</label>
-                    <input value={eleveCourant.tel2} onChange={(e) => updateEleve(eleveActif, "tel2", e.target.value)} />
+                    <input type="tel" inputMode="numeric" value={eleveCourant.tel2} onChange={(e) => updateEleve(eleveActif, "tel2", formaterTelephone(e.target.value))} />
                   </div>
                   <div className="field field-full">
                     <label>Email</label>

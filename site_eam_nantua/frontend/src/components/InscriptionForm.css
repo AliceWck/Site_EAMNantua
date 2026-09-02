@@ -99,6 +99,23 @@
   margin: 0 0 1.5rem;
 }
 
+.report-infos-btn {
+  display: block;
+  margin: 0 0 1rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--inscr-primary-light);
+  border-radius: 8px;
+  background: #f3e8ff;
+  color: var(--inscr-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.report-infos-btn:hover {
+  background: #e9d5ff;
+}
+
 /* ── Foyer ── */
 .inscr-step-foyer h2 { margin-bottom: 0.5rem; }
 
