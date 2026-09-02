@@ -432,7 +432,7 @@ function NouveauPC({ onAdd, onCancel }) {
       </div>
       <div className="ia-checkboxes">
         <C label="∅réduc33% (pas de réduction multi-activités)" checked={f.yogaChorale} onChange={(v) => setF({ ...f, yogaChorale: v })} />
-        <C label="∅réduc10% (exclure de la réduction foyer" checked={f.exclureFoyer10pct} onChange={(v) => setF({ ...f, exclureFoyer10pct: v })} />
+        <C label="∅réduc10% (exclure de la réduction foyer)" checked={f.exclureFoyer10pct} onChange={(v) => setF({ ...f, exclureFoyer10pct: v })} />
       </div>
       <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
         <button className="ia-btn-save" onClick={() => { if (!f.label) return alert("Label requis"); onAdd(f); }}>✓ Ajouter</button>
