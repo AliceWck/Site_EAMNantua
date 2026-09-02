@@ -436,6 +436,29 @@
   border-bottom: 1px solid var(--inscr-bg);
   vertical-align: middle;
 }
+.tarif-group {
+  border: 2px solid var(--group-color);
+}
+.tarif-group + .tarif-group {
+  border-top: 0;
+}
+.tarif-group-title td {
+  background: color-mix(in srgb, var(--group-color) 12%, white);
+  color: var(--group-color);
+  border-bottom: 1px solid color-mix(in srgb, var(--group-color) 35%, white);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.tarif-group-dot {
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.65rem;
+  margin-right: 0.45rem;
+  border-radius: 50%;
+  vertical-align: -0.05rem;
+}
 .recap-table .prix-final { font-weight: 700; text-align: right; }
 .recap-cotisation td { color: var(--inscr-muted); font-style: italic; }
 .recap-sous-total td { background: #faf5ff; }

@@ -52,6 +52,19 @@ function coursDisponibleParTags(cours, age) {
   return cours.tags.some((t) => ageTags.includes(t));
 }
 
+function grouperActivitesParGroupe(activites, groupes = []) {
+  const groupesAvecActivites = groupes.map((groupe) => ({ groupe, activites: [] }));
+  const sansGroupe = { id: "aucun", label: "Aucun", color: "#9ca3af" };
+  const groupeSansNom = { groupe: sansGroupe, activites: [] };
+
+  activites.forEach((activite) => {
+    const groupe = groupesAvecActivites.find(({ groupe: item }) => item.id === activite.groupId);
+    (groupe || groupeSansNom).activites.push(activite);
+  });
+
+  return [...groupesAvecActivites, groupeSansNom].filter(({ activites: items }) => items.length > 0);
+}
+
 // ----- Helpers ------------------------------------------
 function getAge(dateStr) {
   if (!dateStr) return null;
@@ -571,22 +584,27 @@ export default function InscriptionForm() {
                     <th>Options</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {tarifs.coursParticuliers.map(cp => (
-                    <tr key={cp.id}>
-                      <td><strong>{cp.label}</strong></td>
-                      <td>{cp.tarifs?.mineur?.trimestre} €</td>
-                      <td>{cp.tarifs?.mineur?.annuel} €</td>
-                      <td>{cp.tarifs?.majeur?.trimestre} €</td>
-                      <td>{cp.tarifs?.majeur?.annuel} €</td>
-                      <td style={{fontSize:"0.75rem"}}>
-                        {cp.duo && <span className="tag-duo">DUO</span>} {cp.inclusFM && <span className="tag-fm">+FM</span>}
-                        {cp.exclureFoyer10pct && <span className="tag-foyer">Pas de réduction foyer</span>}
-                        {cp.noteParEleve && <span style={{color:"#6b7280"}}> /élève</span>}
-                      </td>
+                {grouperActivitesParGroupe(tarifs.coursParticuliers, tarifs.groupesActivites?.individuelles).map(({ groupe, activites }) => (
+                  <tbody key={groupe.id} className="tarif-group" style={{ "--group-color": groupe.color }}>
+                    <tr className="tarif-group-title">
+                      <td colSpan="6"><span className="tarif-group-dot" style={{ background: groupe.color }} />{groupe.label}</td>
                     </tr>
-                  ))}
-                </tbody>
+                    {activites.map((cp) => (
+                      <tr key={cp.id}>
+                        <td><strong>{cp.label}</strong></td>
+                        <td>{cp.tarifs?.mineur?.trimestre} €</td>
+                        <td>{cp.tarifs?.mineur?.annuel} €</td>
+                        <td>{cp.tarifs?.majeur?.trimestre} €</td>
+                        <td>{cp.tarifs?.majeur?.annuel} €</td>
+                        <td style={{fontSize:"0.75rem"}}>
+                          {cp.duo && <span className="tag-duo">DUO</span>} {cp.inclusFM && <span className="tag-fm">+FM</span>}
+                          {cp.exclureFoyer10pct && <span className="tag-foyer">Pas de réduction foyer</span>}
+                          {cp.noteParEleve && <span style={{color:"#6b7280"}}> /élève</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                ))}
               </table>
             </div>
 
@@ -604,23 +622,28 @@ export default function InscriptionForm() {
                     <th>Notes</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {tarifs.pratiquesCollectives.map(pc => (
-                    <tr key={pc.id}>
-                      <td><strong>{pc.label}</strong></td>
-                      <td>{pc.duree} min</td>
-                      <td>{pc.tarifs?.mineur?.trimestre} €</td>
-                      <td>{pc.tarifs?.mineur?.annuel} €</td>
-                      <td>{pc.tarifs?.majeur ? `${pc.tarifs.majeur.trimestre} €` : "—"}</td>
-                      <td>{pc.tarifs?.majeur ? `${pc.tarifs.majeur.annuel} €` : "—"}</td>
-                      <td style={{fontSize:"0.75rem"}}>
-                        {pc.supplementMateriel > 0 && <span className="tag-mat">+{pc.supplementMateriel}€ mat.</span>}
-                        {pc.yogaChorale && <span className="tag-yoga">Pas de réduction multi</span>}
-                        {pc.exclureFoyer10pct && <span className="tag-foyer">Pas de réduction foyer</span>}
-                      </td>
+                {grouperActivitesParGroupe(tarifs.pratiquesCollectives, tarifs.groupesActivites?.collectives).map(({ groupe, activites }) => (
+                  <tbody key={groupe.id} className="tarif-group" style={{ "--group-color": groupe.color }}>
+                    <tr className="tarif-group-title">
+                      <td colSpan="7"><span className="tarif-group-dot" style={{ background: groupe.color }} />{groupe.label}</td>
                     </tr>
-                  ))}
-                </tbody>
+                    {activites.map((pc) => (
+                      <tr key={pc.id}>
+                        <td><strong>{pc.label}</strong></td>
+                        <td>{pc.duree} min</td>
+                        <td>{pc.tarifs?.mineur?.trimestre} €</td>
+                        <td>{pc.tarifs?.mineur?.annuel} €</td>
+                        <td>{pc.tarifs?.majeur ? `${pc.tarifs.majeur.trimestre} €` : "—"}</td>
+                        <td>{pc.tarifs?.majeur ? `${pc.tarifs.majeur.annuel} €` : "—"}</td>
+                        <td style={{fontSize:"0.75rem"}}>
+                          {pc.supplementMateriel > 0 && <span className="tag-mat">+{pc.supplementMateriel}€ mat.</span>}
+                          {pc.yogaChorale && <span className="tag-yoga">Pas de réduction multi</span>}
+                          {pc.exclureFoyer10pct && <span className="tag-foyer">Pas de réduction foyer</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                ))}
               </table>
             </div>
 
