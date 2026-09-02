@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./InscriptionAdmin.css";
 import { FicheInscriptionModal } from "./FicheInscription";
 
-// ATTENTION variable yogaChorale correspond au str "∅réduc33%"
+// ATTENTION variable yogaChorale correspond à l'exclusion de ∅RéducMultiActivite
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -159,6 +159,7 @@ export default function InscriptionAdmin() {
             <div key={cp.id} className="ia-card">
               <div className="ia-card-header">
                 <strong>{cp.label}</strong>
+                {cp.exclureFoyer10pct && <span className="ia-tag foyer">∅RéducFoyer</span>}
                 <div className="ia-card-actions">
                   <button className="ia-btn-sm" onClick={() => setEditingItem(editingItem === `cp-${idx}` ? null : `cp-${idx}`)}>
                     {editingItem === `cp-${idx}` ? "▲ Fermer" : "✏️ Modifier"}
@@ -173,7 +174,6 @@ export default function InscriptionAdmin() {
                   <span>Majeur : {cp.tarifs?.majeur?.trimestre}€/trim · {cp.tarifs?.majeur?.annuel}€/an</span>
                   {cp.duo && <span className="ia-tag">DUO</span>}
                   {cp.inclusFM && <span className="ia-tag green">+FM</span>}
-                  {cp.exclureFoyer10pct && <span className="ia-tag foyer">Pas de réduction foyer</span>}
                 </div>
               )}
               {editingItem === `cp-${idx}` && (
@@ -222,7 +222,8 @@ export default function InscriptionAdmin() {
               <div className="ia-card-header">
                 <strong>{pc.label}</strong>
                 <span className="ia-tag blue">{pc.duree} min</span>
-                {pc.yogaChorale && <span className="ia-tag pink">∅Réduc33%</span>}
+                {pc.yogaChorale && <span className="ia-tag pink">∅RéducMultiActivite</span>}
+                {pc.exclureFoyer10pct && <span className="ia-tag foyer">∅RéducFoyer</span>}
                 <div className="ia-card-actions">
                   <button className="ia-btn-sm" onClick={() => setEditingItem(editingItem === `pc-${idx}` ? null : `pc-${idx}`)}>
                     {editingItem === `pc-${idx}` ? "▲ Fermer" : "✏️ Modifier"}
@@ -236,7 +237,6 @@ export default function InscriptionAdmin() {
                   <span>Mineur : {pc.tarifs?.mineur?.trimestre}€/trim · {pc.tarifs?.mineur?.annuel}€/an</span>
                   {pc.tarifs?.majeur ? <span>Majeur : {pc.tarifs.majeur.trimestre}€/trim · {pc.tarifs.majeur.annuel}€/an</span> : <span className="ia-na">Majeurs : non disponible</span>}
                   {pc.supplementMateriel > 0 && <span className="ia-tag amber">+{pc.supplementMateriel}€ mat.</span>}
-                  {pc.exclureFoyer10pct && <span className="ia-tag foyer">Pas de réduction foyer</span>}
                 </div>
               )}
               {editingItem === `pc-${idx}` && (
@@ -259,7 +259,7 @@ export default function InscriptionAdmin() {
                     <F label="Supplément matériel / an (€, 0 = aucun)" type="number" value={pc.supplementMateriel ?? 0} onChange={(v) => updatePC(idx, "supplementMateriel", v)} />
                   </div>
                   <div className="ia-checkboxes">
-                    <C label="Exclu des réductions multi-activités (Yoga / Chorale)" checked={!!pc.yogaChorale} onChange={(v) => updatePC(idx, "yogaChorale", v)} />
+                    <C label="∅RéducMultiActivite" checked={!!pc.yogaChorale} onChange={(v) => updatePC(idx, "yogaChorale", v)} />
                     <C label="Réduction 33% multi-activités applicable" checked={!!pc.reducDisponible} onChange={(v) => updatePC(idx, "reducDisponible", v)} />
                     <C label="Exclure de la réduction foyer" checked={!!pc.exclureFoyer10pct} onChange={(v) => updatePC(idx, "exclureFoyer10pct", v)} />
                   </div>
@@ -406,7 +406,7 @@ function NouveauCP({ onAdd, onCancel }) {
       <div className="ia-checkboxes">
         <C label="DUO" checked={f.duo} onChange={(v) => setF({ ...f, duo: v })} />
         <C label="+FM/Orchestre" checked={f.inclusFM} onChange={(v) => setF({ ...f, inclusFM: v })} />
-        <C label="∅réduc10% (exclure de la réduction foyer)" checked={f.exclureFoyer10pct} onChange={(v) => setF({ ...f, exclureFoyer10pct: v })} />
+        <C label="∅RéducFoyer" checked={f.exclureFoyer10pct} onChange={(v) => setF({ ...f, exclureFoyer10pct: v })} />
       </div>
       <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
         <button className="ia-btn-save" onClick={() => { if (!f.label) return alert("Label requis"); onAdd(f); }}>✓ Ajouter</button>
@@ -433,8 +433,8 @@ function NouveauPC({ onAdd, onCancel }) {
         <F label="Supplément matériel/an (€)" type="number" value={f.supplementMateriel} onChange={(v) => setF({ ...f, supplementMateriel: Number(v) })} />
       </div>
       <div className="ia-checkboxes">
-        <C label="∅réduc33% (pas de réduction multi-activités)" checked={f.yogaChorale} onChange={(v) => setF({ ...f, yogaChorale: v })} />
-        <C label="∅réduc10% (exclure de la réduction foyer)" checked={f.exclureFoyer10pct} onChange={(v) => setF({ ...f, exclureFoyer10pct: v })} />
+        <C label="∅RéducMultiActivite" checked={f.yogaChorale} onChange={(v) => setF({ ...f, yogaChorale: v })} />
+        <C label="∅RéducFoyer" checked={f.exclureFoyer10pct} onChange={(v) => setF({ ...f, exclureFoyer10pct: v })} />
       </div>
       <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
         <button className="ia-btn-save" onClick={() => { if (!f.label) return alert("Label requis"); onAdd(f); }}>✓ Ajouter</button>
