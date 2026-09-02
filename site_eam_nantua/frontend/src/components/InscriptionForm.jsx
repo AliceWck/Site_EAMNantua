@@ -359,6 +359,7 @@ export default function InscriptionForm() {
           codePostal: premierEleve.codePostal,
           localite: premierEleve.localite,
           telPerso: premierEleve.telPerso,
+          tel2: premierEleve.tel2,
           email: premierEleve.email,
           representantNom: premierEleve.representantNom,
           representantPrenom: premierEleve.representantPrenom,
