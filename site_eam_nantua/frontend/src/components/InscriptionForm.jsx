@@ -10,15 +10,56 @@ import { FicheInscriptionModal } from "./FicheInscription";
 const API = import.meta.env.VITE_API_URL;
 
 // Liste locale des communes du Haut-Bugey proposée dans le formulaire.
+// Dictionnaire commune → code postal du Haut-Bugey
 const COMMUNES_HAUT_BUGEY = [
-  "Apremont", "Aranc", "Arbent", "Béard-Géovreissiat", "Belleydoux", "Bellignat",
-  "Bolozon", "Brénod", "Brion", "Ceignes", "Champdor-Corcelles", "Charix",
-  "Chevillard", "Condamine", "Corlier", "Dortan", "Échallon", "Evosges",
-  "Géovreisset", "Groissiat", "Izenave", "Izernore", "Lantenay", "Le Poizat-Lalleyriat", "Les Neyrolles",
-  "Leyssard", "Maillat", "Martignat", "Matafelon-Granges", "Montréal-la-Cluse",
-  "Nantua", "Nurieux-Volognat", "Outriaz", "Oyonnax", "Peyriat", "Plateau d'Hauteville", "Port",
-  "Prémillieu", "Saint-Martin-du-Frêne", "Samognat", "Sonthonnax-la-Montagne", "Vieu-d'Izenave",
+  { nom: "Apremont", cp: "01100" },
+  { nom: "Aranc", cp: "01110" },
+  { nom: "Arbent", cp: "01100" },
+  { nom: "Béard-Géovreissiat", cp: "01460" },
+  { nom: "Belleydoux", cp: "01130" },
+  { nom: "Bellignat", cp: "01100" },
+  { nom: "Bolozon", cp: "01450" },
+  { nom: "Brénod", cp: "01110" },
+  { nom: "Brion", cp: "01460" },
+  { nom: "Ceignes", cp: "01430" },
+  { nom: "Champdor-Corcelles", cp: "01110" },
+  { nom: "Charix", cp: "01130" },
+  { nom: "Chevillard", cp: "01430" },
+  { nom: "Condamine", cp: "01430" },
+  { nom: "Corlier", cp: "01110" },
+  { nom: "Dortan", cp: "01590" },
+  { nom: "Échallon", cp: "01130" },
+  { nom: "Évosges", cp: "01230" },
+  { nom: "Géovreisset", cp: "01100" },
+  { nom: "Groissiat", cp: "01100" },
+  { nom: "Izenave", cp: "01430" },
+  { nom: "Izernore", cp: "01580" },
+  { nom: "Lantenay", cp: "01430" },
+  { nom: "Le Poizat-Lalleyriat", cp: "01130" },
+  { nom: "Les Neyrolles", cp: "01130" },
+  { nom: "Leyssard", cp: "01450" },
+  { nom: "Maillat", cp: "01430" },
+  { nom: "Martignat", cp: "01100" },
+  { nom: "Matafelon-Granges", cp: "01580" },
+  { nom: "Montréal-la-Cluse", cp: "01460" },
+  { nom: "Nantua", cp: "01130" },
+  { nom: "Nurieux-Volognat", cp: "01460" },
+  { nom: "Outriaz", cp: "01430" },
+  { nom: "Oyonnax", cp: "01100" },
+  { nom: "Peyriat", cp: "01430" },
+  { nom: "Plateau d'Hauteville", cp: "01110" },
+  { nom: "Port", cp: "01460" },
+  { nom: "Prémillieu", cp: "01110" },
+  { nom: "Saint-Martin-du-Frêne", cp: "01430" },
+  { nom: "Samognat", cp: "01580" },
+  { nom: "Sonthonnax-la-Montagne", cp: "01580" },
+  { nom: "Vieu-d'Izenave", cp: "01430" },
 ];
+
+// Accès rapide commune -> code postal
+const COMMUNES_CP_MAP = Object.fromEntries(
+  COMMUNES_HAUT_BUGEY.map((c) => [c.nom, c.cp])
+);
 
 function formaterTelephone(value) {
   const chiffres = value.replace(/\D/g, "").slice(0, 10);
@@ -818,14 +859,33 @@ export default function InscriptionForm() {
                     <input value={eleveCourant.codePostal} onChange={(e) => updateEleve(eleveActif, "codePostal", e.target.value)} placeholder="01130" />
                   </div>
                   <div className="field">
-                    <label>Localité</label>
-                    <select value={eleveCourant.localite} onChange={(e) => updateEleve(eleveActif, "localite", e.target.value)}>
+                  <label>Localité</label>
+                    <select
+                      value={eleveCourant.localite}
+                      onChange={(e) => {
+                        const nomCommune = e.target.value;
+                        setEleves((prev) =>
+                          prev.map((el, i) =>
+                            i === eleveActif
+                              ? {
+                                  ...el,
+                                  localite: nomCommune,
+                                  // Auto-complète le code postal si la commune est reconnue
+                                  codePostal: COMMUNES_CP_MAP[nomCommune] || el.codePostal,
+                                }
+                              : el
+                          )
+                        );
+                      }}
+                    >
                       <option value="">-- Choisir une commune --</option>
-                      {eleveCourant.localite && !COMMUNES_HAUT_BUGEY.includes(eleveCourant.localite) && (
+                      {eleveCourant.localite && !COMMUNES_CP_MAP[eleveCourant.localite] && (
                         <option value={eleveCourant.localite}>{eleveCourant.localite}</option>
                       )}
                       {COMMUNES_HAUT_BUGEY.map((commune) => (
-                        <option key={commune} value={commune}>{commune}</option>
+                        <option key={commune.nom} value={commune.nom}>
+                          {commune.nom} — {commune.cp}
+                        </option>
                       ))}
                     </select>
                   </div>
