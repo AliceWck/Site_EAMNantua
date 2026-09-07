@@ -572,7 +572,7 @@ function ListeInscrits({ showMsg }) {
 
   const exportCSV = () => {
     const headers = [
-      "Date inscription","Date validation","Année scolaire","N° dossier","Nb membres foyer", "Mode règlement","Mode règlement (type)","Nb échéances","Montant/échéance (€)","Frais SEPA (€)","Total foyer (€)",
+      "Date inscription","Date validation","Année scolaire","N° dossier","Nb membres foyer", "Mode règlement","Mode règlement (type)","Nb échéances","Montant/échéance (€)","Frais SEPA (€)",
       "Nom","Prénom","Date naissance","Âge","Sexe","Statut",
       "Adresse","Code postal","Localité","Tél 1","Tél 2","Email",
       "Niveau scolaire","Établissement","Profession",
@@ -582,7 +582,7 @@ function ListeInscrits({ showMsg }) {
       "Activité 2","Instrument 2","Prix base 2€","Réduction 2","Prix final 2€",
       "Activité 3","Instrument 3","Prix base 3€","Réduction 3","Prix final 3€",
       "Activité 4","Instrument 4","Prix base 4€","Réduction 4","Prix final 4€",
-      "Cotisation€","Supplément matériel€","Total élève€",
+      "Cotisation€","Supplément matériel€","Total élève€","Total foyer (€)",
       "Droit image","WhatsApp","Assurance","Règlement accepté",
     ];
     const rows = [];
@@ -604,11 +604,11 @@ function ListeInscrits({ showMsg }) {
         const row = [
           dateIns, 
           ins.dateValidation ? new Date(ins.dateValidation).toLocaleDateString("fr-FR") : "",
-          ins.annee || "", ins.id || "", ins.foyer?.nbMembres || 1,
+          ins.annee || "", ins.code || ins.id || "", ins.foyer?.nbMembres || 1,
           ins.foyer?.paiementType || "", modeType, nbFois, perEcheance || "", fraisSepaVal || 0, total || "",
           eleve.nom || "", eleve.prenom || "", eleve.dateNaissance || "",
           age ?? "", eleve.sexe || "", age != null ? (age >= 18 ? "Majeur" : "Mineur") : "",
-          eleve.adresse || "", eleve.codePostal || "", eleve.localite || "",
+          eleve.adresse || "", eleve.codePostal ? `="${eleve.codePostal}"` : "", eleve.localite || "",
           eleve.telPerso || "", eleve.tel2 || "", eleve.email || "",
           eleve.niveauScolaire || "", eleve.etablissement || "", eleve.profession || "",
           eleve.representantNom || "", eleve.representantPrenom || "", eleve.parenté || "",
