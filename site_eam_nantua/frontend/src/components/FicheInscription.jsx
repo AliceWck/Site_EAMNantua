@@ -988,7 +988,7 @@ export default function FicheInscription({
 
           {/* Grille des versements */}
           <div style={S.payGrid}>
-            {Array.from({ length: 10 }, (_, i) => (
+            {Array.from({ length: 8 }, (_, i) => (
               <div key={i} style={S.payGridItem}>
                 <span style={{ color: "#e8272a", fontWeight: 700, minWidth: 14 }}>{i + 1}.</span>
                 <input style={{ ...S.payInput, width: 55 }} placeholder="Montant €" />

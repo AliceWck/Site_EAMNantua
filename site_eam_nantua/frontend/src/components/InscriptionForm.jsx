@@ -1040,10 +1040,10 @@ export default function InscriptionForm() {
               </p>
               <div style={{display:"flex", gap:"0.75rem", flexWrap:"wrap", marginBottom:"1rem"}}>
                 {[
-                  { id: "cheque", label: "🏦 Chèque(s)", info: "À l'ordre de l'EAM Haut-Bugey. Max 10 versements (1/mois), soldé avant fin avril." },
-                  { id: "especes", label: "💶 Espèces", info: "Paiement intégral au bureau. Pas de versements." },
-                  { id: "virement", label: "💳 Virement", info: "Paiement intégral. RIB fourni sur demande." },
-                  { id: "mandat_sepa", label: "📋 Mandat SEPA", info: `Prélèvement automatique. +${tarifs?.frais?.fraisSEPA || 10}€ de frais annuels. Max 10 versements.` },
+                  { id: "cheque", label: "🏦 Chèque(s)", info: "À l'ordre de l'EAM Haut-Bugey. Max 8 versements (1/mois), soldé avant fin avril." },
+                  { id: "especes", label: "💶 Espèces", info: "Paiement au bureau. Possibilité de le faire en plusieurs versements." },
+                  { id: "virement", label: "💳 Virement", info: "RIB fourni sur demande. Possibilité de plusieurs versements." },
+                  { id: "mandat_sepa", label: "📋 Mandat SEPA", info: `Prélèvement automatique. +${tarifs?.frais?.fraisSEPA || 10}€ de frais annuels. Max 8 versements.` },
                 ].map((m) => (
                   <button key={m.id}
                     className={`paiement-btn ${modePaiement.type === m.id ? "active" : ""}`}
@@ -1053,14 +1053,14 @@ export default function InscriptionForm() {
                   </button>
                 ))}
               </div>
-              {modePaiement.type && (modePaiement.type === "cheque" || modePaiement.type === "mandat_sepa") && (
+              {modePaiement.type && (
                 <div style={{display:"flex", alignItems:"center", gap:"1rem", flexWrap:"wrap"}}>
                   <label style={{fontSize:"0.875rem", fontWeight:600}}>Nombre de versements :</label>
                   <select
                     className="ia-select"
                     value={modePaiement.nbFois}
                     onChange={(e) => setModePaiement({ ...modePaiement, nbFois: Number(e.target.value) })}>
-                    {Array.from({length:10},(_,i)=>i+1).map(n => (
+                    {Array.from({length:8},(_,i)=>i+1).map(n => (
                       <option key={n} value={n}>{n} fois{n===1?" (paiement unique)":""}</option>
                     ))}
                   </select>
@@ -1074,14 +1074,14 @@ export default function InscriptionForm() {
               {modePaiement.type === "cheque" && (
                 <div style={{background:"#f0fdf4", borderRadius:8, padding:"0.75rem", marginTop:"0.75rem", fontSize:"0.875rem", color:"#166534", borderLeft:"3px solid #86efac"}}>
                   🏦 <strong>Chèque(s) à l'ordre de :</strong> EAMHB<br/>
-                  À remettre au bureau de l'école. <br/>
+                  À remettre au bureau de l'école, selon le nombre de versements choisi. <br/>
                   <span style={{color:"#dc2626", fontWeight:700}}>⚠️ La totalité des chèques doit être remise à l'école lors de la confirmation de l'inscription.</span>
                 </div>
               )}
               {modePaiement.type === "especes" && (
                 <div style={{background:"#fefce8", borderRadius:8, padding:"0.75rem", marginTop:"0.75rem", fontSize:"0.875rem", color:"#854d0e", borderLeft:"3px solid #fde047"}}>
-                  💶 Règlement en espèces directement au bureau de l'école. <br/>
-                  <span style={{color:"#dc2626", fontWeight:700}}>⚠️ La totalité de la somme doit être réglée en une seule fois.</span>
+                  💶 Règlement en espèces directement au bureau de l'école, selon le nombre de versements choisi. <br/>
+                  {/* <span style={{color:"#dc2626", fontWeight:700}}>⚠️ La totalité de la somme doit être réglée en une seule fois.</span> */}
                 </div>
               )}
               {modePaiement.type === "virement" && (
@@ -1089,7 +1089,8 @@ export default function InscriptionForm() {
                   💳 <strong>Virement bancaire :</strong><br/>
                   IBAN : <strong>FR76 1009 6181 8400 0138 4350 118</strong><br/>
                   BIC : <strong>CMCIFRPP</strong><br/>
-                  <span style={{color:"#dc2626", fontWeight:700}}>⚠️ Le virement doit couvrir la totalité de la facture.</span>
+                  Selon le nombre de versements choisi ci-dessus.
+                  {/* <span style={{color:"#dc2626", fontWeight:700}}>⚠️ Le virement doit couvrir la totalité de la facture.</span> */}
                 </div>
               )}
               {modePaiement.type === "mandat_sepa" && (
