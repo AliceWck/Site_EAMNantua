@@ -649,7 +649,9 @@ export default function FicheInscription({
     const w = window.open('', '_blank', 'width=900,height=700');
     if (!w) return;
 
-    const content = printRef.current?.outerHTML || '';
+     // cloneNode(true) copie l'état RÉEL des champs (value tapée, checked coché...) contrairement à outerHTML qui ne reflète que le HTML initial et ignore tout ce que l'utilisateur a saisi ensuite.
+    const clone = printRef.current?.cloneNode(true);
+    const content = clone?.outerHTML || '';
 
     w.document.write(`<!doctype html>
     <html>
@@ -973,7 +975,7 @@ export default function FicheInscription({
           </div>
           <div style={S.payRow}>
             <span style={{ fontSize: 11, fontWeight: 700 }}>Inscription : paiement en</span>
-            {[1, 2, 3, "X"].map((n) => (
+            {[1, 2, 3].map((n) => (
               <label key={n} style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 11, cursor: "pointer" }}>
                 <input
                   type="checkbox"
@@ -981,9 +983,39 @@ export default function FicheInscription({
                   checked={modePaiement.nbFois === n}
                   onChange={() => setModePaiement((p) => ({ ...p, nbFois: n }))}
                 />
-                {n}{n !== "X" && "X"}
+                {n}X
               </label>
             ))}
+            <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, cursor: "pointer" }}>
+              <input
+                type="checkbox"
+                style={S.payCheckbox}
+                checked={modePaiement.nbFois > 3}
+                onChange={() => {
+                  // Repasse à "1X" si on décoche, sinon garde/initialise à 4
+                  setModePaiement((p) => ({
+                    ...p,
+                    nbFois: p.nbFois > 3 ? 1 : (p.nbFois > 1 ? p.nbFois : 4),
+                  }));
+                }}
+              />
+              <input
+                type="number"
+                min={1}
+                max={8}
+                value={modePaiement.nbFois > 3 ? modePaiement.nbFois : ""}
+                onChange={(e) => {
+                  let val = Number(e.target.value);
+                  if (Number.isNaN(val)) val = 1;
+                  if (val > 8) val = 8;
+                  if (val < 1) val = 1;
+                  setModePaiement((p) => ({ ...p, nbFois: val }));
+                }}
+                style={{ ...S.payInput, width: 34, textAlign: "center" }}
+                placeholder="_"
+              />
+              fois
+            </label>
           </div>
 
           {/* Grille des versements */}
@@ -1038,7 +1070,7 @@ export default function FicheInscription({
         <div style={S.divider} />
 
         {/* ── Droits à l'image */}
-        <div style={S.engSection}>
+        <div style={{...S.engSection, pageBreakBefore: "always", breakBefore: "page" }}>
           <div style={S.engTitle}>Déclaration et Engagement</div>
 
           <div style={S.droitBox}>
