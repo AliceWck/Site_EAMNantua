@@ -1335,12 +1335,21 @@ app.post("/api/inscriptions", (req, res) => {
     const inscriptions = loadInscriptions();
     const annees = loadAnnees();
 
-    // Vérifier que le code généré côté client n'existe pas déjà (très improbable mais sécurité)
-    const code = req.body.code || genCode();
-    if (inscriptions.find((i) => i.code === code)) {
-      // Régénérer si collision
-      req.body.code = genCode();
+    const anneeCourante = annees.courante || null;
+
+    // On vérifie l'unicité du code SEULEMENT au sein de l'année scolaire en cours.
+    // Un code déjà utilisé une année précédente peut être légitimement réutilisé
+    // (et servira plus tard à retrouver/pré-remplir les infos de la famille).
+    let code = req.body.code || genCode();
+    const collisionMemeAnnee = (c) =>
+      inscriptions.some((i) => i.code === c && i.annee === anneeCourante);
+
+    let tentatives = 0;
+    while (collisionMemeAnnee(code) && tentatives < 10) {
+      code = genCode();
+      tentatives++;
     }
+    req.body.code = code;
 
     const newIns = {
       id: Date.now(),
