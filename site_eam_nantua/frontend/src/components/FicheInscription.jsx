@@ -649,9 +649,41 @@ export default function FicheInscription({
     const w = window.open('', '_blank', 'width=900,height=700');
     if (!w) return;
 
-     // cloneNode(true) copie l'état RÉEL des champs (value tapée, checked coché...) contrairement à outerHTML qui ne reflète que le HTML initial et ignore tout ce que l'utilisateur a saisi ensuite.
-    const clone = printRef.current?.cloneNode(true);
-    const content = clone?.outerHTML || '';
+    const original = printRef.current;
+    const clone = original.cloneNode(true);
+
+    // cloneNode ne recopie PAS la valeur/l'état saisi par l'utilisateur pour
+    // les champs non contrôlés (value tapée, checkbox cochée) — seulement les
+    // attributs HTML d'origine. On copie donc manuellement, champ par champ,
+    // l'état RÉEL du DOM vers des attributs HTML dans le clone avant impression.
+    const origFields = original.querySelectorAll('input, textarea, select');
+    const cloneFields = clone.querySelectorAll('input, textarea, select');
+
+    origFields.forEach((origEl, i) => {
+      const cloneEl = cloneFields[i];
+      if (!cloneEl) return;
+      const tag = origEl.tagName.toLowerCase();
+
+      if (tag === 'input') {
+        const type = (origEl.type || 'text').toLowerCase();
+        if (type === 'checkbox' || type === 'radio') {
+          if (origEl.checked) cloneEl.setAttribute('checked', 'checked');
+          else cloneEl.removeAttribute('checked');
+        } else {
+          cloneEl.setAttribute('value', origEl.value ?? '');
+        }
+      } else if (tag === 'textarea') {
+        cloneEl.textContent = origEl.value ?? '';
+      } else if (tag === 'select') {
+        const val = origEl.value;
+        cloneEl.querySelectorAll('option').forEach((opt) => {
+          if (opt.value === val) opt.setAttribute('selected', 'selected');
+          else opt.removeAttribute('selected');
+        });
+      }
+    });
+
+    const content = clone.outerHTML;
 
     w.document.write(`<!doctype html>
     <html>
