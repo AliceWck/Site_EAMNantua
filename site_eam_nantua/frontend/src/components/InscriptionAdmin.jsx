@@ -571,62 +571,93 @@ function ListeInscrits({ showMsg }) {
   });
 
   const exportCSV = () => {
-    const headers = [
-      "Date inscription","Date validation","Année scolaire","N° dossier","Nb membres foyer", "Mode règlement","Mode règlement (type)","Nb échéances","Montant/échéance (€)","Frais SEPA (€)",
-      "Nom","Prénom","Date naissance","Âge","Sexe","Statut",
-      "Adresse","Code postal","Localité","Tél 1","Tél 2","Email",
-      "Niveau scolaire","Établissement","Profession",
-      "Représentant nom","Représentant prénom","Parenté",
-      "Autres membres du foyer",
-      "Activité 1","Instrument 1","Prix base 1€","Réduction 1","Prix final 1€",
-      "Activité 2","Instrument 2","Prix base 2€","Réduction 2","Prix final 2€",
-      "Activité 3","Instrument 3","Prix base 3€","Réduction 3","Prix final 3€",
-      "Activité 4","Instrument 4","Prix base 4€","Réduction 4","Prix final 4€",
-      "Cotisation€","Supplément matériel€","Total élève€","Total foyer (€)",
-      "Droit image","WhatsApp","Assurance","Règlement accepté",
+    // ── Définition des colonnes : UNE SEULE source de vérité ──
+    // Chaque colonne = { label, get(ins, eleve, ei, ctx) }
+    // → impossible que l'en-tête et la donnée se décalent, car ils sont
+    //   définis ensemble, ligne par ligne, ici.
+    const colonnes = [
+      { label: "Date inscription", get: (ins) => new Date(ins.dateInscription).toLocaleDateString("fr-FR") },
+      { label: "Date validation", get: (ins) => ins.dateValidation ? new Date(ins.dateValidation).toLocaleDateString("fr-FR") : "" },
+      { label: "Année scolaire", get: (ins) => ins.annee || "" },
+      { label: "N° dossier", get: (ins) => ins.code || ins.id || "" }, // ✅ code famille, pas l'id technique
+      { label: "Nb membres foyer", get: (ins) => ins.foyer?.nbMembres || 1 },
+      { label: "Mode règlement (foyer)", get: (ins) => ins.foyer?.paiementType || "" },
+      { label: "Mode règlement (type)", get: (ins) => ins.modePaiement?.type || "" },
+      { label: "Nb échéances", get: (ins) => ins.modePaiement?.nbFois || 1 },
+      { label: "Montant/échéance (€)", get: (ins, eleve, ei, ctx) => ctx.perEcheance || "" },
+      { label: "Frais SEPA (€)", get: (ins, eleve, ei, ctx) => ctx.fraisSepaVal || 0 },
+
+      { label: "Nom", get: (ins, eleve) => eleve.nom || "" },
+      { label: "Prénom", get: (ins, eleve) => eleve.prenom || "" },
+      { label: "Date naissance", get: (ins, eleve) => eleve.dateNaissance || "" },
+      { label: "Âge", get: (ins, eleve, ei, ctx) => ctx.age ?? "" },
+      { label: "Sexe", get: (ins, eleve) => eleve.sexe || "" },
+      { label: "Statut civil", get: (ins, eleve, ei, ctx) => ctx.age != null ? (ctx.age >= 18 ? "Majeur" : "Mineur") : "" },
+
+      { label: "Adresse", get: (ins, eleve) => eleve.adresse || "" },
+      { label: "Localité", get: (ins, eleve) => eleve.localite || "" },
+      { label: "Code postal", get: (ins, eleve) => eleve.codePostal ? `="${eleve.codePostal}"` : "" }, // ✅ garde le 0
+
+      { label: "Tél 1", get: (ins, eleve) => eleve.telPerso || "" },
+      { label: "Tél 2", get: (ins, eleve) => eleve.tel2 || "" },
+      { label: "Email", get: (ins, eleve) => eleve.email || "" },
+
+      { label: "Niveau scolaire", get: (ins, eleve) => eleve.niveauScolaire || "" },
+      { label: "Établissement", get: (ins, eleve) => eleve.etablissement || "" },
+      { label: "Profession", get: (ins, eleve) => eleve.profession || "" },
+
+      { label: "Représentant nom", get: (ins, eleve) => eleve.representantNom || "" },
+      { label: "Représentant prénom", get: (ins, eleve) => eleve.representantPrenom || "" },
+      { label: "Parenté", get: (ins, eleve) => eleve.parenté || "" },
+
+      { label: "Autres membres du foyer", get: (ins, eleve, ei) =>
+          (ins.eleves || []).filter((_, i) => i !== ei).map((e) => `${e.prenom} ${e.nom}`).join(" | ") },
+
+      // Activités 1 à 4
+      ...[0, 1, 2, 3].flatMap((i) => [
+        { label: `Activité ${i + 1}`, get: (ins, eleve) => eleve.coursDetails?.[i]?.coursData?.label || "" },
+        { label: `Instrument ${i + 1}`, get: (ins, eleve) => eleve.coursDetails?.[i]?.instrumentId || "" },
+        { label: `Prix base ${i + 1}€`, get: (ins, eleve) => eleve.coursDetails?.[i]?.prixBase ?? "" },
+        { label: `Réduction ${i + 1}`, get: (ins, eleve) => eleve.coursDetails?.[i]?.reductionAppliquee || "—" },
+        { label: `Prix final ${i + 1}€`, get: (ins, eleve) => eleve.coursDetails?.[i]?.prixFinal ?? "" },
+      ]),
+
+      { label: "Cotisation€", get: (ins, eleve) => eleve.cotisation ?? ins.cotisationAnnuelle ?? 25 },
+      { label: "Supplément matériel€", get: (ins, eleve, ei, ctx) => ctx.supMat || 0 },
+      { label: "Total élève€", get: (ins, eleve) => eleve.totalEleve || "" }, // ✅ surligné en vert dans les commentaires ci-dessous
+      { label: "Total foyer€", get: (ins, eleve, ei, ctx) => ctx.total || "" }, // ✅ juste après Total élève
+
+      { label: "Droit image", get: (ins) => ins.engagements?.droitImage || "" },
+      { label: "WhatsApp", get: (ins) => ins.engagements?.whatsapp ? "Oui" : "Non" },
+      { label: "Assurance", get: (ins) => ins.engagements?.assurance ? "Oui" : "Non" },
+      { label: "Règlement accepté", get: (ins) => ins.engagements?.reglement ? "Oui" : "Non" },
     ];
+
+    const headers = colonnes.map((c) => c.label);
     const rows = [];
+
     inscrits.forEach((ins) => {
-      const dateIns = new Date(ins.dateInscription).toLocaleDateString("fr-FR");
       (ins.eleves || []).forEach((eleve, ei) => {
         const age = getAge(eleve.dateNaissance);
         const cours = eleve.coursDetails || [];
         const supMat = cours.reduce((s, c) => s + (c.coursData?.supplementMateriel || 0), 0);
-        const autresMembres = (ins.eleves || []).filter((_, i) => i !== ei).map((e) => `${e.prenom} ${e.nom}`).join(" | ");
 
         const modeType = ins.modePaiement?.type || "";
-        // Ne pas exposer de RIB dans l'export CSV (masquage côté client)
         const nbFois = ins.modePaiement?.nbFois || 1;
         const total = ins.totalGeneral || 0;
         const perEcheance = nbFois > 1 ? Math.round(total / nbFois) : total;
-        const fraisSepaVal = modeType === "mandat_sepa" ? 10 : 0;
+        const fraisSepaVal = modeType === "mandat_sepa" ? (ins.modePaiement?.fraisSepa ?? 10) : 0;
 
-        const row = [
-          dateIns, 
-          ins.dateValidation ? new Date(ins.dateValidation).toLocaleDateString("fr-FR") : "",
-          ins.annee || "", ins.code || ins.id || "", ins.foyer?.nbMembres || 1,
-          ins.foyer?.paiementType || "", modeType, nbFois, perEcheance || "", fraisSepaVal || 0, total || "",
-          eleve.nom || "", eleve.prenom || "", eleve.dateNaissance || "",
-          age ?? "", eleve.sexe || "", age != null ? (age >= 18 ? "Majeur" : "Mineur") : "",
-          eleve.adresse || "", eleve.codePostal ? `="${eleve.codePostal}"` : "", eleve.localite || "",
-          eleve.telPerso || "", eleve.tel2 || "", eleve.email || "",
-          eleve.niveauScolaire || "", eleve.etablissement || "", eleve.profession || "",
-          eleve.representantNom || "", eleve.representantPrenom || "", eleve.parenté || "",
-          autresMembres,
-        ];
-        for (let i = 0; i < 4; i++) {
-          const c = cours[i];
-          if (c) row.push(c.coursData?.label || "", c.instrumentId || "", c.prixBase || "", c.reductionAppliquee || "—", c.prixFinal || "");
-          else row.push("", "", "", "", "");
-        }
-        // Récupérer la cotisation depuis les données de l'inscription en dynamique
-        const cotisationVal = eleve.cotisation ?? ins.cotisationAnnuelle ?? 25;
-        row.push(cotisationVal, supMat || 0, eleve.totalEleve || "");
-        row.push(ins.engagements?.droitImage || "", ins.engagements?.whatsapp ? "Oui" : "Non", ins.engagements?.assurance ? "Oui" : "Non", ins.engagements?.reglement ? "Oui" : "Non");
+        const ctx = { age, supMat, perEcheance, fraisSepaVal, total };
+
+        const row = colonnes.map((col) => col.get(ins, eleve, ei, ctx));
         rows.push(row);
       });
     });
-    const csv = [headers, ...rows].map((r) => r.map((c) => `"${String(c ?? "").replace(/"/g, '""')}"`).join(";")).join("\n");
+
+    const csv = [headers, ...rows]
+      .map((r) => r.map((c) => `"${String(c ?? "").replace(/"/g, '""')}"`).join(";"))
+      .join("\n");
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
